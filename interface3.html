@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="font-awesome/css/all.min.css">
+</head>
+<style>
+    *{
+       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
+   
+   .interface4{
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+       font-family: 'Courier New', monospace;
+        background: #f4f4f4;
+        overflow: hidden;
+    }
+    header{
+    display: flex;
+    height: 6vh;
+    width: 100%;
+    gap: 20px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    }
+    header i, h2{
+        color:rgb(0, 0, 0, 0.9);
+        margin-right: 30px;
+        margin-left: 10px;
+        font-size: 20px;
+    }
+     header nav{
+        display: flex;
+        gap: 20px;
+        margin-left: -600px;
+     }
+     header nav a{
+         text-decoration: none;  
+         color: rgb(0, 0, 0, 0.9);
+     }
+    /*---GAUCHE---*/
+    
+    
+.gauche{
+    width: 220px;
+    background:white; 
+    color:0, 0, 0, 0.7;
+    height: 70vh;
+    gap: 10px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+   flex-direction: column;
+    }
+.gauche .profil{
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 200px;
+    background-color: white;
+    margin-top: 30px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+.gauche .profil .image{
+    width: 80px;
+    height: 80px;
+    background-color: gray;
+    overflow: hidden;
+    border-radius: 50%;
+}
+.gauche .profil .image img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.gauche .profil h1{
+    font-size: 20px;
+    font-weight: 900;
+}
+.gauche .profil h3{
+    font-size: 15px;
+    padding: 8px;
+    background-color: rgb(110, 243, 243);
+    border-radius: 20px;
+    color: white;
+}
+.gauche p{
+    display: flex;
+    flex-direction: row;
+    color: gold;
+    gap: 5px;
+}
+.gauche .cercles{
+    width: 100px;
+    height: 100px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+      box-shadow:  0 2px 6px rgb(134, 128, 128);
+
+}
+.gauche .cercles .cercle{
+    width: 70px;
+    height: 70px;
+    border: 1px solid;
+    border-radius: 50%;
+}
+     /*
+.container{
+        flex: 1;
+        height: 100vh;
+        background-color: #f4f6f8;
+        padding: 20px;
+        background-color: silver;
+        border: 2px solid;
+    }*/
+    .container{
+        height: 93vh;
+        display: flex;
+        flex-direction: row;
+    }
+
+main{
+    flex: 1;
+    padding-left: 20px;
+    background: #f4f4f4;
+    margin-right: 10px;
+}
+.principal{
+    display: flex;
+    background: #f4f4f4;
+    height: 623px;
+    margin-top: 6px;
+    gap: 20px;
+}
+.partie1{
+    width: 65%;
+    height:600px;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+}
+.partie1::-webkit-scrollbar{
+    display: none;
+}
+.partie1 .header{
+    height: 80px;
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    flex-direction: row;
+    padding-right: 40px;
+}
+.partie1 .header .box{
+    height: 80px;
+    width: 150px;
+    background-color: white;
+    border-radius: px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 15px;
+    justify-content: center;
+    font-weight: 100;
+}
+.partie1 .top{
+    border-radius: 20px;
+    background-color: white;
+    height:auto;
+    margin-top: 5px;
+    gap: 10px;
+}
+.partie1 .top .produit{
+    width: 100%;
+    height: 150px;
+    background-color: white;
+    display: flex;
+    border: 1px solid rgb(0, 0, 0, 0.5);
+    border-radius: 10px;
+     flex-direction: row;
+     gap: 20px;
+}
+
+.partie1 .description{
+        height: 100px;
+        width: 100%;
+        background-color:white;
+        margin-top: 10px;
+        border: 1px solid rgb(0, 0, 0, 0.5);
+        border-radius: 10px;
+}
+.partie1 .bottom{
+        height: 100px;
+        width:100%;
+        margin-top: 20px;
+        background-color:white;
+        border-radius: 10px;
+        border: 1px solid rgb(0, 0, 0, 0.5);
+}
+.partie2{
+    background:white;
+    width: 25%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    margin-right: 20px;
+    flex-direction: column;
+}
+.partie2 nav{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 100px;
+    height:400px;
+    width: 260px;
+    background-color: green;
+}
+.partie2 nav i,h4{
+    background-color: white;
+    padding: 4px;
+    color: red;cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    box-shadow:  0 2px 6px rgb(0, 0, 0, 0.4);
+}
+ul{
+        list-style: none;
+         margin-right: 40px;
+    }
+    ul li i{
+        color:rgb(0, 0, 0, 0.5);
+        margin-right: 10px;
+    }
+    ul li{
+      margin: 15px 0;
+      cursor: pointer;
+      margin-left: 40px;
+    }
+    
+
+
+</style>
+<body>
+    <div class="interface4">
+                <header>
+        <h2>IZORKU</h2>
+        <nav>
+            <a href="#">Evenement</a>
+            <a href="#">Evenement</a>
+            <a href="#">Evenement</a>
+            <a href="#">Evenement</a>
+            <a href="#">Evenement</a>
+        </nav>
+        <div class="header-icones">
+            <i class="fas fa-search"></i>
+        </div>
+    </header>
+    <div class="container">
+        <div class="gauche">
+            <div class="profil">
+                <div class="image">
+                    <img src="image6.jpg" alt="profil">
+                </div>
+                <h1>warakoze granie</h1>
+                <h3>pourquoi java?</h3>
+            </div>
+            <p>
+             <i class="fas fa-star"></i>
+             <i class="fas fa-star"></i>
+             <i class="fas fa-star"></i>
+             <i class="fas fa-star"></i>
+             <i class="fas fa-star"></i>
+            </p>
+            reparation
+            <div class="cercles">
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                    <defs>
+                    <linearGradient id="circleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="yellow" />
+                        <stop offset="100%" stop-color="teal" />
+                    </linearGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="50" stroke="#eee" stroke-width="4" fill="none" />
+                    <circle cx="60" cy="60" r="50" stroke="url(#circleGradient)" stroke-width="4"
+                            fill="none" stroke-dasharray="315" stroke-dashoffset="90"
+                             transform="rotate(-90 60 60)" />
+                    <text x="60" y="65" text-anchor="middle" font-size="20" fill="#004" font-weight="bold">710</text>
+                </svg>
+                <h6 >IWOKKU Credit</h6>  
+            </div>
+        </div>
+        <main>
+            <div class="principal">
+                <div class="partie1">
+                    <div class="header">
+                        <div class="box">
+                            <h1>26</h1>
+                            <h6>somme</h6>
+                        </div>
+                        <div class="box">
+                            <h1>7</h1>
+                            <h6>cultures</h6>
+                        </div>
+                        <div class="box">
+                            <h1>2508</h1>
+                            <h6>produit</h6>
+                        </div>
+                        <div class="box">
+                            <h1>25</h1>
+                            <h6>resultat</h6>
+                        </div>
+                    </div>
+                    <div class="top">
+                      <div class="produit"></div>
+                        <div class="description"></div>
+                        <div class="bottom">
+                        </div><div class="bottom">
+                        </div><div class="bottom">
+                        </div><div class="bottom">
+                        </div><div class="bottom">
+                        </div><div class="bottom">
+                        </div><div class="bottom">
+                        </div><div class="bottom">
+
+                    </div>
+                    </div>
+            
+                </div>
+                <div class="partie2">
+                <!--<nav>
+                        <h4>share</h4>
+                        <i class="fas fa-gem"></i>
+                        <i class="fas fa-gem"></i>
+                        <i class="fas fa-gem"></i>
+                        <i class="fas fa-gem"></i>
+                        <i class="fas fa-gem"></i>
+                    </nav>-->
+                    <ul>
+                        <li>Main Menu</li>
+                            <li><i class="fas fa-gem"></i>Overview</li>
+                            <li><i class="fas fa-chart-line"></i>Analytics</li>
+                            <li><i class="fas fa-box"></i>product</li>
+                            <li><i class="fas fa-dollar-sign"></i>sales</li>
+                            <li>transation</li>
+                            <li><i class="fas fa-credit-card"></i>payment</li>
+                            <li><i class="fas fa-rotate-left"></i>Refunds</li>
+                            <li><i class="fas fa-file-invoice"></i>invoice</li>
+                            <li><i class="fas fa-undo-alt"></i>Returns</li>
+                    </ul>
+                </div>
+            </div>
+    </main>
+    </div> 
+    </div>
+</body>
+</html>
