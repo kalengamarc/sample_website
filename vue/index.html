@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TermaDevs — Futuriste</title>
+<link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <!-- simple SVG telecom-ish logo -->
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <path d="M4 12c2-4 8-8 12-4" stroke="#04221a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="4" fill="#04221a" />
+          <path d="M20 4l-4 4" stroke="#fff" stroke-opacity="0.06" stroke-width="1.2" />
+        </svg>
+      </div>
+      <div>
+        <h1>JosNet</h1>
+        <p>Vente Télécom • Dev • Formation • Coaching</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="btn">Produits</button>
+      <button class="btn">Services</button>
+      <button class="btn">Contact</button>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero reveal" id="hero">
+    <div class="hero-left">
+      <div class="kicker">NOUVEAU • Réseau & Solutions</div>
+      <h2 class="title">Construisons l'infrastructure numérique du futur</h2>
+      <p class="subtitle">JosNet fournit équipements télécom, développement sur-mesure et formations pratiques pour accélérer la transformation digitale.</p>
+      <img src="images/image1.png" alt="" class="hero-image" style="width:100%;max-width:400px;box-shadow:0 8px 24px rgba(0,0,0,0.1);border-radius:12px;">
+      <div class="hero-cta">
+        <button class="cta-primary">Demander un devis</button>
+        <button class="cta-ghost">Nos formations</button>
+      </div>
+      <!-- tiny neon accent -->
+      <div style="position:absolute;right:-80px;top:-20px;width:280px;height:280px;border-radius:50%;
+                  background:radial-gradient(circle at 30% 30%, rgba(5,240,122,0.06), transparent);
+                  filter:blur(30px);pointer-events:none;"></div>
+    </div>
+
+    <aside class="hero-right">
+      <!-- three small summary cards with tilt and neon glow -->
+      <div class="card reveal" data-tilt>
+        <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
+        <div class="icon">
+          <!-- SVG icon -->
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 3v6" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/><path d="M5 12h14" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/><path d="M6 19h12" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Installations pro</h3>
+          <p>Déploiement de réseaux & optimisation des performances.</p>
+        </div>
+      </div>
+
+      <div class="card reveal" data-tilt>
+        <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
+        <div class="icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h7" stroke="#00ffc2" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Formations & certifications</h3>
+          <p>Modules pratiques: réseau, dev, sécurité, soft skills.</p>
+        </div>
+      </div>
+
+      <div class="card reveal" data-tilt>
+        <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
+        <div class="icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h3>Support 24/7</h3>
+          <p>Assistance technique et maintenance réactive sur site.</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section class="reveal" id="features">
+    <div class="grid">
+      <article class="card" data-tilt>
+        <div class="neon-outline"></div>
+        <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <div>
+          <h3>Equipements Télécom</h3>
+          <p>Antennes, routeurs, switches, câbles et solutions sur-mesure.</p>
+        </div>
+      </article>
+
+      <article class="card" data-tilt>
+        <div class="neon-outline"></div>
+        <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="#00ffc2" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div>
+          <h3>Développement</h3>
+          <p>Solutions web & mobile: e-commerce, ERP, systèmes de gestion.</p>
+        </div>
+      </article>
+
+      <article class="card" data-tilt>
+        <div class="neon-outline"></div>
+        <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3v18" stroke="#05f07a" stroke-width="1.6" /></svg></div>
+        <div>
+          <h3>Formations pratiques</h3>
+          <p>Ateliers intensifs: CCNA-like, dev, sécurité, cloud et plus.</p>
+        </div>
+      </article>
+
+      <article class="card" data-tilt>
+        <div class="neon-outline"></div>
+        <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M6 12l4 4 8-8" stroke="#00ffc2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <div>
+          <h3>Conseil & audit</h3>
+          <p>Études d'architecture, optimisation coûts & sécurité.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="reveal">
+    <small>&copy; <span id="year"></span> TermaDevs — Construit pour l'avenir </small>
+  </footer>
+</div>
+
+<script>
+/* ======================================================
+   CANVAS PARTICLES (lightweight)
+   ====================================================== */
+(() => {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = innerWidth;
+  let h = canvas.height = innerHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = w * dpr; canvas.height = h * dpr; canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  ctx.scale(dpr, dpr);
+
+  const particles = [];
+  const NUM = Math.floor((w*h)/90000); // scalable count
+  for(let i=0;i<NUM;i++){
+    particles.push({
+      x: Math.random()*w,
+      y: Math.random()*h,
+      r: 0.6 + Math.random()*1.6,
+      vx: (Math.random()-0.5)*0.25,
+      vy: (Math.random()-0.5)*0.25,
+      life: Math.random()*100
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    // subtle gradient glow center
+    const g = ctx.createRadialGradient(w*0.15,h*0.1,0,w*0.5,h*0.5,Math.max(w,h));
+    g.addColorStop(0,'rgba(5,240,122,0.03)');
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+
+    for(const p of particles){
+      p.x += p.vx; p.y += p.vy; p.life += 0.02;
+      if(p.x < -10) p.x = w+10;
+      if(p.x > w+10) p.x = -10;
+      if(p.y < -10) p.y = h+10;
+      if(p.y > h+10) p.y = -10;
+
+      ctx.beginPath();
+      const alpha = 0.12 + 0.3*Math.sin(p.life*0.05);
+      ctx.fillStyle = `rgba(5,240,122,${alpha})`;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  // handle resize
+  addEventListener('resize', ()=> {
+    w = canvas.width = innerWidth;
+    h = canvas.height = innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr; canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.scale(dpr,dpr);
+  });
+  draw();
+})();
+
+/* ======================================================
+   SCROLL REVEAL (IntersectionObserver)
+   ====================================================== */
+(() => {
+  const elems = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('show');
+        // once shown keep it
+      }
+    });
+  }, {threshold: 0.12});
+  elems.forEach(e => io.observe(e));
+})();
+
+/* ======================================================
+   TILT EFFECT (mouse) for elements with data-tilt
+   lightweight, not using any lib
+   ====================================================== */
+(() => {
+  const tiltables = document.querySelectorAll('[data-tilt]');
+  tiltables.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    el.style.transformStyle = 'preserve-3d';
+    function handle(e){
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left)/r.width;
+      const py = (e.clientY - r.top)/r.height;
+      const rx = (py - 0.5) * 12; // rotateX
+      const ry = (px - 0.5) * -12; // rotateY
+      el.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(4px)`;
+    }
+    function reset(){ el.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)'; }
+    el.addEventListener('mousemove', handle);
+    el.addEventListener('mouseleave', reset);
+    // touch fallback: small pop
+    el.addEventListener('touchstart', ()=> el.style.transform = 'translateY(-6px) scale(1.02)');
+    el.addEventListener('touchend', reset);
+  });
+})();
+
+/* ======================================================
+   Misc: year & accessibility (reduce motion)
+   ====================================================== */
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
