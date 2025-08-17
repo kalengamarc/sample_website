@@ -260,7 +260,25 @@
     opacity:1;
     transform:translateY(0) scale(1);
 }
-
+/* =========================
+     profil
+     ========================= */
+.user_message > div{
+  width: 40px;
+  height: 40px;
+  background: #e6f5ee;
+  border-radius: 50%;
+}
+.user_message{
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 10px;
+  z-index: 1000;
+}
   /* =========================
      footers, small screens
      ========================= */
