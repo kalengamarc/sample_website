@@ -266,7 +266,7 @@
 .user_message > div{
   width: 40px;
   height: 40px;
-  background: #e6f5ee;
+  background: var(--neon);
   border-radius: 50%;
 }
 .user_message{
