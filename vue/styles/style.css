@@ -311,12 +311,12 @@
 }
 .user_message{
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 5px !important;
+  right: 5px !important;
   display: flex;
   flex-direction: row;
   gap: 5px;
-  z-index: 1000px;
+  z-index: 1000;
 }
 
     *{
