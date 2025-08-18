@@ -302,6 +302,22 @@
      Responsive tweaks
      ========================= */
   @media (max-width:980px){
+    
+  .user_message > div{
+  width: 20px;
+  height: 20px;
+  background: var(--neon);
+  border-radius: 50%;
+}
+.user_message{
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  z-index: 1000px;
+}
 
     *{
         padding:0px;
