@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Pseudo-classes CSS Démo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    /* :link et :visited */
+    a:link {
+      color: blue;
+    }
+    a:visited {
+      color: purple;
+    }
+
+    /* :hover et :focus */
+    a:hover, button:hover {
+      background: yellow;
+    }
+    input:focus {
+      border: 2px solid green;
+    }
+
+    /* :target */
+    #news:target {
+      background: lightyellow;
+      border: 2px solid orange;
+    }
+
+    /* :checked */
+    input:checked + label {
+      color: green;
+      font-weight: bold;
+    }
+
+    /* :default */
+    input:default + label {
+      border: 1px solid blue;
+      padding: 2px 5px;
+    }
+
+    /* :disabled et :enabled */
+    input:disabled {
+      background: lightgray;
+    }
+    input:enabled {
+      background: white;
+    }
+
+    /* :empty */
+    p:empty {
+      border: 1px dashed red;
+      height: 20px;
+    }
+
+    /* :first-child et :first-of-type */
+    div.demo p:first-child {
+      color: red;
+    }
+    div.demo p:first-of-type {
+      font-style: italic;
+    }
+
+    /* :last-child et :last-of-type */
+    div.demo p:last-child {
+      color: blue;
+    }
+    div.demo p:last-of-type {
+      font-weight: bold;
+    }
+
+    /* :focus-within */
+    .zone:focus-within {
+      background: lightblue;
+      padding: 5px;
+    }
+
+    /* :invalid et :valid */
+    input:invalid {
+      border: 2px solid red;
+    }
+    input:valid {
+      border: 2px solid green;
+    }
+
+    /* :not() */
+    p:not(.important) {
+      color: gray;
+    }
+
+    /* :nth-child */
+    ul li:nth-child(odd) {
+      background: #eee;
+    }
+    ul li:nth-child(even) {
+      background: #ddd;
+    }
+
+    /* :only-child */
+    .seul p:only-child {
+      background: lightgreen;
+    }
+  </style>
+</head>
+<body>
+  <h1>Démo des Pseudo-classes CSS</h1>
+
+  <h2>:link, :visited, :hover, :target</h2>
+  <p><a href="#news">Aller à la section News</a></p>
+  <div id="news">
+    <h3>Section News</h3>
+    <p>Tu es arrivé ici avec l’ancre #news.</p>
+  </div>
+
+  <h2>:checked, :default</h2>
+  <input type="checkbox" id="c1">
+  <label for="c1">Option 1</label><br>
+  <input type="radio" name="choix" id="r1" checked>
+  <label for="r1">Par défaut</label>
+  <input type="radio" name="choix" id="r2">
+  <label for="r2">Autre choix</label>
+
+  <h2>:disabled, :enabled</h2>
+  <input type="text" value="Actif">
+  <input type="text" value="Inactif" disabled>
+
+  <h2>:empty</h2>
+  <p>Non vide</p>
+  <p></p>
+
+  <h2>:first-child, :first-of-type, :last-child, :last-of-type</h2>
+  <div class="demo">
+    <p>Premier paragraphe</p>
+    <span>Je suis un span</span>
+    <p>Deuxième paragraphe</p>
+    <p>Dernier paragraphe</p>
+  </div>
+
+  <h2>:focus, :focus-within</h2>
+  <div class="zone">
+    <input type="text" placeholder="Tape ici">
+  </div>
+
+  <h2>:valid et :invalid</h2>
+  <input type="email" placeholder="Entrez un email">
+
+  <h2>:not()</h2>
+  <p class="important">Important</p>
+  <p>Normal</p>
+
+  <h2>:nth-child</h2>
+  <ul>
+    <li>Élément 1</li>
+    <li>Élément 2</li>
+    <li>Élément 3</li>
+    <li>Élément 4</li>
+  </ul>
+
+  <h2>:only-child</h2>
+  <div class="seul">
+    <p>Je suis seul</p>
+  </div>
+  <div class="seul">
+    <p>Pas seul 1</p>
+    <p>Pas seul 2</p>
+  </div>
+</body>
+</html>
