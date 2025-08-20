@@ -7,10 +7,10 @@
 <link rel="stylesheet" href="styles/style.css" />
 </head>
 <body>
-<div class="user_message">
-  <div class="panier"></div>
-  <div class="notification"></div>
-  <div class="profil"></div>
+<div class="user_message" >
+  <a href=""><div class="panier" data-tooltip="panier"></div></a>
+  <a href=""><div class="notification" data-tooltip="notification"></div></a>
+  <a href=""><div class="profil" data-tooltip="Profil"></div></a>
 </div>
 <canvas id="bg-canvas"></canvas>
 
@@ -64,46 +64,51 @@
 
     <aside class="hero-right">
       <!-- three small summary cards with tilt and neon glow -->
-      <div class="card reveal" data-tilt>
-        <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
-        <div class="icon">
-          <!-- SVG icon -->
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 3v6" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/><path d="M5 12h14" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/><path d="M6 19h12" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg>
-        </div>
-        <div>
-          <h3>Installations pro</h3>
-          <p>Déploiement de réseaux & optimisation des performances.</p>
-        </div>
+      <a href="installatin.html">
+          <div class="card reveal" data-tilt>
+                <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
+                  <div class="icon">
+                    <!-- SVG icon -->
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 3v6" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/><path d="M5 12h14" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/><path d="M6 19h12" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg>
+                  </div>
+                  <div>
+                    <h3>Installations pro</h3>
+                    <p>Déploiement de réseaux & optimisation des performances.</p>
+                  </div>
+          </div>
+      <a href="formation_certification.html">
+        <div class="card reveal" data-tilt>
+            <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
+            <div class="icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h7" stroke="#00ffc2" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <h3>Formations & certifications</h3>
+              <p>Modules pratiques: réseau, dev, sécurité, soft skills.</p>
+            </div>
       </div>
+      </a>
 
-      <div class="card reveal" data-tilt>
-        <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
-        <div class="icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h10M4 17h7" stroke="#00ffc2" stroke-width="1.6" stroke-linecap="round"/></svg>
-        </div>
-        <div>
-          <h3>Formations & certifications</h3>
-          <p>Modules pratiques: réseau, dev, sécurité, soft skills.</p>
-        </div>
+      <a href="support.html">
+        <div class="card reveal" data-tilt>
+          <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
+          <div class="icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <h3>Support 24/7</h3>
+            <p>Assistance technique et maintenance réactive sur site.</p>
+          </div>
       </div>
-
-      <div class="card reveal" data-tilt>
-        <div class="neon-outline" style="inset:-8px;border-radius:12px"></div>
-        <div class="icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg>
-        </div>
-        <div>
-          <h3>Support 24/7</h3>
-          <p>Assistance technique et maintenance réactive sur site.</p>
-        </div>
-      </div>
+      </a>
     </aside>
   </section>
 
   <!-- FEATURES GRID -->
   <section class="reveal" id="features">
     <div class="grid">
-      <article class="card" data-tilt>
+      <a href="equipement.html">
+        <article class="card" data-tilt>
         <div class="neon-outline"></div>
         <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="#05f07a" stroke-width="1.6" stroke-linecap="round"/></svg></div>
         <div>
@@ -111,8 +116,10 @@
           <p>Antennes, routeurs, switches, câbles et solutions sur-mesure.</p>
         </div>
       </article>
+      </a>
 
-      <article class="card" data-tilt>
+      <a href="">
+        <article class="card" data-tilt>
         <div class="neon-outline"></div>
         <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="#00ffc2" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
         <div>
@@ -120,8 +127,10 @@
           <p>Solutions web & mobile: e-commerce, ERP, systèmes de gestion.</p>
         </div>
       </article>
+      </a>
 
-      <article class="card" data-tilt>
+      <a href="formationpratique.html">
+        <article class="card" data-tilt>
         <div class="neon-outline"></div>
         <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3v18" stroke="#05f07a" stroke-width="1.6" /></svg></div>
         <div>
@@ -130,14 +139,15 @@
         </div>
       </article>
 
-      <article class="card" data-tilt>
+      </a>
+      <a href=""><article class="card" data-tilt>
         <div class="neon-outline"></div>
         <div class="icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M6 12l4 4 8-8" stroke="#00ffc2" stroke-width="1.6" stroke-linecap="round"/></svg></div>
         <div>
           <h3>Conseil & audit</h3>
           <p>Études d'architecture, optimisation coûts & sécurité.</p>
         </div>
-      </article>
+      </article></a>
     </div>
   </section>
 
