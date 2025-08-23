@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<style>
+    :root{
+      --shadow: 2px 10px 8px rgba(83, 163, 83, 0.15);
+      --color1: #1f5d1f;
+      --color2:  rgba(44, 122, 44, 0.75);
+      --color3: #f4f9f4;
+    }
+
+</style>
+<body>
+   <div class="page_connexion">
+        <div class="connexion-container">
+            <h1>ENA</h1>
+            <h2>connexion a MyENA</h2>
+            <form action="">
+                <p>entrez vos identifiants pour acceder a votre compte</p><br>
+                <label for="">Email</label>
+                <input type="text" placeholder="Mot de passe" required>
+                <label for="">Mot de passe</label><!----
+               <div class="password-container">
+                    <input type="password" id="password" placeholder=" Votre mot de passe"  required>
+                    <span class="toggle-password" onclick="togglepassord()"> <i class="fa fa-eye"></i></span>
+               </div>-->
+               <div class="password-container">
+                <input type="password" id="password" placeholder="Votre mot de passe">
+                <span class="toggle-password" onclick="togglePassword()">
+                    <i class="fa fa-eye"></i>
+                </span>
+                </div>
+                <p><a href="">Mot de passe oublie?</a></p>
+                <button type="submit">se connecter</button>
+                <div class="register-link">
+                    <p>pas encore de compte ?<a href="login.html">        S'inscrire</a></p>
+                 </div>
+            </form>
+        </div> 
+        
+    </div><!--
+    <script>
+        function toggle-password(){
+            const input=document.getElementById("password");
+            input.type=input.type==="password" ? "text" : "password";
+        }
+    </script>-->
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("password");
+            input.type = input.type === "password" ? "text" : "password";
+        }
+    </script>
+</body>
+</html>

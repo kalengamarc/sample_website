@@ -102,10 +102,10 @@
 /* les boutons sont les trois contacts services et produits */
   .btn{
     background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06);
     color:var(--neon);
     padding:10px 14px;
     border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
     font-weight:600;
     cursor:pointer;
     transition:transform .18s ease, box-shadow .18s ease;
@@ -135,6 +135,11 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     position:relative;
     overflow:hidden;
+  }
+  .contenu_contact_bottom{
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .kicker{
@@ -295,8 +300,20 @@
 .user_message > a div{
   width: 20px;
   height: 20px;
-  background: var(--neon);
+  padding:18px;
+  background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.06);
   border-radius: 50%;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  color:gold;
+  font-size: 22px;
+}
+
+.user_message > a {
+  text-decoration: none;
 }
 .user_message{
   position: absolute;
@@ -418,15 +435,14 @@
         content: attr(data-tooltip);
         padding: 2px 10px;
         text-align: center;
-        top: 25px;
+        top: 40px;
+         background-color:gold;
         left: -15px;
         font-size: 13px;
         color: white;
         border-radius: 2px;
         color:  rgba(0,0,0,0.7);
-        transition: transform 0.3;
-        background-color: #fff;
-        
+        transition: transform 0.3; 
     }
     
      .notification{
@@ -437,13 +453,13 @@
         content: attr(data-tooltip);
         padding: 2px 5px;
         text-align: center;
-        top: 25px;
+        top: 40px;
+         background-color: gold;
         left: -15px;
         font-size: 13px;
         color: white;
         border-radius: 5px;
         color:  rgba(0,0,0,0.7);
-        background-color: #fff;
     }
     
     .profil{
@@ -454,12 +470,370 @@
         content: attr(data-tooltip);
         padding: 2px 10px;
         text-align: center;
-        top: 25px;
+        top: 40px;
+        background-color: gold;
         left: -15px;
         font-size: 13px;
-        color: white;
         border-radius: 5px;
         color:  rgba(0,0,0,0.7);
-        background-color: #fff;
         border:1px solid rgba(224, 10, 10, 0.06);
     }
+
+    /* =========================
+     LOGININTERFACE
+     ========================= */
+
+
+
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    body{
+         height: 130vh;
+        width: 100%;
+    }
+    .form_inscription{
+        height: 130vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
+        overflow: hidden;
+    }
+    .form_inscription::-webkit-scrollbar{
+        display: none;
+    }
+    #ena{
+        color: green;
+        font-size: 40px;
+    }
+   form{
+        width:500px;
+        height: 750px;
+        background:linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
+        border-radius: 10px;
+        margin-bottom: 20px;
+        color: white;
+        box-shadow: 2px 2px 15px gold;
+    }
+   form .contenuedesinput{
+        margin: 10px;
+        text-align: center;
+       
+    }
+    form .contenuedesinput h4{
+        color: black;
+        font-size: 18px;
+        font-weight: bolder;
+        margin: 10px;
+    }
+  
+   form .contenuedesinput .input{
+        display: flex;
+        align-items: start;
+        justify-content: start;
+        gap: 5px;
+        flex-direction: column;
+        padding: 5px;
+    }
+    
+     form .contenuedesinput .mt{
+        margin: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #code_phone_contry{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #surenamename{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    #surenamename .divename{
+        display: flex;
+        align-items: start;
+        justify-content: start;
+        flex-direction: column;
+    }
+    #surenamename .divename input{
+        width:85%;
+        flex-direction: column;
+        padding: 8px;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+        background-color: rgb(54, 53, 53);
+        margin-right: 40px;
+     }
+    #surenamename .divename input:focus{
+        border: 1px solid gold;
+        color: white;
+    }
+    #surenamename .divsurename label{
+        font-size: 14px;
+        font-weight: 100;
+        margin-bottom: -20px;
+     }
+     #surenamename .divename label{
+        margin-bottom: -17px;
+        font-size: 14px;
+        font-weight: 100;
+     }
+     
+    #surenamename .divsurename {
+        display: flex;
+        align-items: start;
+        justify-content: start;
+        flex-direction: column;
+    }
+    #surenamename .divsurename input{
+        width: 90%;
+        flex-direction: column;
+        padding: 8px;
+        margin-left:24px;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+         background-color: rgb(54, 53, 53);
+       
+     }
+     #surenamename .divsurename label{
+        margin-left: 20px;
+     }
+     #surenamename .divsurename input:focus{
+        border: 1px solid gold;
+        color: white;
+     }
+    form .contenuedesinput .input #labell{
+        font-size: 14px;
+        font-weight: 100;
+        margin-top: 2px;
+         margin-left: 10px;
+    }
+    form .contenuedesinput .input #input12{
+        padding: 8px;
+        outline: none;
+        border: none;
+        width: 95%;
+        border-radius: 5px;
+        background-color: rgb(54, 53, 53);
+        margin-left: 10px;
+    }
+    form .contenuedesinput .input #input12:focus{
+        border: 1px solid gold;
+        color: white;
+    }
+    
+    .botton_part{
+        display: flex;
+        align-items: start;
+        justify-content: start;
+        flex-direction: column;
+        font-size: 12px;
+    }
+    #rightpassword{
+        margin-left: 100px;
+        justify-content: center;
+        float: center;
+        margin-top: 5px;
+        font-size: 15px;
+    }
+    .validation_{
+        display: flex;
+        align-items: start;
+        justify-content: start;
+    }
+    .botton_part p{
+        font-size: 12px;
+        color: green;
+        margin-left: 5px;
+    }
+    .conf_mess{
+        display: flex;
+        align-items: center;
+        justify-content:center;
+        margin-top: 10px;
+        font-size: 14px;
+        margin-left: 10px;
+    }
+    
+    .style_check{
+        width: 15px;
+        height: 15px;
+        accent-color: gold;
+        margin-bottom: 5px;
+    }
+    .cond_fonc{
+        color: rgb(137, 137, 207);
+        font-weight: 900;
+        font-size: 12px;
+    }
+    #create_macount{
+        padding: 8px;
+        width: 95%;
+        background-color:rgb(33, 83, 33);
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        opacity: 0.8;
+        margin-top: 18px;
+    }
+    #create_macount:hover{
+       background-color: gold;
+        color: black;
+       opacity: 0.5;
+    }
+    #create_macount a{
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        
+    }
+    .fina_inf{
+        font-size: 14px;
+        margin-top:25px;
+    }
+    .fina_inf a{ 
+        text-decoration: none;
+        color: gold;
+        opacity: 0.8;
+    }
+   #retour{
+    margin-top: 8px;
+    font-size: 14px;
+    color: gold;
+    opacity: 0.8;
+   }
+
+/* =========================
+     SE CONNECTER
+     ========================= */
+
+
+
+
+
+   *{
+ margin: 0;
+ padding: 0;
+}
+.page_connexion{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}   
+.page_connexion>.connexion-container{
+    border-radius: 10px;
+    background-color: white ;
+    background:linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
+    width: 400px;
+    height:500px;
+    box-shadow: 1px 2px 8px gold;
+    position: relative;
+    z-index: 1;
+}
+.page_connexion>.connexion-container p{
+    color:white;
+    font-size: 15px;
+}
+.page_connexion form{
+    
+    min-width:  200px;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.page_connexion .connexion-container h1{
+    color:var(--neon);
+    text-align: center ;
+    margin-top: 20px;
+    font-size: 30px;
+}
+.page_connexion .connexion-container h2{
+     color:white ;
+    text-align: center ;
+}
+.page_connexion label{
+    color:white;
+}
+.page_connexion input{
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    color:rgb(0,0,0,0.7);
+    border: 1px solid silver;
+    width: 100%;
+    padding-right: 35px;
+    padding: 10px;
+    height: 35px;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+  .page_connexion  input:focus{
+    outline: none;
+    font-weight: 600;
+    padding-left: 10px;
+    border: 2px solid gold;
+  }
+.page_connexion .password-container {
+  position: relative;
+  width: 100%;
+}
+.page_connexion .password-container i{
+    color:black;
+}
+.password-container input {
+  width: 100%;
+  padding-right: 35px;
+  padding: 10px;
+}
+
+.page_connexion .toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  cursor: pointer;
+}
+
+.page_connexion button{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    background-color: #1e90ff;
+    background:linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
+    color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+.page_connexion button:hover{
+    background-color: gold;
+    opacity: 0.6;
+}
+.page_connexion .toggle-password{
+    margin-right: 5px;
+}
+.page_connexion  p a{
+    color: #1e90ff;
+    text-decoration: none;
+}
+.page_connexion .register-link{
+    margin: 40px;
+}
