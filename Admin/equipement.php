@@ -14,50 +14,7 @@
       box-sizing: border-box;
       font-family: sans-serif;
     }
-    .equipement_admin{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100vh;
-    }
-   .contain{
-        display: flex;
-        flex-direction: column;
-        border-radius: 10px;
-        display: flex;
-        width:95%;
-        align-items: center;
-        height: 90vh;
-        justify-content: center;
-    }
     
- table {
-      border-collapse: collapse;
-      width: 100%;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    th, td {
-      padding: 20px 15px;
-      text-align: left;
-    }
-
-    th {
-      background: #f0f2f5;
-      font-weight: bold;
-    }
-
-    tr:not(:last-child) {
-      border-bottom: 1px solid #e5e5e5;
-    }
-
-    td {
-      font-size: 14px;
-    }
 </style>
 <body>
     <div class="equipement_admin">
@@ -89,8 +46,8 @@
                                 <td>300 €</td>
                                 <td>15</td>
                                 </tr>
-                            </table>
-                    </div>
+                          </table>
+                      </div>
                 </main>
         </div> 
     </div>

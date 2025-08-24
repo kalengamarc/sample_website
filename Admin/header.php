@@ -47,6 +47,11 @@
         margin-right: 20px;
         cursor: pointer;
     }
+      .text_right a{
+        text-decoration: none;
+        color:white;
+        font-weight:600;
+      }
     </style>
     <title>Document</title>
 </head>
@@ -55,14 +60,14 @@
        <div class="dash_tete">
                 <div class="text_left">
                     <i class="fas fa-user"></i>
-                    <p>Centre de formtion</p>
+                    <p>Centre de formation</p>
                 </div>
                 <div class="text_right">
                     <i class=" fas fa-envelope"></i>
                     <i class="fas fa-bell"></i>
                     <i class="fas fa-trash"></i>
                     <i class=" fas fa-cog"></i>
-                    <p>Deconnection</p>
+                    <a href=""><p>Deconnection</p></a>
                 </div>
             </div>
     </div> 
