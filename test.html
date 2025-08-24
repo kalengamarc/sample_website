@@ -1,178 +1,181 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Pseudo-classes CSS Démo</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    /* :link et :visited */
-    a:link {
-      color: blue;
-    }
-    a:visited {
-      color: purple;
-    }
-
-    /* :hover et :focus */
-    a:hover, button:hover {
-      background: yellow;
-    }
-    input:focus {
-      border: 2px solid green;
-    }
-
-    /* :target */
-    #news:target {
-      background: lightyellow;
-      border: 2px solid orange;
-    }
-
-    /* :checked */
-    input:checked + label {
-      color: green;
-      font-weight: bold;
-    }
-
-    /* :default */
-    input:default + label {
-      border: 1px solid blue;
-      padding: 2px 5px;
-    }
-
-    /* :disabled et :enabled */
-    input:disabled {
-      background: lightgray;
-    }
-    input:enabled {
-      background: white;
-    }
-
-    /* :empty */
-    p:empty {
-      border: 1px dashed red;
-      height: 20px;
-    }
-
-    /* :first-child et :first-of-type */
-    div.demo p:first-child {
-      color: red;
-    }
-    div.demo p:first-of-type {
-      font-style: italic;
-    }
-
-    /* :last-child et :last-of-type */
-    div.demo p:last-child {
-      color: blue;
-    }
-    div.demo p:last-of-type {
-      font-weight: bold;
-    }
-
-    /* :focus-within */
-    .zone:focus-within {
-      background: lightblue;
-      padding: 5px;
-    }
-
-    /* :invalid et :valid */
-    input:invalid {
-      border: 2px solid red;
-    }
-    input:valid {
-      border: 2px solid green;
-    }
-
-    /* :not() */
-    p:not(.important) {
-      color: gray;
-    }
-
-    /* :nth-child */
-    ul li:nth-child(odd) {
-      background: #eee;
-    }
-    ul li:nth-child(even) {
-      background: #ddd;
-    }
-
-    /* :only-child */
-    .seul p:only-child {
-      background: lightgreen;
-    }
-  </style>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; }
+  .wrap { position: relative; max-width: 720px; margin: auto; }
+  .view {
+    overflow: hidden; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.1);
+  }
+  .track {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 100%;
+    scroll-behavior: smooth; overflow-x: auto; overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .track::-webkit-scrollbar { display: none; }
+  .slide {
+    height: 320px; display: grid; place-items: center; font-size: 32px; font-weight: 700;
+  }
+  .slide:nth-child(1){ background:#ffe082; }
+  .slide:nth-child(2){ background:#80deea; }
+  .slide:nth-child(3){ background:#a5d6a7; }
+  .btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border: 0; border-radius: 999px; cursor: pointer;
+    background: white; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    display: grid; place-items: center; font-size: 20px;
+  }
+  .btn:active { transform: translateY(-50%) scale(0.98); }
+  .prev { left: -16px; } .next { right: -16px; }
+</style>
 </head>
 <body>
-  <h1>Démo des Pseudo-classes CSS</h1>
-
-  <h2>:link, :visited, :hover, :target</h2>
-  <p><a href="#news">Aller à la section News</a></p>
-  <div id="news">
-    <h3>Section News</h3>
-    <p>Tu es arrivé ici avec l’ancre #news.</p>
+  <div class="wrap">
+    <button class="btn prev" aria-label="Précédent">◀</button>
+    <div class="view">
+      <div class="track" id="track">
+        <section class="slide">Slide 1</section>
+        <section class="slide">Slide 2</section>
+        <section class="slide">Slide 3</section>
+      </div>
+    </div>
+    <button class="btn next" aria-label="Suivant">▶</button>
   </div>
+<style>
+  details {
+    width: 220px;
+    margin: 6px 0;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: bold;
+  }
+  summary::marker {
+    font-size: 16px;
+  }
+  details a {
+    display: block;
+    padding: 6px 0 6px 16px;
+    text-decoration: none;
+    color: #333;
+  }
+  details a:hover {
+    background: #f0f0f0;
+  }
+</style>
 
-  <h2>:checked, :default</h2>
-  <input type="checkbox" id="c1">
-  <label for="c1">Option 1</label><br>
-  <input type="radio" name="choix" id="r1" checked>
-  <label for="r1">Par défaut</label>
-  <input type="radio" name="choix" id="r2">
-  <label for="r2">Autre choix</label>
+<details>
+  <summary>📂 commande</summary>
+  <a href="#">➕ Ajouter</a>
+  <a href="#">✏️ Modifier</a>
+  <a href="#">🗑 Supprimer</a>
+</details>
 
-  <h2>:disabled, :enabled</h2>
-  <input type="text" value="Actif">
-  <input type="text" value="Inactif" disabled>
+<details>
+  <summary>⚙️ Paramètres</summary>
+  <a href="#">Général</a>
+  <a href="#">Sécurité</a>
+</details>
 
-  <h2>:empty</h2>
-  <p>Non vide</p>
-  <p></p>
+<script>
+  const track = document.getElementById('track');
+  const slideWidth = () => track.clientWidth; // 100% de la vue
 
-  <h2>:first-child, :first-of-type, :last-child, :last-of-type</h2>
-  <div class="demo">
-    <p>Premier paragraphe</p>
-    <span>Je suis un span</span>
-    <p>Deuxième paragraphe</p>
-    <p>Dernier paragraphe</p>
-  </div>
+  document.querySelector('.next').addEventListener('click', () => {
+    track.scrollBy({ left: slideWidth(), behavior: 'smooth' });
+  });
+  document.querySelector('.prev').addEventListener('click', () => {
+    track.scrollBy({ left: -slideWidth(), behavior: 'smooth' });
+  });
+  /*
+  Oui 👍 je peux te générer une **grande liste d’émojis (200+)** que tu pourras copier-coller directement dans ton projet.
+Je vais te les organiser par **catégories** pour que ce soit plus facile à retrouver.
 
-  <h2>:focus, :focus-within</h2>
-  <div class="zone">
-    <input type="text" placeholder="Tape ici">
-  </div>
+---
 
-  <h2>:valid et :invalid</h2>
-  <input type="email" placeholder="Entrez un email">
+# 📑 Liste de 200+ Émojis utiles pour menus, applications et sites
 
-  <h2>:not()</h2>
-  <p class="important">Important</p>
-  <p>Normal</p>
+### 📂 Dossiers / Fichiers
 
-  <h2>:nth-child</h2>
-  <ul>
-    <li>Élément 1</li>
-    <li>Élément 2</li>
-    <li>Élément 3</li>
-    <li>Élément 4</li>
-  </ul>
+📂 📁 🗂 🗄 🗃 🗳 📑 📄 📃 📜 📒 📓 📔 📕 📖 📗 📘 📙 📚 📝 ✏️ ✒️ 🖋 🖊 🖌 🖍 🗒 🗓
 
-  <h2>:only-child</h2>
-  <div class="seul">
-    <p>Je suis seul</p>
-  </div>
-  <div class="seul">
-    <p>Pas seul 1</p>
-    <p>Pas seul 2</p>
-  </div>
+### ⚙️ Paramètres / Outils
+
+⚙️ 🔧 🔨 🛠 🪛 🔩 ⚒ 🪚 🪓 🧰 🧲 ⛏ 🪛 🔐 🔒 🔓 🔑 🗝
+
+### 👤 Utilisateurs / Personnes
+
+👤 👥 🧑 👨 👩 🧓 👴 👵 🧑‍🎓 👩‍🎓 👨‍🎓 👨‍💻 👩‍💻 👨‍🏫 👩‍🏫 🧑‍🏫 👮‍♂️ 👮‍♀️ 🕵️‍♂️ 🕵️‍♀️ 💂‍♂️ 💂‍♀️ 👷‍♂️ 👷‍♀️ 🧑‍🚒 👨‍🚒 👩‍🚒 👨‍⚕️ 👩‍⚕️ 🧑‍⚕️
+
+### 💬 Communication / Messages
+
+💬 🗨 🗯 💭 📢 📣 📯 📨 📩 📧 ✉️ 📮 📪 📫 📬 📭 📨
+
+### 🏠 Navigation / Lieux
+
+🏠 🏡 🏢 🏣 🏤 🏥 🏦 🏨 🏩 🏪 🏫 🏬 🏭 🏯 🏰 🗼 🗽 🕌 🛕 ⛪ 🕍
+
+### 📞 Téléphone / Communication
+
+📞 ☎️ 📱 📲 📟 📠 📺 📻 🎙 🎚 🎛
+
+### 🌐 Internet / Réseau
+
+🌐 🖥 💻 🖱 ⌨️ 🖲 🧮 📡 📶 📊 📈 📉 🗂 🗄
+
+### 💡 Idées / Créativité
+
+💡 🔦 🕯 🪔 🎨 🖌 🖍 🎭 🎬 🎤 🎧 🎼 🎹 🥁 🎷 🎺 🎸 🎻
+
+### 🛒 Commerce / Achat
+
+🛒 🛍 💳 💰 💲 💵 💴 💶 💷 🪙 🧾 📦 🎁 🏷
+
+### ⏰ Temps / Date
+
+⏰ ⌚ ⏱ ⏲ 🕰 🗓 📅 📆 🌞 🌜 🌛 🌙 🌟 ⭐ ✨ ⚡ 🔥
+
+### 🚀 Transport / Déplacement
+
+🚗 🚕 🚙 🚌 🚎 🏎 🚓 🚑 🚒 🚐 🚚 🚛 🚜 🛵 🏍 🚲 🛴 🛹 🚂 🚆 🚈 🚄 ✈️ 🚁 🚀 ⛵ 🚤 🛳 ⛴ 🚢
+
+### 🖼 Multimédia
+
+📷 📸 📹 🎥 📽 🎞 📺 📻 📼 💿 📀 📇
+
+### 🖌 Design / Interface
+
+🎨 🖌 🖍 🖼 🧩 🔲 🔳 ⚪ ⚫ 🔴 🟠 🟡 🟢 🔵 🟣 🟤 ⚪ 🔘
+
+### 🏆 Succès / Récompenses
+
+🏆 🏅 🎖 🥇 🥈 🥉 🌟 💎 🔑 🎯 ✔️ ✅ ☑️ ✖️ ❌ 🚫 ⛔ ⚠️ ⚡
+
+### 🌍 Nature / Divers
+
+🌳 🌲 🌴 🌵 🌱 🌿 ☘️ 🍀 🌹 🌺 🌸 🌼 🌻 🌞 🌝 🌜 🌙 ⭐ 🌟 🌈 ☁️ 🌧 ⛈ 🌩 ❄️ 🌊 🔥
+
+---
+
+👉 Ça fait **plus de 200 émojis** utilisables directement dans ton HTML, CSS (en `content: "📂";`) ou dans ton texte.
+Tu peux copier-coller ceux que tu veux, ou utiliser leur code Unicode (`&#128193;` pour 📂 par ex.).
+
+---
+
+Veux-tu que je te fasse un **fichier HTML complet avec ces 200 émojis organisés par catégories** (pour que tu l’ouvres dans ton navigateur et choisisses facilement) ?
+
+  
+  */
+
+  // (Optionnel) bouclage en fin
+  track.addEventListener('scrollend', () => {
+    // nécessite Chrome/Edge récents, sinon ignorer
+  });
+</script>
 </body>
 </html>
