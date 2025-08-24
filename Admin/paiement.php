@@ -5,66 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
-    <link rel="stylesheet" href="../vue/styles/style.cs">
+    <link rel="stylesheet" href="../vue/styles/stylemenu.css">
 </head>
 <style>
-    *{
-       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: sans-serif;
-    }
-    .paiement_admin{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100vh;
-    }
-   .contain{
-        display: flex;
-        flex-direction: column;
-        border-radius: 10px;
-        display: flex;
-        width:95%;
-        align-items: center;
-        height: 90vh;
-        justify-content: center;
-    }
-    header{
-        display: flex;
-        align-items: center;
-        background-color: navy;
-        width:100%;
-        justify-content: start;
-        gap: 50px;
-        color: white;
-        padding: 10px 0;
-       border-radius: 10px 10px 0 0;
-    }
-    header h1{
-        margin-left: 50px;
-        font-size: 25px;
-        font-weight: 600;
-    }
-    header h2{
-        font-size: 25px;
-        font-weight: 900;
-    }
-.container{
-        height: 100vh;
-        width:100%;
-        display: flex;
-        flex-direction: row;
-       border-radius: 0px 0px 10px 10px;
-    }
-
-  .sidebar{
-    width: 220px;
-    height: 100%;
-    background-color: #05f07a;  
-    border-radius: 0 0 0 10px;  
-    }
   
     ul{
         list-style: none;
@@ -155,23 +98,10 @@ main{
 <body>
     <div class="paiement_admin">
         <div class="contain">
-                <header>
-                    <h1>LOGO</h1>
-                    <h2>Paiements</h2>
-                </header>
+                <!-- le header pour  l'application -->
+                 <?php include_once('header.php');?>
                 <div class="container">
-                    <div class="sidebar">
-                        <ul>
-                             <li><a href="accueil.html"><i class="fas fa-home"></i> Accueil</a></li>
-                            <li><a href="formation.html"><i class="fas fa-folder"></i> Formations</a></li>
-                            <li><a href="participant.html"><i class="fas fa-users"></i> Participants</a></li>
-                            <li><a href="formation.html"><i class="fas fa-user-tie"></i> Formateurs</a></li>
-                            <li><a href="equipement.html"><i class="fas fa-box"></i> Équipements</a></li>
-                            <li><a href="commande.html"><i class="fas fa-shopping-cart"></i> Commandes</a></li>
-                            <li><a href="paiement.html"><i class="fas fa-credit-card"></i> Paiements</a></li>
-                            <li><a href="rapport.html"><i class="fas fa-file-alt"></i> Rapports</a></li>
-                        </ul>
-                    </div>
+                    <?php include_once('menu.php');?>
                     <main>
                         <div class="principal">
                             <table>

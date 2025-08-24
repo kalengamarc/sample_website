@@ -1,19 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
-</head>
-<style>
-    *{
-       margin: 0;
+ .header_side{
+        display: flex;
+        align-items: center;
+        background-color: navy;
+        background-color: #00ffc2;
+        width:100%;
+        justify-content: start;
+        gap: 50px;
+        color: white;
+        padding: 10px 0;
+       border-radius: 10px 10px 0 0;
+    }
+        *{
+        margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: sans-serif;
     }
-    body{
+    .paiement_admin{
         display: flex;
         align-items: center;
         justify-content: center;
@@ -30,16 +33,7 @@
         height: 90vh;
         justify-content: center;
     }
-    header{
-        display: flex;
-        align-items: center;
-        background-color: navy;
-        width:100%;
-        gap: 50px;
-        color: white;
-        padding: 10px 0;
-       border-radius: 10px 10px 0 0;
-    }
+
     header h1{
         margin-left: 50px;
         font-size: 25px;
@@ -60,7 +54,7 @@
   .sidebar{
     width: 220px;
     height: 100%;
-    background-color: blue;  
+    background-color: #05f07a;  
     border-radius: 0 0 0 10px;  
     }
   
@@ -107,6 +101,50 @@
      }
 
 main{
+    flex: 1;
+    background-color: rgb(207, 202, 202); 
+    border-radius: 0 0 10px; 
+}
+.principal{
+    display: flex;
+    flex-direction: column;
+    background-color:white;
+    flex: 1;
+    margin: 10px;
+    height:auto;
+    border-radius: 10px;
+    color: black;
+    gap: 0px;
+}
+
+
+ table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 20px 15px;
+      text-align: left;
+    }
+
+    th {
+      background: #f0f2f5;
+      font-weight: bold;
+    }
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    td {
+      font-size: 14px;
+    }
+    main{
     flex: 1;
     background-color: rgb(207, 202, 202); 
     border-radius: 0 0 10px; 
@@ -179,43 +217,3 @@ main{
     align-items: center;
     flex: 1;
 }
-</style>
-<body>
-    <div class="contain">
-            <header>
-                <h1>LOGO</h1>
-                <h2>Formations</h2>
-            </header>
-            <div class="container">
-                <div class="sidebar">
-                    <ul>
-                         <li><a href="accueil.html"><i class="fas fa-home"></i> Accueil</a></li>
-                            <li><a href="formation.html"><i class="fas fa-folder"></i> Formations</a></li>
-                            <li><a href="participant.html"><i class="fas fa-users"></i> Participants</a></li>
-                            <li><a href="formation.html"><i class="fas fa-user-tie"></i> Formateurs</a></li>
-                            <li><a href="equipement.html"><i class="fas fa-box"></i> Équipements</a></li>
-                            <li><a href="commande.html"><i class="fas fa-shopping-cart"></i> Commandes</a></li>
-                            <li><a href="paiement.html"><i class="fas fa-credit-card"></i> Paiements</a></li>
-                            <li><a href="rapport.html"><i class="fas fa-file-alt"></i> Rapports</a></li>
-                    </ul>
-                </div>
-                <main>
-                    <div class="principal">
-                        <div class="tache">
-                            <div class="image"><img src="../vue/images/onduleur.jpg" alt="web"></div>
-                            <div class="description">Developpement web<i class="fas fa-chevron-down"></i></div>
-                        </div>
-                        <div class="tache">
-                            <div class="image"><img src="../vue/images/cable.jpg" alt="web"></div>
-                            <div class="description">gestion de projet<i class="fas fa-chevron-down"></i></div>
-                        </div>
-                        <div class="tache">
-                            <div class="image"><img src="../vue/images/windows.jpg" alt="web"></div>
-                            <div class="description">Marketing digital<i class="fas fa-chevron-down"></i></div>
-                        </div>
-                    </div>
-                </main>
-        </div> 
-    </div>
-</body>
-</html>
