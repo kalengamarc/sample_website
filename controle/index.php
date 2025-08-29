@@ -24,14 +24,6 @@ require_once 'models/Presence.php';
 require_once 'models/Produit.php';
 require_once 'models/DetailCommande.php';
 
-// Inclure les classes de requête
-require_once 'models/RequeteUtilisateur.php';
-require_once 'models/RequeteFormation.php';
-require_once 'models/RequeteInscription.php';
-require_once 'models/CRUDPaiement.php';
-require_once 'models/CRUDPresence.php';
-require_once 'models/CRUDProduit.php';
-require_once 'models/RequeteDetailCommande.php';
 
 // Fonction pour obtenir les données de la requête
 function getRequestData() {
