@@ -6,6 +6,8 @@
     <title>commande</title>
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
+    <link rel="stylesheet" href="../vue/styles/style.css">
+
 </head>
 
 <body>

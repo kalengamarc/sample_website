@@ -8,21 +8,15 @@
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
 </head>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>commande</title>
-    <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
-    <link rel="stylesheet" href="../vue/styles/stylemenu.css">
-    <style>
-
+<style>
+    .paiement_admin{
+        width: 100%;
+        height:;
+    }
 .principal{
     display: flex;
     flex-direction: column;
     background-color:white;
-    flex: 1;
     margin: 10px;
     height:auto;
     border-radius: 10px;

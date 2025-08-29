@@ -79,6 +79,12 @@
     .tabl_contnu::-webkit-scrollbar{
         display: none;
     }
+    /*STYLE DU TABLEAU*/ 
+
+    table thead{
+        font-size: 14px;
+        color: #ffae2b;
+    }
 
 
 /* ouvrir sous-menu quand radio checké */
@@ -89,13 +95,7 @@
     margin-top: 20px;
     margin-bottom: 10px;
     font-size: 16px;
-    color: #021a12;
-  }
-  /* STYLE DU TABLEAU */ 
-  table thead{
-    font-size: 14px;
-    color: #ffae2b;
-    background-color: #00110a;
+    color: #00110a;
   }
 
 .icon_action {
@@ -119,69 +119,46 @@
     color:  #00ffc2;;
     cursor: pointer;
 }
-
 </style>
 <body>
     <div class="header_dash">
         <div class="cont_dash">
-            <!--PARTIE HEADER-->
+            <!-- PARTIE HEADER-->
             <?php
                 include ("headers.php");
             ?>
-           
-        <div class="ail_fle">
-         <!--PARTIE HEADER-->
-           <?php
-                include ("menu.php");
-            ?> 
-            <div class="dashcontainu">
-                 <div class="tabl_contnu">
-                    <h2> Nouveau paiement</h2>
-                    <!--PARTIE Tableau-->
-                    <table>
+            <div class="ail_fle">
+                <!-- PARTIE menu-->
+                <?php
+                    include ("menu.php");
+                ?>
+                <div class="dashcontainu">
+                    <div class="tabl_contnu">
+                      <h2> Historique des Paiements</h2>
+                      <!-- PARTIE tableau-->
+                       <table>
                         <thead>
                             <tr>
                                 <th>
                                     <input type="checkbox">
                                 </th>
                                 <th>ID</th>
-                              <th>Types</th>
-                              <th>References</th>
-                              <th>Date_paiement</th>
-                              <th>Montant</th>
-                              <th>Action</th>
+                                <th>Types</th>
+                                <th>References</th>
+                                <th>Montant</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                           <tr>
-                                <th>
-                                    <input type="checkbox">
-                                </th>
-                                <td>1</td>
-                                <td>Formations</td>
-                                <td>FORM123</td>
-                                <td>20/01/2025</td>
-                                <td>500 €</td>
-                                <td>
-                                    <!-- PARTIE action-->
-                                    <div class="icon_action">
-                                        <i class="fas fa-eye"></i>
-                                        <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash"></i>
-                                    </div>
-                                </td>
-                            </tr>                       
+                        <tbody>  
                             <tr>
                                 <th>
                                     <input type="checkbox">
                                 </th>
-                                <td>2</td>
+                                <th>1</th>
                                 <td>Formations</td>
                                 <td>FORM123</td>
-                                <td>20/01/2025</td>
                                 <td>500 €</td>
                                 <td>
-                                    <!-- PARTIE action-->
                                     <div class="icon_action">
                                         <i class="fas fa-eye"></i>
                                         <i class="fas fa-edit"></i>
@@ -193,20 +170,34 @@
                                 <th>
                                     <input type="checkbox">
                                 </th>
-                                <td>3</td>
-                                <td>Formations</td>
-                                <td>FORM123</td>
-                                <td>20/01/2025</td>
-                                <td>500 €</td>
-                                 <td>
-                                    <!-- PARTIE action-->
+                                <th>2</th>
+                                <td>Commande</td>
+                                <td>CMD488</td>
+                                <td>200 €</td>
+                                <td>
                                     <div class="icon_action">
                                         <i class="fas fa-eye"></i>
                                         <i class="fas fa-edit"></i>
                                         <i class="fas fa-trash"></i>
                                     </div>
                                 </td>
-                            </tr>         
+                            </tr>
+                            <tr>
+                                <th>
+                                    <input type="checkbox">
+                                </th>
+                                <th>3</th>
+                                <td>Formation</td>
+                                <td>FORM793</td>
+                                <td>300 €</td>
+                                <td>
+                                    <div class="icon_action">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
