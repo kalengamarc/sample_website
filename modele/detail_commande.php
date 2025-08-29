@@ -9,9 +9,9 @@ class DetailCommande {
     private int $quantite;
     private float $prix_unitaire;
 
-    public function __construct(int $id_detail, int $id_commande, int $id_produit, int $quantite, float $prix_unitaire)
+    public function __construct(?int $id_detail, int $id_commande, int $id_produit, int $quantite, float $prix_unitaire)
     {
-        $this->id_detail = $id_detail;
+        $this->id_detail = $id_detail ?? 0; // 0 par défaut si nouvel objet
         $this->id_commande = $id_commande;
         $this->id_produit = $id_produit;
         $this->quantite = $quantite;
@@ -33,7 +33,7 @@ class DetailCommande {
     public function setPrixUnitaire(float $prix_unitaire): void { $this->prix_unitaire = $prix_unitaire; }
 }
 
-class RequeteDetailProduit {
+class RequeteDetailCommande {
     private $crud;
 
     public function __construct(){
@@ -41,13 +41,12 @@ class RequeteDetailProduit {
         $this->crud = $pdo->getConnection();
     }
 
-    // ✅ Ajouter un détail
-    public function AjouterDetailCommande(DetailCommande $detailCommande){
-        $sql = "INSERT INTO details_commandes (id_detail, id_commande, id_produit, quantite, prix_unitaire)
-                VALUES (?, ?, ?, ?, ?)";
+    // ✅ Ajouter un détail (sans id_detail car AUTO_INCREMENT)
+    public function ajouterDetailCommande(DetailCommande $detailCommande): bool {
+        $sql = "INSERT INTO details_commandes (id_commande, id_produit, quantite, prix_unitaire)
+                VALUES (?, ?, ?, ?)";
         $stmt = $this->crud->prepare($sql);
         $param = [
-            $detailCommande->getIdDetail(),
             $detailCommande->getIdCommande(),
             $detailCommande->getIdProduit(),
             $detailCommande->getQuantite(),
@@ -57,11 +56,12 @@ class RequeteDetailProduit {
     }
 
     // ✅ Lire un détail par ID
-    public function getDetailById(int $id_detail): ?array {
+    public function getDetailById(int $id_detail): ?DetailCommande {
         $sql = "SELECT * FROM details_commandes WHERE id_detail = ?";
         $stmt = $this->crud->prepare($sql);
         $stmt->execute([$id_detail]);
-        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? new DetailCommande($row['id_detail'], $row['id_commande'], $row['id_produit'], $row['quantite'], $row['prix_unitaire']) : null;
     }
 
     // ✅ Lister les détails d’une commande
@@ -69,7 +69,11 @@ class RequeteDetailProduit {
         $sql = "SELECT * FROM details_commandes WHERE id_commande = ?";
         $stmt = $this->crud->prepare($sql);
         $stmt->execute([$id_commande]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $details = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $details[] = new DetailCommande($row['id_detail'], $row['id_commande'], $row['id_produit'], $row['quantite'], $row['prix_unitaire']);
+        }
+        return $details;
     }
 
     // ✅ Mettre à jour un détail
