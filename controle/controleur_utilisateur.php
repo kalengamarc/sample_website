@@ -12,32 +12,21 @@ class UtilisateurController {
 
     /**
      * Créer un nouvel utilisateur
+     * 
      */
-    public function createUtilisateur(string $nom, string $prenom, string $email, string $mot_de_passe, string $telephone, string $role, string $photo = null): array {
-        try {
-            // Validation des données
-            $validationErrors = $this->validateUtilisateurData($nom, $prenom, $email, $mot_de_passe, $telephone, $role);
-            
-            if (!empty($validationErrors)) {
-                return [
-                    'success' => false,
-                    'message' => 'Données invalides',
-                    'errors' => $validationErrors
-                ];
-            }
+    public function createUtilisateur(string $nom, string $prenom, string $email, string $mot_de_passe, string $telephone, string $role, $photoFile = null): array {
+    try {
+        // Validation...
+        
+        $photoPath = null;
+        if ($photoFile && $photoFile['error'] === UPLOAD_ERR_OK) {
+            $photoPath = $this->handleFileUpload($photoFile, 'utilisateurs');
+        }
 
-            // Vérifier si l'email existe déjà
-            if ($this->requeteUtilisateur->getUtilisateurByEmail($email)) {
-                return [
-                    'success' => false,
-                    'message' => 'Cet email est déjà utilisé'
-                ];
-            }
-
-            $date_creation = date('Y-m-d H:i:s');
-            $utilisateur = new Utilisateur(null, $nom, $prenom, $email, $mot_de_passe, $telephone, $role, $date_creation, $photo);
-            
-            if ($this->requeteUtilisateur->ajouterUtilisateur($utilisateur)) {
+        $date_creation = date('Y-m-d H:i:s');
+        $utilisateur = new Utilisateur(null, $nom, $prenom, $email, $mot_de_passe, $telephone, $role, $date_creation, $photoPath);
+        
+        if ($this->requeteUtilisateur->ajouterUtilisateur($utilisateur)) {
                 // Récupérer l'utilisateur créé pour avoir l'ID
                 $newUser = $this->requeteUtilisateur->getUtilisateurByEmail($email);
                 if ($newUser) {
@@ -65,6 +54,40 @@ class UtilisateurController {
             ];
         }
     }
+}
+
+private function handleFileUpload($file, $category): string {
+    $uploadDir = __DIR__ . '/../uploads/' . $category . '/';
+    
+    // Créer le dossier s'il n'existe pas
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    // Validation du fichier
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (!in_array($file['type'], $allowedTypes)) {
+        throw new Exception('Type de fichier non autorisé');
+    }
+    
+    if ($file['size'] > $maxSize) {
+        throw new Exception('Fichier trop volumineux (max 5MB)');
+    }
+    
+    // Générer un nom de fichier unique
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid() . '_' . time() . '.' . $extension;
+    $filepath = $uploadDir . $filename;
+    
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return 'uploads/' . $category . '/' . $filename;
+    }
+    
+    throw new Exception('Erreur lors du téléchargement du fichier');
+}
+#=================================================================================================
 
     /**
      * Récupérer un utilisateur par son ID

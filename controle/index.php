@@ -86,6 +86,72 @@ try {
 
     // Router les requêtes
     switch ($entity) {
+        // Dans le switch case pour l'entité 'file'
+        case 'file':
+            switch ($action) {
+                case 'uploadImage':
+                    checkAuthentication();
+                    $result = handleImageUpload($_FILES['image'] ?? null, $_POST['category'] ?? '');
+                    sendJsonResponse($result);
+                    break;
+                    
+                case 'deleteImage':
+                    checkAuthentication();
+                    $result = deleteImage($_POST['filepath'] ?? '');
+                    sendJsonResponse($result);
+                    break;
+                    
+                default:
+                    sendJsonResponse(['success' => false, 'message' => 'Action non reconnue']);
+            }
+            break;
+
+        // Fonctions de gestion d'images
+        function handleImageUpload($file, $category) {
+            if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+                return ['success' => false, 'message' => 'Aucun fichier uploadé'];
+            }
+            
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $maxSize = 5 * 1024 * 1024;
+            
+            if (!in_array($file['type'], $allowedTypes)) {
+                return ['success' => false, 'message' => 'Type de fichier non autorisé'];
+            }
+            
+            if ($file['size'] > $maxSize) {
+                return ['success' => false, 'message' => 'Fichier trop volumineux (max 5MB)'];
+            }
+            
+            $uploadDir = __DIR__ . '/uploads/' . $category . '/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+            $filepath = $uploadDir . $filename;
+            
+            if (move_uploaded_file($file['tmp_name'], $filepath)) {
+                return [
+                    'success' => true,
+                    'message' => 'Fichier uploadé avec succès',
+                    'filepath' => 'uploads/' . $category . '/' . $filename,
+                    'filename' => $filename
+                ];
+            }
+            
+            return ['success' => false, 'message' => 'Erreur lors du téléchargement'];
+        }
+
+        function deleteImage($filepath) {
+            if (file_exists(__DIR__ . '/' . $filepath)) {
+                if (unlink(__DIR__ . '/' . $filepath)) {
+                    return ['success' => true, 'message' => 'Image supprimée'];
+                }
+            }
+            return ['success' => false, 'message' => 'Erreur lors de la suppression'];
+        }
         case 'utilisateur':
             switch ($action) {
                 case 'login':
