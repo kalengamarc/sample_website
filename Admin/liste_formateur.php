@@ -40,7 +40,7 @@
     .tabl_contnu{
         width: 100%;
         height: 100%;
-        background-color: #b9c1be;;
+        background-color: #b9c1be;
         color: black;
         overflow: scroll;
         text-align:center;
@@ -198,12 +198,13 @@
     }
 
     th {
-      background: #f0f2f5;
+      background: #021a12;
       font-weight: bold;
+      color: #ffae2b;
     }
 
     tr:not(:last-child) {
-      border-bottom: 1px solid #e5e5e5;
+      border-bottom: 1px solid #021a12;
     }
 
     td {
@@ -221,7 +222,7 @@
                         <div class="titre_formation">
                            
                             <h3>Liste des formateurs</h3>
-                            <div class="ajouter" data-tooltip="ajouter un formateur"><a href=""><i class="fas fa-plus"></i></a></div>
+                            <div class="ajouter" data-tooltip="ajouter un formateur"><a href="../Admin/AjoutFormateur.php"><i class="fas fa-plus"></i></a></div>
                         </div>
                         <?php
                     // Inclure ton contrôleur
@@ -239,6 +240,7 @@
                                     <th>Email</th>
                                     <th>Téléphone</th>
                                     <th>Role</th>
+                                    <th>Specialite</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -256,6 +258,7 @@
                                             <td><?= htmlspecialchars($user->getEmail()) ?></td>
                                             <td><?= htmlspecialchars($user->getTelephone()) ?></td>
                                             <td><?= htmlspecialchars($user->getRole()) ?></td>
+                                            <td><?= htmlspecialchars($user->getSpecialite()) ?></td>
                                             <td>
                                                 <div class="icons_actuality">
                                                     <a href="voir.php?id=<?= $user->getId() ?>"><div class="voir" data-tooltip="Voir"><i class="fas fa-eye"></i></div></a>
