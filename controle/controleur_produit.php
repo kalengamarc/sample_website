@@ -1,7 +1,6 @@
 <?php
 
-include_once("Produit.php");
-include_once("CRUDProduit.php");
+include_once("../modele/produit.php");
 
 class ProduitController {
     private $crudProduit;

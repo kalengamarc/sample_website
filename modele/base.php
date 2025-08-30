@@ -1,42 +1,62 @@
 <?php
 class Database {
-    private static $host = "localhost";
-    private static $dbname = "josnet";
-    private static $username = "root";
-    private static $password = "";
-    public static $conn = null;
+    private static string $host = "localhost";
+    private static string $dbname = "josnet";
+    private static string $username = "root";
+    private static string $password = "";
+    private static ?PDO $conn = null;
 
-    public static function getConnection() {
+    // Connexion unique (Singleton)
+    public static function getConnection(): PDO {
         if (self::$conn === null) {
             try {
                 self::$conn = new PDO(
-                    "mysql:host=" . self::$host . ";dbname=" . self::$dbname,
+                    "mysql:host=" . self::$host . ";dbname=" . self::$dbname . ";charset=utf8",
                     self::$username,
                     self::$password
                 );
                 self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch(PDOException $e) {
-                die("Erreur de connexion : " . $e->getMessage());
+                self::$conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                die("❌ Erreur de connexion à la base de données : " . $e->getMessage());
             }
         }
         return self::$conn;
     }
 
-    public static function Transactionbegin(){
-        self::$conn->beginTransaction();
+    // Démarrer une transaction
+    public static function beginTransaction(): void {
+        $db = self::getConnection();
+        if (!$db->inTransaction()) {
+            $db->beginTransaction();
+        }
     }
 
-    public static function isInTransanction(){
-        return self::$conn->inTransaction();
+    // Vérifier si on est en transaction
+    public static function isInTransaction(): bool {
+        $db = self::getConnection();
+        return $db->inTransaction();
     }
 
-    public static function commit(){
-        self::$conn->commit();
+    // Valider une transaction
+    public static function commit(): void {
+        $db = self::getConnection();
+        if ($db->inTransaction()) {
+            $db->commit();
+        }
     }
 
-    public static function rollBack(){
-        return self::$conn->rollBack();
+    // Annuler une transaction
+    public static function rollBack(): void {
+        $db = self::getConnection();
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
     }
-    
+
+    // Fermer la connexion
+    public static function close(): void {
+        self::$conn = null;
+    }
 }
 ?>

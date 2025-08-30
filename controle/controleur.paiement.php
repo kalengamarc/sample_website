@@ -1,7 +1,6 @@
 <?php
 
-include_once("Paiement.php");
-include_once("CRUDPaiement.php");
+include_once("../modele/paiement.php");
 
 class PaiementController {
     private $crudPaiement;

@@ -223,190 +223,59 @@
                             <h3>Liste des formateurs</h3>
                             <div class="ajouter" data-tooltip="ajouter un formateur"><a href=""><i class="fas fa-plus"></i></a></div>
                         </div>
-                        <div class="principal">
-                            <table>
-                                    <thead>
+                        <?php
+                    // Inclure ton contrôleur
+                    include_once('../controle/controleur_utilisateur.php');
+                    $utilisateurCtrl = new UtilisateurController();
+                    $usersData = $utilisateurCtrl->getUtilisateursByRole('formateur'); // récupération de tous les utilisateurs
+                    ?>
+                    <div class="principal">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Photo</th>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if($usersData['success'] && count($usersData['data']) > 0): ?>
+                                    <?php foreach($usersData['data'] as $index => $user): ?>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Nom</th>
-                                            <th>Description</th>
-                                            <th>Duree</th>
-                                            <th>Prix</th>
-                                            <th>action</th>
+                                            <td><?= $index + 1 ?></td>
+                                            <td>
+                                            <img src="<?=!empty($user->getPhoto()) ? '../controle/'.$user->getPhoto() : 'profil.jpg' ?>" 
+                                                    alt="profil" 
+                                                    style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #00110a;">
+                                            </td>
+                                            <td><?= htmlspecialchars($user->getNom() . ' ' . $user->getPrenom()) ?></td>
+                                            <td><?= htmlspecialchars($user->getEmail()) ?></td>
+                                            <td><?= htmlspecialchars($user->getTelephone()) ?></td>
+                                            <td><?= htmlspecialchars($user->getRole()) ?></td>
+                                            <td>
+                                                <div class="icons_actuality">
+                                                    <a href="voir.php?id=<?= $user->getId() ?>"><div class="voir" data-tooltip="Voir"><i class="fas fa-eye"></i></div></a>
+                                                    <a href="modifier.php?id=<?= $user->getId() ?>"><div class="modifier" data-tooltip="Modifier"><i class="fas fa-edit"></i></div></a>
+                                                    <a href="supprimer.php?id=<?= $user->getId() ?>" onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?')">
+                                                        <div class="supprimer_" data-tooltip="Supprimer"><i class="fas fa-trash"></i></div>
+                                                    </a>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                   
+                                    <?php endforeach; ?>
+                                <?php else: ?>
                                     <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
+                                        <td colspan="7" style="text-align:center;">Aucun utilisateur trouvé</td>
                                     </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                                                        <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                                                        <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    
-                                </table>
-                        </div> 
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
                     </div>
                 </div>
             </div>

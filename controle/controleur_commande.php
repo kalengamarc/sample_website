@@ -1,5 +1,5 @@
 <?php
-include_once(__DIR__ . "/../modeles/Commande.php");
+include_once(__DIR__ . "/../modele/commande.php");
 
 class CommandeController {
     private $commandeDAO;

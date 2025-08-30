@@ -1,7 +1,6 @@
 <?php
 
-include_once("Inscription.php");
-include_once("RequeteInscription.php");
+include_once("../modele/inscription.php");
 
 class InscriptionController {
     private $requeteInscription;

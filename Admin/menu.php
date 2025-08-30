@@ -115,7 +115,7 @@
                         <a href="liste_formation.php">Liste des formations</a>
                     </li>
                     <li>
-                        <a href="#">Créer une formation</a>
+                        <a href="AjouteFormation.php">Créer une formation</a>
                     </li>
                 </ul>
             </li>
@@ -147,7 +147,7 @@
                         <a href="liste_formateur.php">Liste des formateurs</a>
                     </li>
                     <li>
-                        <a href="#">Ajouter un formateur</a>
+                        <a href="AjoutFormateur.php">Ajouter un formateur</a>
                     </li>
                 </ul>
             </li>

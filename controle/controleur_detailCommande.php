@@ -1,6 +1,6 @@
 <?php
 
-include_once('DetailCommande.php');
+include_once('../modele/detail_commande.php');
 
 class DetailCommandeController {
     private $requeteDetailCommande;

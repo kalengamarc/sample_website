@@ -32,12 +32,12 @@ class Inscription {
 
 
 include_once('base.php');
-include_once('Inscription.php'); // ajustez le chemin si besoin
+
 
 class RequeteInscription {
     private $crud;
-    private const $TABLE = 'inscriptions'; // changez en 'inscription' si votre table est au singulier
-    private const $STATUTS = ['inscrit', 'en cours', 'terminé', 'annulé'];
+    private const TABLE = 'inscriptions'; // changez en 'inscription' si votre table est au singulier
+    private const STATUTS = ['inscrit', 'en cours', 'terminé', 'annulé'];
 
     public function __construct() {
         $pdo = new Database();

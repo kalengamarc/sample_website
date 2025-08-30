@@ -11,8 +11,22 @@ class Utilisateur {
     private $role;
     private $date_creation;
     private $photo; // ✅ Ajout de l'attribut photo
+    private $description; // ✅ Ajout de l'attribut description
+    private $specialite; // ✅ Ajout de l'attribut specialite
 
-    public function __construct($id, $nom, $prenom, $email, $mot_de_passe, $telephone, $role, $date_creation, $photo) {
+    public function __construct(
+        $id,
+        $nom,
+        $prenom,
+        $email,
+        $mot_de_passe,
+        $telephone,
+        $role,
+        $description,
+        $date_creation,
+        $photo,
+        $specialite = '')
+        {
         $this->id = $id;
         $this->nom = $nom;
         $this->prenom = $prenom;
@@ -20,6 +34,8 @@ class Utilisateur {
         $this->mot_de_passe = $mot_de_passe;
         $this->telephone = $telephone;
         $this->role = $role;
+        $this->description = $description;
+        $this->specialite = $specialite;
         $this->date_creation = $date_creation;
         $this->photo = $photo;
     }
@@ -31,6 +47,8 @@ class Utilisateur {
     public function getEmail() { return $this->email; }
     public function getMotDePasse() { return $this->mot_de_passe; }
     public function getRole() { return $this->role; }
+    public function getDescription() { return $this->description; }
+    public function getSpecialite() { return $this->specialite; } // ✅ Getter specialite
     public function getTelephone() { return $this->telephone; }
     public function getDateCreation() { return $this->date_creation; }
     public function getPhoto() { return $this->photo; } // ✅ Getter photo
@@ -42,6 +60,8 @@ class Utilisateur {
     public function setMotDePasse($mot_de_passe) { $this->mot_de_passe = $mot_de_passe; }
     public function setTelephone($telephone) { $this->telephone = $telephone; }
     public function setRole($role) { $this->role = $role; }
+    public function setDescription($description) { $this->description = $description; }
+    public function setSpecialite($specialite) { $this->specialite = $specialite; } // ✅ Setter specialite
     public function setDateCreation($date_creation) { $this->date_creation = $date_creation; }
     public function setPhoto($photo) { $this->photo = $photo; } // ✅ Setter photo
 }
@@ -55,8 +75,8 @@ class RequeteUtilisateur {
 
     // ✅ Ajouter utilisateur avec photo
     public function ajouterUtilisateur($utilisateur) {
-        $sql = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role, date_creation, photo) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role,description, date_creation, photo, specialite) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->crud->prepare($sql);
         $params = [
             $utilisateur->getNom(),
@@ -65,8 +85,10 @@ class RequeteUtilisateur {
             password_hash($utilisateur->getMotDePasse(), PASSWORD_BCRYPT),
             $utilisateur->getTelephone(),
             $utilisateur->getRole(),
+            $utilisateur->getDescription(),
             $utilisateur->getDateCreation(),
-            $utilisateur->getPhoto()
+            $utilisateur->getPhoto(),
+            $utilisateur->getSpecialite()
         ];
         return $stmt->execute($params);
     }
@@ -77,10 +99,35 @@ class RequeteUtilisateur {
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['date_creation'], $row['photo']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite']);
         }
         return null;
     }
+    public function getUtilisateursByRole(string $role): array {
+    $sql = "SELECT * FROM utilisateurs WHERE role = ?";
+    $stmt = $this->crud->prepare($sql);
+    $stmt->execute([$role]);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $utilisateurs = [];
+    foreach ($rows as $row) {
+        $utilisateurs[] = new Utilisateur(
+            $row['id_utilisateur'],
+            $row['nom'],
+            $row['prenom'],
+            $row['email'],
+            $row['mot_de_passe'],
+            $row['telephone'],
+            $row['role'],
+            $row['description'],
+            $row['date_creation'],
+            $row['photo'],
+            $row['specialite']
+        );
+    }
+    return $utilisateurs;
+}
+    // ✅ Récupérer utilisateur par ID avec photo
 
     public function getUtilisateurById($id) {
         $sql = "SELECT * FROM utilisateurs WHERE id_utilisateur = ?";
@@ -88,7 +135,7 @@ class RequeteUtilisateur {
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['date_creation'], $row['photo']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite']);
         }
         return null;
     }
@@ -98,7 +145,7 @@ class RequeteUtilisateur {
         $stmt = $this->crud->query($sql);
         $utilisateurs = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['date_creation'], $row['photo']);
+            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite']);
         }
         return $utilisateurs;
     }

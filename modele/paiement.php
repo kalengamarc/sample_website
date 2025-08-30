@@ -47,7 +47,7 @@ class CRUDPaiement {
 
     public function __construct() {
         $db = new Database();
-        $this->connexion = $db->getConnexion();
+        $this->connexion = $db->getConnection();
     }
 
     // Créer un paiement

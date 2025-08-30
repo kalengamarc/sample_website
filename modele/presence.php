@@ -32,7 +32,7 @@ class CRUDPresence {
 
     public function __construct() {
         $db = new Database();
-        $this->connexion = $db->getConnexion();
+        $this->connexion = $db->getConnection();
     }
 
     // Ajouter une présence

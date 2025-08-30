@@ -1,7 +1,6 @@
 <?php
 
-include_once("Presence.php");
-include_once("CRUDPresence.php");
+include_once("../modele/presence.php");
 
 class PresenceController {
     private $crudPresence;

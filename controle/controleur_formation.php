@@ -1,6 +1,6 @@
 <?php
 
-include_once("Formation.php");
+include_once("../modele/formation.php");
 
 class FormationController {
     private $requeteFormation;
@@ -78,21 +78,21 @@ class FormationController {
      * Récupérer toutes les formations
      */
     public function getAllFormations(): array {
-        try {
-            $formations = $this->requeteFormation->getAllFormations();
-            
-            return [
-                'success' => true,
-                'data' => $formations,
-                'count' => count($formations)
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ];
-        }
+    try {
+        $formations = $this->requeteFormation->getAllFormations();
+        
+        return [
+            'success' => true,
+            'data' => $formations,
+            'count' => count($formations)
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
     }
+}
 
     /**
      * Mettre à jour une formation
