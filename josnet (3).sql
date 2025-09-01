@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 30, 2025 at 02:00 PM
+-- Generation Time: Sep 01, 2025 at 09:44 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -71,11 +71,22 @@ CREATE TABLE IF NOT EXISTS `formations` (
   `prix` decimal(10,2) NOT NULL,
   `duree` varchar(50) DEFAULT NULL,
   `id_formateur` int DEFAULT NULL,
+  `debut_formation` date NOT NULL,
   `date_creation` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `photo` text NOT NULL,
   PRIMARY KEY (`id_formation`),
   KEY `fk_formateur` (`id_formateur`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `formations`
+--
+
+INSERT INTO `formations` (`id_formation`, `titre`, `description`, `prix`, `duree`, `id_formateur`, `debut_formation`, `date_creation`, `photo`) VALUES
+(1, 'Programmation Web 2', 'venez nombre pour suivre le cours', 400.00, '120', 8, '2025-07-30', '2025-08-31 02:09:05', 'uploads/formations/68b3cae1cd074_1756613345.jpg'),
+(2, 'Mathematique Pure', 'les mathetique demeurent toujours l\\\'outil du monde', 400000.00, '145', 4, '2025-08-07', '2025-08-31 03:13:40', 'uploads/formations/68b3da04ec246_1756617220.jpg'),
+(3, 'Mathematique Modele', 'les mathetique demeurent toujours l\\\'outil du monde', 400000.00, '145', 4, '2025-09-07', '2025-08-31 03:15:36', 'uploads/formations/68b3da7867511_1756617336.jpeg'),
+(4, 'Antenne et Reseau de Satellite', 'venez nombreux pour suivre le cours', 300000.00, '210', 12, '2025-09-07', '2025-08-31 05:13:10', 'uploads/formations/68b3f6062187c_1756624390.jpg');
 
 -- --------------------------------------------------------
 
