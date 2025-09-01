@@ -12,7 +12,7 @@ class FormationController {
     /**
      * Créer une nouvelle formation
      */
-    public function createFormation($titre, $description, $prix, $duree, $id_formateur, $photo = null): array {
+    public function createFormation($titre, $description, $prix, $duree, $id_formateur, $debut_formation, $photo = null): array {
         try {
             // Validation des données
             $validationErrors = $this->validateFormationData($titre, $description, $prix, $duree, $id_formateur);
@@ -26,7 +26,7 @@ class FormationController {
             }
 
             $date_creation = date('Y-m-d H:i:s');
-            $formation = new Formation(null, $titre, $description, $prix, $duree, $id_formateur, $date_creation, $photo);
+            $formation = new Formation(null, $titre, $description, $prix, $duree, $id_formateur, $date_creation, $debut_formation, $photo);
             
             if ($this->requeteFormation->ajouterFormation($formation)) {
                 return [
@@ -97,7 +97,7 @@ class FormationController {
     /**
      * Mettre à jour une formation
      */
-    public function updateFormation($id_formation, $titre, $description, $prix, $duree, $id_formateur, $photo = null): array {
+public function updateFormation($id_formation, $titre, $description, $prix, $duree, $id_formateur, $debut_formation, $photo = null): array {
         try {
             // Vérifier d'abord si la formation existe
             $existingFormation = $this->requeteFormation->getFormationById($id_formation);
@@ -123,7 +123,7 @@ class FormationController {
             // Conserver la date de création originale
             $date_creation = $existingFormation->getDateCreation();
             
-            $formation = new Formation($id_formation, $titre, $description, $prix, $duree, $id_formateur, $date_creation, $photo);
+            $formation = new Formation($id_formation, $titre, $description, $prix, $duree, $id_formateur, $date_creation, $debut_formation, $photo);
             
             if ($this->requeteFormation->mettreAJourFormation($formation)) {
                 return [
@@ -286,6 +286,30 @@ class FormationController {
                 'success' => false,
                 'message' => 'Erreur: ' . $e->getMessage()
             ];
+        }
+    }
+
+    public function getTempsRestantFinFormation($timeSpeci,$duree){
+        $timePresent = time();
+        $timeSpecifique = strtotime($timeSpeci);
+        $heureRestant = ($timeSpecifique - $timePresent)/3600;
+
+        if ($heureRestant<=0 && $heureRestant<$duree) {
+            if (abs(round($heureRestant/24))>30) {
+                return round(abs(round($heureRestant/24))/30) ." mois ". abs(round($heureRestant/24))%30 ." jours de cours";
+            } else {
+                return abs(round($heureRestant/24))." jours de cours";
+            }            
+        }
+        elseif ($heureRestant >= 0) {
+            if (($heureRestant/24)>=30) {
+                return 'la formation en preparation il reste <b> '. round(($heureRestant/24)/30) .' mois et '. round($heureRestant/24)%30 .' jours';
+            }else{
+                return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
+            }        
+        }
+        elseif(abs($heureRestant)>$duree) {
+            return 'la formation a deja termine';
         }
     }
 }

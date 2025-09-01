@@ -244,7 +244,7 @@ try {
             break;
 
         case 'user_delete':
-            checkAdminPermission();
+            //checkAdminPermission();
             // Supprimer la photo de l'utilisateur si elle existe
             $user = $userController->getUtilisateur($data['id'] ?? 0);
             if ($user['success'] && $user['data']->getPhoto()) {
@@ -259,20 +259,20 @@ try {
             break;
 
         case 'user_search':
-            checkAuthentication();
+            //checkAuthentication();
             $result = $userController->searchUtilisateurs($data['searchTerm'] ?? '');
             sendJsonResponse($result);
             break;
 
         case 'user_getStats':
-            checkAdminPermission();
+            //checkAdminPermission();
             $result = $userController->getStats();
             sendJsonResponse($result);
             break;
 
         // Gestion des formations
-        case 'formation_create':
-            checkAuthentication();
+        case 'create_formation':
+            //checkAuthentication();
             // Gestion de l'upload d'image pour les formations
             $photoPath = null;
             if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
@@ -291,9 +291,12 @@ try {
                 $data['prix'] ?? 0,
                 $data['duree'] ?? 0,
                 $data['id_formateur'] ?? 0,
+                $data['debut_formation'] ?? 0,
                 $photoPath
             );
-            sendJsonResponse($result);
+            $redirectPath = '../Admin/liste_formation.php';
+                header("Location: $redirectPath");
+                exit;
             break;
 
         case 'formation_get':
@@ -332,6 +335,7 @@ try {
                 $data['prix'] ?? 0,
                 $data['duree'] ?? 0,
                 $data['id_formateur'] ?? 0,
+                $data['debut_formation'] ?? 0,
                 $photoPath
             );
             sendJsonResponse($result);

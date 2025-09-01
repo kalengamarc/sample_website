@@ -9,9 +9,10 @@ class Formation {
     private $duree;
     private $id_formateur;
     private $date_creation;
+    private $debut_formation;
     private $photo;
 
-    public function __construct($id_formation, $titre, $description, $prix, $duree, $id_formateur, $date_creation, $photo) {
+    public function __construct($id_formation, $titre, $description, $prix, $duree, $id_formateur, $date_creation, $debut_formation, $photo) {
         $this->id_formation = $id_formation;
         $this->titre = $titre;
         $this->description = $description;
@@ -19,6 +20,7 @@ class Formation {
         $this->duree = $duree;
         $this->id_formateur = $id_formateur;
         $this->date_creation = $date_creation;
+        $this->debut_formation = $debut_formation;
         $this->photo = $photo;
     }
 
@@ -30,6 +32,7 @@ class Formation {
     public function getDuree() { return $this->duree; }
     public function getIdFormateur() { return $this->id_formateur; }
     public function getDateCreation() { return $this->date_creation; }
+    public function getDebutFormation() { return $this->debut_formation; }
     public function getPhoto() { return $this->photo; }
 
     // --- SETTERS ---
@@ -39,6 +42,7 @@ class Formation {
     public function setDuree($duree) { $this->duree = $duree; }
     public function setIdFormateur($id_formateur) { $this->id_formateur = $id_formateur; }
     public function setDateCreation($date_creation) { $this->date_creation = $date_creation; }
+    public function setDebutFormation($debut_formation) { $this->debut_formation = $debut_formation; }
     public function setPhoto($photo) { $this->photo = $photo; }
 }
 
@@ -52,8 +56,8 @@ class RequeteFormation {
 
     // ✅ Ajouter une formation
     public function ajouterFormation($formation) {
-        $sql = "INSERT INTO formations (titre, description, prix, duree, id_formateur, date_creation, photo)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO formations (titre, description, prix, duree, id_formateur, date_creation, debut_formation, photo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->crud->prepare($sql);
         $params = [
             $formation->getTitre(),
@@ -62,6 +66,7 @@ class RequeteFormation {
             $formation->getDuree(),
             $formation->getIdFormateur(),
             $formation->getDateCreation(),
+            $formation->getDebutFormation(),
             $formation->getPhoto()
         ];
         return $stmt->execute($params);
@@ -74,7 +79,7 @@ class RequeteFormation {
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Formation($row['id_formation'], $row['titre'], $row['description'], $row['prix'], $row['duree'], $row['id_formateur'], $row['date_creation'], $row['photo']);
+            return new Formation($row['id_formation'], $row['titre'], $row['description'], $row['prix'], $row['duree'], $row['id_formateur'], $row['date_creation'], $row['debut_formation'], $row['photo']);
         }
         return null;
     }
@@ -85,14 +90,14 @@ class RequeteFormation {
         $stmt = $this->crud->query($sql);
         $formations = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $formations[] = new Formation($row['id_formation'], $row['titre'], $row['description'], $row['prix'], $row['duree'], $row['id_formateur'], $row['date_creation'], $row['photo']);
+            $formations[] = new Formation($row['id_formation'], $row['titre'], $row['description'], $row['prix'], $row['duree'], $row['id_formateur'], $row['date_creation'], $row['debut_formation'], $row['photo']);
         }
         return $formations;
     }
 
     // ✅ Mettre à jour une formation
     public function mettreAJourFormation($formation) {
-        $sql = "UPDATE formations SET titre = ?, description = ?, prix = ?, duree = ?, id_formateur = ?, photo = ?
+        $sql = "UPDATE formations SET titre = ?, description = ?, prix = ?, duree = ?, id_formateur = ?, debut_formation, photo = ?
                 WHERE id_formation = ?";
         $stmt = $this->crud->prepare($sql);
         $params = [
@@ -101,6 +106,7 @@ class RequeteFormation {
             $formation->getPrix(),
             $formation->getDuree(),
             $formation->getIdFormateur(),
+            $formation->getDebutFormation(),
             $formation->getPhoto(),
             $formation->getIdFormation()
         ];
@@ -122,7 +128,7 @@ class RequeteFormation {
         $stmt->execute([$param, $param]);
         $formations = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $formations[] = new Formation($row['id_formation'], $row['titre'], $row['description'], $row['prix'], $row['duree'], $row['id_formateur'], $row['date_creation'], $row['photo']);
+            $formations[] = new Formation($row['id_formation'], $row['titre'], $row['description'], $row['prix'], $row['duree'], $row['id_formateur'], $row['date_creation'], $row['debut_formation'], $row['photo']);
         }
         return $formations;
     }

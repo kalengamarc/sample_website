@@ -381,7 +381,7 @@
                         <?php endif; ?>
                         
                         <div class="form_card">
-                            <form method="POST" action="../controleurs/index.php" enctype="multipart/form-data" id="formationForm">
+                            <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formationForm">
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="titre">Titre de la formation <span class="required">*</span></label>
@@ -402,6 +402,11 @@
                                         <input type="number" id="duree" name="duree" min="1" value="<?= $_POST['duree'] ?? '' ?>" required>
                                         <div class="error_message" id="dureeError"></div>
                                     </div>
+                                    <div class="form_group">
+                                        <label for="duree">Debut de la formation <span class="required">*</span></label>
+                                        <input type="date" id="duree" name="debut_formation" min="1" value="<?= $_POST['debut_formation'] ?? '' ?>" required>
+                                        <div class="error_message" id="dureeError"></div>
+                                    </div>
                                     
                                     <div class="form_group">
                                         <label for="formateur">Formateur <span class="required">*</span></label>
@@ -415,9 +420,7 @@
                                                     $selected = (isset($_POST['id_formateur']) && $_POST['id_formateur'] == $formateur->getId()) ? 'selected' : '';
                                                     echo "<option value='{$formateur->getId()}' $selected>{$formateur->getPrenom()} {$formateur->getNom()}</option>";
                                                 }
-                                                // foreach($formateurs as $formateur) {
-                                                //     echo "<option value='{$formateur['id']}'>{$formateur['prenom']} {$formateur['nom']}</option>";
-                                                // }
+                                               
                                             } catch (Exception $e) {
                                                 echo "<option value=''>Erreur de chargement des formateurs</option>";
                                             }
