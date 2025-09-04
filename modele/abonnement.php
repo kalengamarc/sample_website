@@ -224,7 +224,7 @@ class CRUDAbonnement {
      */
     public function checkMutualAbonnement(int $id_utilisateur1, int $id_utilisateur2): bool {
         $sql = "SELECT COUNT(*) FROM abonnements 
-                WHERE (id_abonne = ? AND id_formateur = ?)
+                  WHERE (id_abonne = ? AND id_formateur = ?)
                 OR (id_abonne = ? AND id_formateur = ?)";
         
         $stmt = $this->connexion->prepare($sql);
