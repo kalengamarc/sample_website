@@ -60,21 +60,22 @@
     }
    
     .dashcontainu{
-        width: 80%;
+        width: 90%;
         height: 94%;
         background-color: #b9c1be;
         display: flex;
-        align-items: center;
         justify-content: center;
         
     }
     .tabl_contnu{
-        width: 100%;
+        width: 90%;
         height: 100%;
         background-color: #b9c1be;;
         color: black;
         overflow: scroll;
-        margin: 15px;
+        margin-top: 15px;
+        margin-right: 15px;
+        
     }
     .tabl_contnu::-webkit-scrollbar{
         display: none;
@@ -92,27 +93,29 @@
     font-size: 18px;
 }
 .profile_div{
-    width: 95%;
-    height: 120vh;
+    width: 98%;
+    height: 112vh;
     background-color: #f4f4f4;
-    margin-left: 20px;
+    margin-left: 2px;
     border-radius: 5px;
     font-size: 16px;
 }
 .profile_div_cont{
     margin: 9px;
     font-size: 16px;
+    width: 95%;
+    height: 120vh;
 }
 .imge_profile{
     display: flex;
-    align-items: start;
-    justify-content: start;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
     font-size: 16px;
 }
 .imgprof{
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     margin-top: 20px;
     font-size: 16px;
@@ -129,37 +132,41 @@
 .boutonprof{
     position: relative;
 }
+
+/*=====================================================
+    STYLE DU BOUTON PLUS SUR L'IMAGE PROFILE
+========================================================*/
 .boutonprof #plus_cirle{
     position: absolute;
     color:#05f07a;
-    font-size: 30px;
-    top: 90px;
-    right: 178px;
+    font-size: 20px;
+    top: 50px;
+    right: 176px;
     cursor: pointer;
+    font-size: 25px;
 }
 #Upload{
     padding: 8px;
-    font-size: 16px;
+    font-size: 12px;
     background-color: #021a12;
     border: 1px solid #021a12;
     outline: none;
     color: #f4f4f4;
     font-weight: 900;   
-    margin-top: 50px;
+    margin-top:15px;
     border-radius: 5px;
-    margin-left: 20px;
+    margin-left: 40px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 11px;
 }
 #Delete{
     padding: 8px;
-    font-size: 16px;
+    font-size: 12px;
     border: 1px solid white;
     outline: none;
-    margin-top: 40px;
+    margin-top: 15px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
 }
 .first_inputsforms{
     display: flex;
@@ -174,8 +181,9 @@
     align-items: center;
     justify-content: space-between;
     flex-direction: column;
-    gap: 10px;
-    font-size: 14px;
+    gap: 8px;
+    font-size: 12px;
+    
 }
 .firstname{
     display: flex;
@@ -183,18 +191,25 @@
     justify-content: start;
     gap:2px;
     flex-direction: column;
-    font-size: 14px;
+    font-size: 12px;
+}
+#mardiinput{
+    padding: 6px;
 }
 .firstname input{
-      padding: 8px;
-      width: 480px;
-      border: 1px solid #021a12;
-      outline: none;
+    padding: 8px;
+    width: 450px;
+    border: 1px solid #b9c1be;
+    outline: none;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 12px;
+    margin-left: 20px;
+}
+.firstname label{
+    margin-left: 20px;
 }
 .firstname input:focus{
-    border: 1px solid gold;
+    border: 3px solid #021a12;
 }
 .second_input{
     display: flex;
@@ -202,52 +217,100 @@
     justify-content: start;
     gap:2px;
     flex-direction: column;
+    margin-left: 35px;
    
 }
 .second_input input{
     padding: 8px;
-    width: 480px;
-    border: 1px solid #021a12;
+    width: 300px;
+    border: 1px solid #b9c1be;
     outline: none;
     border-radius: 5px;
 }
 .second_input input:focus{
-    border: 1px solid gold;
+    border: 3px solid #021a12;
 }
 #adresse_residence{
-    width: 970px;
+    width:790px;
     resize: none;
     padding: 8px;
     border-radius: 5px;
     outline: none;
+    margin-left: 20px;
     border: 1px solid #021a12;
 
 }
 #adresse_residence:focus{
-    border: 1px solid gold;
+    border: 3px solid #021a12;
 }
 #savechanged{
     padding: 8px;
     background-color: #021a12;
     color: #b9c1be;
     outline: none;
-    border: 1px solid #021a12;
+    border: 1px solid #b9c1be;
     font-size: 16px;
     align-self:flex-start;
-    margin-left: 14px;
+    margin-left: 25px;
     border-radius: 5px;
     margin-top: 20px;
     font-size: 14px;
 }
-
-
 /** PLUS-CIRCLE-STYLE */
 #savechanged:hover{
     background-color: gold;
-    border: 1px solid gold;
     color: #00110a;
     cursor: pointer;
 
+}
+
+/*=================================================
+    SITTINGS SIDE
+==================================================*/
+.settings_side{
+    width: 25%;
+    height: 25vh;
+    background-color: #f4f4f4;
+    margin-top: 25px;
+    border-radius: 5px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.settings_side .listedesmarametres{
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    gap: 10px;
+    flex-direction: column;
+}
+.settings_side .listedesmarametres .iconssss{
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    gap: 5px;
+    width: 250px;
+    height: 40px;
+    padding: 5px;
+}
+.settings_side .listedesmarametres .iconssss:hover{
+    background-color: #021a12;
+    justify-content: start;
+    align-items: start;
+    color: #ffae2b;
+}
+.settings_side .listedesmarametres .iconssss:hover a{
+    color: #f4f4f4;
+}
+.settings_side .listedesmarametres .iconssss i{
+    color: #ffae2b;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+.settings_side .listedesmarametres .iconssss a{
+    text-decoration: none;
+    color: #021a12;
+    margin-top: 5px;
 }
 </style>
 <body>
@@ -262,16 +325,35 @@
                 include ("menu.php");
             ?>
                 <div class="dashcontainu">
+                    <div class="settings_side">
+                         <!--PARAMETTRES-->
+                        <div class="listedesmarametres">
+                            <div class="iconssss">
+                                <i class="fas fa-user"></i>
+                                <a href="#">Profile</a>
+                            </div>
+                            <div class="iconssss">
+                                <i class="fas fa-user"></i>
+                                <a href="#">Paramaitres generals</a>
+                            </div>
+                            <div class="iconssss">
+                                <i class="fas fa-user"></i>
+                                <a href="#">Notifications</a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tabl_contnu">
-                       <h2>My profile</h2>
                        <div class="profile_div">
                             <div class="profile_div_cont">
+                                 <!--LELEMENTS DU PROFILE-->
                                 <div class="imge_profile">
                                     <div class="imageprof">
                                         <div class="imgprof">
+                                             <!--IMAGE_PROFILE-->
                                             <img src="../vue/defi7/images/Student day _ Premium Photo.jpeg" alt="">
                                         </div>
                                     </div>
+                                     <!--BOUTON POUR CHANGER LA PHOTO DE PROFILE-->
                                     <div class="boutonprof">
                                         <button id="Upload"> Upload </button>
                                         <button id="Delete">Delete avatar</button>
@@ -284,11 +366,11 @@
                                     <div class="first_inputsforms">
                                         <div class="firstname">
                                             <label for="">First name</label><br>
-                                            <input type="text" placeholder="firstname">
+                                            <input type="text" placeholder="firstname" id="mardiinput">
                                         </div>
                                         <div class="second_input">
                                             <label for="">Lastname</label><br>
-                                            <input type="text" placeholder="Lastname">
+                                            <input type="text" placeholder="Lastname" id="mardiinput">
                                         </div>
                                     </div>
                                     <div class="first_inputsforms">

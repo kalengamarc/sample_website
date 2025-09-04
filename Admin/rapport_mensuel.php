@@ -118,7 +118,66 @@
     .months p{
         font-size: 12px;
     }
-    
+    /* RAPPORT MENSUEL* */
+
+
+    .dashboardmonth {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.report-card {
+    background-color: #00110a;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 65%;
+    margin: 20px;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ffc2;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.chart-placeholder {
+    width: 100%;
+    height: 250px;
+    background-color: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    text-align: center;
+    line-height: 200px;
+    color: #3c5a74;
+    font-size: 18px;
+    padding: 20px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ffae2b;
+}
+
+.stat-description {
+    font-size: 16px;
+    color: #7a8c98;
+}
+
 
 </style>
 <body>
@@ -135,45 +194,23 @@
                 ?>
                 <div class="dashcontainu">
                     <div class="tabl_contnu">
-                        <h4>Rapport mensuel</h4>
-                       <div class="graphs">
-                             <!--Partie evolutions statistics-->
-                            <div class="evolutions">
-                                <div class="firstline">
-                                    <h4>20</h4>
-                                    <hr>
+                        <div class="dashboardmonth">
+                            <div class="report-card">
+                                <h2 class="report-title">RAPPORT MENSUEL</h2>
+                                <div class="chart monthly-chart">
+                                    <!-- Graphiques en secteurs et à barres -->
+                                    <div class="chart-placeholder">Graphique Mensuel</div>
                                 </div>
-                                <div class="firstline">
-                                    <h4>15</h4>
-                                    <hr>
+                                <div class="stats">
+                                    <div class="stat">
+                                        <span class="stat-number">950</span>
+                                        <span class="stat-description">Visites</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-number">72%</span>
+                                        <span class="stat-description">Abonnement</span>
+                                    </div>
                                 </div>
-                                <div class="firstline">
-                                    <h4>10</h4>
-                                    <hr>
-                                </div>
-                                <div class="firstline">
-                                    <h4>5</h4>
-                                    <hr>
-                                </div>
-                                <div class="firstline">
-                                    <h4>0</h4>
-                                    <hr>
-                                </div>
-                                <div class="months">
-                                    <p>Janvier</p>
-                                    <p>Fevrier</p>
-                                    <p>Mars</p>
-                                    <p>Avril</p>
-                                    <p>Mai</p>
-                                    <p>Juin</p>
-                                    <P>Juillet</P>
-                                    <p>Auguste</p>
-                                    <p>Octobre</p>
-                                    <p>Novembre</p>
-                                    <p>Decembre</p>
-                                </div>
-                            <div class="bars">
-
                             </div>
                         </div>
                     </div>

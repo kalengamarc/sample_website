@@ -101,23 +101,78 @@
         position: relative;
         
     }
-    .evolutions{
-        margin-top: 25px;
-    }
-    .firstline hr{
-        width: 95%;
-        margin-top: 10px;
-    }
-    .months{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 50px;
-    }
-    .months p{
-        font-size: 12px;
-    }
     
+
+/*=======================================================
+    /*Graphique du rapport mensuel
+=======================================================* */
+    .dashboard {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.report-card {
+    background-color: #00110a;;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 70%;
+    margin: 20px;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ffc2;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.chart-placeholder {
+    width: 100%;
+    height: 250px;
+    background-color: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    text-align: center;
+    line-height: 200px;
+    color: #3c5a74;
+    font-size: 18px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #ffae2b;
+}
+
+.stat-description {
+    font-size: 16px;
+    color: #7a8c98;
+}
+
+/*======================================================
+        STYELE POUR LE GRAPHIQUE CIRCULAIRE
+========================================================*/ 
+.chart #graph_anuel{
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    margin: 20px auto;
+    background: conic-gradient( #00ffc2 0% 10%, #021a12 10% 20%, #ffae2b 20% 30%, rgba(255,255,255,0.09) 30% 40%, rgba(255,255,255,0.12) 40% 50%, #05f07a 50% 60%, rgba(255,255,255,0.06) 60% 70%, #f032e6 20% 10%);
+    padding: 40px;
+}   
 
 </style>
 <body>
@@ -134,45 +189,22 @@
                 ?>
                 <div class="dashcontainu">
                     <div class="tabl_contnu">
-                        <h4>Rapport Annuel</h4>
-                        <div class="graphs">
-                            <!--Partie graphique des evolutions-->
-                            <div class="evolutions">
-                                <div class="firstline">
-                                    <h4>20</h4>
-                                    <hr>
+                        <div class="dashboard">
+                            <div class="report-card">
+                                <h2 class="report-title">RAPPORT ANNUEL</h2>
+                                <div class="chart annual-chart">
+                                    <!-- Graphique ligne simulé avec un arrière-plan -->
+                                    <div class="chart-placeholder" id="graph_anuel"></div>
                                 </div>
-                                <div class="firstline">
-                                    <h4>15</h4>
-                                    <hr>
-                                </div>
-                                <div class="firstline">
-                                    <h4>10</h4>
-                                    <hr>
-                                </div>
-                                <div class="firstline">
-                                    <h4>5</h4>
-                                    <hr>
-                                </div>
-                                <div class="firstline">
-                                    <h4>0</h4>
-                                    <hr>
-                                </div>
-                                <div class="months">
-                                    <p>2018</p>
-                                    <p>2019</p>
-                                    <p>2020</p>
-                                    <p>2021</p>
-                                    <p>2022</p>
-                                    <p>2023</p>
-                                    <P>2024</P>
-                                    <p>2025</p>
-                                    <p>2026</p>
-                                    <p>2027</p>
-                                    <p>2028</p>
-                                </div>
-                                <div class="bars">
-
+                                <div class="stats">
+                                    <div class="stat">
+                                        <span class="stat-number">1,250</span>
+                                        <span class="stat-description">Visites</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-number">65%</span>
+                                        <span class="stat-description">Abonnement</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
