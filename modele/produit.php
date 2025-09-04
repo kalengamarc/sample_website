@@ -54,7 +54,7 @@ class CRUDProduit {
 
     // Ajouter un produit
     public function ajouterProduit(Produit $p) {
-        $sql = "INSERT INTO produit (nom, description, prix, stock, categorie, photo) 
+        $sql = "INSERT INTO produits (nom, description, prix, stock, categorie, photo) 
                 VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->connexion->prepare($sql);
         $ok = $stmt->execute([
@@ -71,7 +71,7 @@ class CRUDProduit {
 
     // Lire un produit par ID
     public function getProduitById($id) {
-        $sql = "SELECT * FROM produit WHERE id_produit = ?";
+        $sql = "SELECT * FROM produits WHERE id_produit = ?";
         $stmt = $this->connexion->prepare($sql);
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -80,7 +80,7 @@ class CRUDProduit {
 
     // Lire tous les produits
     public function getAllProduits() {
-        $sql = "SELECT * FROM produit ORDER BY date_ajout DESC";
+        $sql = "SELECT * FROM produits ORDER BY date_ajout DESC";
         $stmt = $this->connexion->query($sql);
         $produits = [];
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -91,7 +91,7 @@ class CRUDProduit {
 
     // Mettre à jour un produit
     public function updateProduit(Produit $p) {
-        $sql = "UPDATE produit SET nom = ?, description = ?, prix = ?, stock = ?, categorie = ?, photo = ? WHERE id_produit = ?";
+        $sql = "UPDATE produits SET nom = ?, description = ?, prix = ?, stock = ?, categorie = ?, photo = ? WHERE id_produit = ?";
         $stmt = $this->connexion->prepare($sql);
         return $stmt->execute([
             $p->getNom(),
@@ -106,7 +106,7 @@ class CRUDProduit {
 
     // Supprimer un produit
     public function deleteProduit($id) {
-        $sql = "DELETE FROM produit WHERE id_produit = ?";
+        $sql = "DELETE FROM produits WHERE id_produit = ?";
         $stmt = $this->connexion->prepare($sql);
         return $stmt->execute([$id]);
     }

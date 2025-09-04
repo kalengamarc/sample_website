@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php
+        include_once('../controle/controleur_produit.php');
+        $ProduitController = new ProduitController();
+        $produits = $ProduitController->getAllProduits();
+        //print_r($produits);
+        //exit();
+    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashborad</title>
@@ -199,7 +206,8 @@
     }
 
     th {
-      background: #f0f2f5;
+      background:#00110a;
+      color:yellow;
       font-weight: bold;
     }
 
@@ -221,7 +229,7 @@
                     <div class="tabl_contnu">
                         <div class="titre_formation">
                             <h3>Liste des equipements</h3>
-                            <div class="ajouter" data-tooltip="ajouter un equipement"><a href=""><i class="fas fa-plus"></i></a></div>
+                            <div class="ajouter" data-tooltip="ajouter un equipement"><a href="../Admin/ajoutProduit.php"><i class="fas fa-plus"></i></a></div>
                         </div>
                         <div class="principal">
                             <table>
@@ -230,74 +238,24 @@
                                             <th>#</th>
                                             <th>Nom</th>
                                             <th>Description</th>
-                                            <th>Duree</th>
+                                            <th>categorie</th>
                                             <th>Prix</th>
+                                            <th>Quantite</th>
+                                            <th>Photo</th>
                                             <th>action</th>
                                         </tr>
                                     </thead>
-                                   
+                                   <?php foreach($produits['data'] as $produit):?>
                                     <tr>
                                         <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
+                                        <td><?=$produit->getNom()?></td>
+                                        <td><?=$produit->getDescription()?></td>
+                                        <td><?=$produit->getCategorie()?></td>
+                                        <td><?=$produit->getPrix()?></td>
+                                        <td><?=$produit->getStock()?></td>
+                                        <td><img src="../controle/<?=$produit->getPhoto()?>" alt="Equipement" 
+                                        style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #00110a;">
+                                        </td>
                                         <td>
                                                 <div class="icons_actuality">
                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
@@ -306,106 +264,14 @@
                                                 </div>
                                             </td>
                                     </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                                                        <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                                                        <tr>
-                                        <td>1</td>
-                                        <td>Développement Web</td>
-                                        <td>Apprenez HTML, CSS, JavaScript et PHP</td>
-                                        <td>3 mois</td>
-                                        <td>200$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                     <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Réseaux Informatiques</td>
-                                        <td>Concepts VLAN, ACL, Routage</td>
-                                        <td>2 mois</td>
-                                        <td>150$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Intelligence Artificielle</td>
-                                        <td>Introduction au Machine Learning et Deep Learning</td>
-                                        <td>4 mois</td>
-                                        <td>300$</td>
-                                        <td>
-                                                <div class="icons_actuality">
-                                                    <a href=""><div class="voir" data-tooltip="Voir"><i class=" fas fa-eye"></i></div></a>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
-                                                </div>
-                                            </td>
-                                    </tr>
+                                    <?php endforeach;?>
                                     
                                 </table>
+                                <div style="display:flex; justify-content:center; align-items:center; margin-top:20px; padding:10px; gap:20px; background:#00110a; color:white; border-radius:5px;">
+                                    <h3> Stock Total : <?=$produits['stats']['total_stock'] ?>   </h3>
+                                    <h3> Moyenne de Prix: <?=$produits['stats']['average_price'] ?>   </h3>
+                                    <h3> Montant Total: <?=$produits['stats']['total_valeur'] ?>   </h3>
+                                </div>
                         </div> 
                     </div>
                 </div>

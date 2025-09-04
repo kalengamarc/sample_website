@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="fr">
 <head>
+  <?php
+      include_once('../controle/controleur_produit.php');
+      $ProduitController = new ProduitController();
+      $produits = $ProduitController->getAllProduits();
+  ?>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Produits</title>
@@ -40,8 +45,8 @@
   <!-- fin du logo et les textes ensemble -->
 <!-- navigateur debut-->
     <nav class="nav">
-      <a href="produits.html"><button class="btn">Produits</button></a>
-      <a href="services.html"><button class="btn">Services</button></a>
+      <a href="produits.php"><button class="btn">Produits</button></a>
+      <a href="services.php"><button class="btn">Services</button></a>
       <a href="contact.html"><button class="btn">Contact</button></a>  
     </nav>
   <!-- navigateur fin-->
@@ -54,10 +59,11 @@
   <!-- FEATURES GRID -->
   <section class="reveal" id="features">
     <div class="grid">
+      <?php foreach ($produits['data'] as $produit): ?>
       <article class="card" data-tilt>
-          <img src="../vue/images/equipement.jpg" alt="">
-          <h3>Tricot orginal pour les garcons</h3>
-          <p> L'un de nos produits les plus demandes</h3>
+          <img src="<?='../controle/'.$produit->getPhoto()?>" alt="">
+          <h3><?=$produit->getNom()?></h3>
+          <p><?=$produit->getDescription()?></h3>
           <div class="alignements_icones">
              <i class=" icon fa fa-comment"></i>
             <i class=" icon fas fa-shopping-cart" ></i>
@@ -65,6 +71,7 @@
             <i class="icon fas fa-share"></i>
           </div>
       </article>
+      <?php endforeach; ?>
 
       <article class="card" data-tilt>
         <img src="../vue/images//image2.jpg" alt="">

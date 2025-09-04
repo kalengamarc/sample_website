@@ -165,7 +165,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="AjoutProduit.php">
                             Ajouter un équipement
                         </a>
                     </li>

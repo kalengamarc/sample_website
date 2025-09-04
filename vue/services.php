@@ -5,9 +5,7 @@
     include_once('../controle/controleur_formation.php');
     $formation = new FormationController();
     $listeFormation = $formation->getAllFormations();
-    print_r($listeFormation);
     ?>
-  ?>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Produits</title>
@@ -80,7 +78,7 @@
   </section>
 
   <footer class="reveal">
-    <small>&copy; <span id="year"></span> TermaDevs — Construit pour l'avenir </small>
+    <small>&copy; <span id="year"></span> JosNet — Construit pour l'avenir </small>
   </footer>
   <script src="javascript/imageAnimation.js"></script>
 </div>

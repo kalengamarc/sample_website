@@ -139,10 +139,7 @@ try {
 
         // Gestion des utilisateurs
         case 'user_login':
-            $result = $userController->authenticate(
-                $data['email'] ?? '',
-                $data['password'] ?? ''
-            );
+            $result = $userController->authenticate($data['email'] ?? '',$data['password'] ?? '');
             if ($result['success']) {
                 $_SESSION['user_id'] = $result['data']->getId();
                 $_SESSION['user_role'] = $result['data']->getRole();
@@ -373,7 +370,7 @@ try {
 
         // Gestion des produits
         case 'produit_create':
-            checkAuthentication();
+            //checkAuthentication();
             // Gestion de l'upload d'image pour les produits
             $photoPath = null;
             if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
@@ -394,7 +391,9 @@ try {
                 $data['categorie'] ?? '',
                 $photoPath
             );
-            sendJsonResponse($result);
+            $redirectPath = '../Admin/liste_equipement.php';
+                header("Location: $redirectPath");
+                exit;
             break;
 
         case 'produit_get':
@@ -690,8 +689,8 @@ try {
         // Page d'accueil par défaut
         case '':
             // Afficher l'interface utilisateur
-            if (file_exists('views/index.html')) {
-                include 'views/index.html';
+            if (file_exists('index.html')) {
+                include 'index.html';
             } else {
                 echo "Bienvenue sur l'application. Utilisez le paramètre 'do' pour effectuer des actions.";
             }
