@@ -93,9 +93,9 @@ class RequeteUtilisateur {
         return $stmt->execute($params);
     }
 
-    public function getUtilisateurByEmail($email) {
+    public static function getUtilisateurByEmail($email) {
         $sql = "SELECT * FROM utilisateurs WHERE email = ?";
-        $stmt = $this->crud->prepare($sql);
+        $stmt = $crud->prepare($sql);
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
@@ -173,6 +173,14 @@ class RequeteUtilisateur {
         $sql = "DELETE FROM utilisateurs WHERE id_utilisateur = ?";
         $stmt = $this->crud->prepare($sql);
         return $stmt->execute([$id]);
+    }
+
+    public function authentifier($email, $mot_de_passe) {
+        $utilisateur = $this->getUtilisateurByEmail($email);
+        if ($utilisateur && password_verify($mot_de_passe, $utilisateur->getMotDePasse())) {
+            return $utilisateur;
+        }
+        return null;
     }
 }
 ?>

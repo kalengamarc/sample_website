@@ -74,7 +74,8 @@ class CommentaireCRUD {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getConnection();
+        $db = new DataBase();
+        $this->pdo = $db->getConnection();
     }
 
     // CREATE

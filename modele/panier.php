@@ -68,7 +68,8 @@ class PanierCRUD {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getPDOConnection();
+        $db = new DataBase();
+        $this->pdo = $db->getConnection();
     }
 
     // CREATE

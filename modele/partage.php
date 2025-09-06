@@ -107,7 +107,8 @@ class PartageCRUD {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getPDOConnection();
+        $db = new DataBase();
+        $this->pdo = $db->getConnection();
     }
 
     // CREATE

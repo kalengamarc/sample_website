@@ -128,7 +128,7 @@ class UtilisateurController {
         try {
             $utilisateur = $this->requeteUtilisateur->getUtilisateurByEmail($email);
             if ($utilisateur) {
-                $utilisateur->setMotDePasse('');
+                //$utilisateur->setMotDePasse('');
                 return ['success' => true, 'data' => $utilisateur];
             }
             return ['success' => false, 'message' => 'Utilisateur non trouvé'];
@@ -140,7 +140,7 @@ class UtilisateurController {
     public function getAllUtilisateurs(): array {
         try {
             $utilisateurs = $this->requeteUtilisateur->getAllUtilisateurs();
-            foreach ($utilisateurs as $u) $u->setMotDePasse('');
+            foreach ($utilisateurs as $u) //$u->setMotDePasse('');
             return ['success' => true, 'data' => $utilisateurs, 'count' => count($utilisateurs)];
         } catch (Exception $e) {
             return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
@@ -227,6 +227,15 @@ class UtilisateurController {
         $validRoles = ['admin', 'formateur', 'etudiant', 'client'];
         if (!in_array($role, $validRoles)) $errors[] = 'Rôle invalide. Les rôles valides sont: ' . implode(', ', $validRoles);
         return $errors;
+    }
+
+public function authenticate($email, $mot_de_passe) {
+        $utilisateur = new RequeteUtilisateur();
+        $authentifiedUser = $utilisateur->authentifier($email, $mot_de_passe);
+        if ($authentifiedUser) {
+            $authentifiedUser->setMotDePasse(''); // Ne pas exposer le mot de passe
+            return ['success' => true, 'data' => $authentifiedUser];
+        }
     }
 }
 

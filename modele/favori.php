@@ -68,14 +68,15 @@ class Favori {
 }
 ?>
 <?php
-require_once 'Favori.php';
+
 require_once 'base.php';
 
 class FavoriCRUD {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getPDOConnection();
+        $db = new DataBase();
+        $this->pdo = $db->getConnection();
     }
 
     // CREATE
