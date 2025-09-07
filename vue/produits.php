@@ -944,11 +944,11 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             </div>
         </section>
 
-        <!-- Comment Modal -->
+         <!-- Comment Modal -->
         <div id="commentModal" class="modal" role="dialog" aria-labelledby="commentModalTitle" aria-hidden="true">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="commentModalTitle"><极好 class="fas fa-star"></i> Votre avis compte</h3>
+                    <h3 id="commentModalTitle"><i class="fas fa-star"></i> Votre avis compte</h3>
                     <span class="close" onclick="closeModal('commentModal')" title="Fermer">&times;</span>
                 </div>
                 
@@ -956,7 +956,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     <form method="post" id="commentForm">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
                         <input type="hidden" name="action" value="ajouter_commentaire">
-                        <极好 type="hidden" name="id_produit" id="comment_produit_id">
+                        <input type="hidden" name="id_service" id="comment_service_id">
                         
                         <!-- Rating Section -->
                         <div class="rating-section">
@@ -970,7 +970,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 <label for="star4" title="4 étoiles" data-value="4">★</label>
                                 <input type="radio" id="star3" name="note" value="3" />
                                 <label for="star3" title="3 étoiles" data-value="3">★</label>
-                                <input type="radio" id="star2" name="note" value="极好" />
+                                <input type="radio" id="star2" name="note" value="2" />
                                 <label for="star2" title="2 étoiles" data-value="2">★</label>
                                 <input type="radio" id="star1" name="note" value="1" />
                                 <label for="star1" title="1 étoile" data-value="1">★</label>
@@ -986,7 +986,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 </label>
                                 <textarea name="commentaire" 
                                           id="commentaire" 
-                                          placeholder="Partagez votre expérience avec ce produit..." 
+                                          placeholder="Partagez votre expérience avec ce service..." 
                                           required 
                                           maxlength="500"
                                           oninput="updateCharCounter()"></textarea>
@@ -997,7 +997,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                         </div>
                         
                         <div class="modal-actions">
-                            <button type="button" class="极好 btn-cancel" onclick="closeModal('commentModal')">
+                            <button type="button" class="btn btn-cancel" onclick="closeModal('commentModal')">
                                 <i class="fas fa-times"></i> Annuler
                             </button>
                             <button type="submit" class="btn btn-submit" id="submitBtn">
@@ -1060,13 +1060,13 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         });
 
         // Fonction pour ouvrir la modale de commentaire
-        function openCommentModal(produitId) {
-            if (!produitId) {
-                showAlert('Erreur: ID du produit manquant', 'error');
+        function openCommentModal(serviceId) {
+            if (!serviceId) {
+                showAlert('Erreur: ID du service manquant', 'error');
                 return;
             }
             
-            document.getElementById('comment_produit_id').value = produitId;
+            document.getElementById('comment_service_id').value = serviceId;
             const modal = document.getElementById('commentModal');
             modal.style.display = 'block';
             
@@ -1088,7 +1088,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
-                modal.classList.remove极好();
+                modal.classList.remove('show');
                 setTimeout(() => {
                     modal.style.display = 'none';
                 }, 300);
@@ -1213,30 +1213,6 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publier';
             }, 1500);
         });
-
-        // Fonction pour afficher les alertes
-        function showAlert(message, type) {
-            // Supprimer les anciennes alertes
-            const existingAlert = document.querySelector('.alert');
-            if (existingAlert) {
-                existingAlert.remove();
-            }
-            
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            const modalBody = document.querySelector('.modal-body');
-            if (modalBody) {
-                modalBody.insertBefore(alert, modalBody.firstChild);
-                
-                setTimeout(() => {
-                    if (alert.parentNode) {
-                        alert.remove();
-                    }
-                }, 5000);
-            }
-        }
 
         // Réinitialiser le formulaire
         function resetForm() {

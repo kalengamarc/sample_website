@@ -1,16 +1,18 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<?php
-session_start();
-include_once('../controle/controleur_produit.php');
-$produitController = new ProduitController();
-$produitsResult = $produitController->getAllProduits();
-$produits = $produitsResult['success'] ? $produitsResult['data'] : [];
-?>
+    <?php
+    session_start();
+    include_once('../controle/controleur_formation.php');
+    include_once('../controle/controleur_utilisateur.php');
+    $utilisateur = new UtilisateurController();
+    $formations = new FormationController();
+    $listeFormation = $formations->getAllFormations();
+    ?>
+  
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Produits - JosNet</title>
+    <title>Services - JosNet</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -113,7 +115,6 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             text-decoration: none;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            cursor: pointer;
         }
 
         .user_message a:hover {
@@ -135,7 +136,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             margin-bottom: 10px;
         }
 
-        /* Products Grid */
+        /* Services Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -200,14 +201,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             flex-grow: 1;
         }
 
-        .card .price {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #2c5f2d;
-            margin-bottom: 15px;
-        }
-
-        /* Product Actions */
+        /* Service Actions */
         .alignements_icones {
             display: flex;
             justify-content: space-around;
@@ -241,7 +235,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             background: rgba(23, 162, 184, 0.1);
         }
         .fa-shopping-cart { 
-            color: #28a745; 
+            color: #0c521cff; 
             background: rgba(40, 167, 69, 0.1);
         }
         .fa-star { 
@@ -288,7 +282,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             border-radius: 20px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 极好 25px 50px rgba(0,0,0,0.25);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
             position: relative;
             transform: translateY(-50px);
             transition: transform 0.3s ease;
@@ -368,7 +362,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             color: #ddd;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 极好px;
+            padding: 5px;
             border-radius: 50%;
         }
 
@@ -537,6 +531,53 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             animation: pulse 0.6s ease-in-out;
         }
 
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .wrap {
+                padding: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .nav {
+                justify-content: center;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .rating label {
+                font-size: 28px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .nom_service h1 {
+                font-size: 2em;
+            }
+            
+        }
         /* WhatsApp-like popup styles */
         .whatsapp-popup {
             position: fixed;
@@ -707,7 +748,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
 </head>
 
 <body>
-    <!-- User Message Icons -->
+<!-- User Message Icons -->
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
@@ -865,6 +906,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         </div>
     </div>
 
+
     <div class="wrap">
         <!-- Header -->
         <header>
@@ -873,7 +915,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M4 12c2-4 8-8 12-4" stroke="#04221a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                         <circle cx="12" cy="12" r="4" fill="#04221a" />
-                        <path d="M20 4l-4 极好" stroke="#fff" stroke-opacity="0.06" stroke-width="1.2" />
+                        <path d="M20 4l-4 4" stroke="#fff" stroke-opacity="0.06" stroke-width="1.2" />
                     </svg>
                 </div>
                 <div>
@@ -892,43 +934,44 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
 
         <!-- Page Title -->
         <div class="nom_service">
-            <h1>NOS EQUIPEMENTS DISPONIBLES</h1>
+            <h1>NOS ACTUALITES</h1>
         </div>
                 
-        <!-- Products Section -->
+        <!-- Services Section -->
         <section class="reveal" id="features">
             <div class="grid">
-                <?php if (!empty($produits)): ?>
-                    <?php foreach ($produits as $produit): ?>
+                <?php if (!empty($listeFormation['data'])): ?>
+                    <?php foreach ($listeFormation['data'] as $formation): ?>
                         <article class="card" data-tilt>
                             <div class="image-container">
-                                <img src="<?='../controle/'.$produit->getPhoto()?>" 
-                                     alt="<?='Image de '.htmlspecialchars($produit->getNom())?>"
+                                <img src="<?='../controle/'.$formation->getPhoto()?>" 
+                                     alt="<?='Image de '.htmlspecialchars($formation->getTitre())?>"
                                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNTU1Ij5JbWFnZSBub24gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+'">
                             </div>
                             
                             <div class="card-content">
-                                <h3><?=htmlspecialchars($produit->getNom())?></h3>
-                                <?php if (method_exists($produit, 'getPrix')): ?>
-                                    <div class="price"><?=number_format($produit->getPrix(), 2, ',', ' ')?> €</div>
-                                <?php endif; ?>
-                                <p><?=htmlspecialchars($produit->getDescription())?></p>
+                                <h3><?=htmlspecialchars(substr($formation->getTitre(), 0, 50))?></h3>
+                                <p><?=htmlspecialchars(substr($formation->getDescription(), 0, 100))?> . . .</p>
+                                <p>
+                                          <?php
+                                                $duree = $formation->getDuree();
+                                                $dateDebut = $formation->getDebutFormation();
+                                                $etat = $formations->getTempsRestantFinFormation($dateDebut,$duree);
+                                                echo $etat;
+                                            ?>
+                              </p>
                                 
                                 <div class="alignements_icones">
                                     <button class="icon fa fa-comment" 
-                                            onclick="openCommentModal(<?=$produit->getIdProduit()?>)" 
+                                            onclick="openCommentModal(<?=$formation->getIdFormation()?>)" 
                                             title="Commenter">
                                     </button>
-                                    <button class="icon fas fa-shopping-cart" 
-                                            onclick="addToCart(<?=$produit->getIdProduit()?>)" 
-                                            title="Ajouter au panier">
-                                    </button>
                                     <button class="icon fas fa-star" 
-                                            onclick="addToFavorites(<?=$produit->getIdProduit()?>)" 
+                                            onclick="addToFavorites(<?=$formation->getIdFormation()?>)" 
                                             title="Ajouter aux favoris">
                                     </button>
                                     <button class="icon fas fa-share" 
-                                            onclick="openShareModal(<?=$produit->getIdProduit()?>, 'produit')" 
+                                            onclick="openShareModal(<?=$formation->getIdFormation()?>, 'service')" 
                                             title="Partager">
                                     </button>
                                 </div>
@@ -937,8 +980,8 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 15px;">
-                        <h3 style="color: #666; margin-bottom: 20px;">Aucun produit disponible</h3>
-                        <p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux produits.</p>
+                        <h3 style="color: #666; margin-bottom: 20px;">Aucun service disponible</h3>
+                        <p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux services.</p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -948,7 +991,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         <div id="commentModal" class="modal" role="dialog" aria-labelledby="commentModalTitle" aria-hidden="true">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="commentModalTitle"><极好 class="fas fa-star"></i> Votre avis compte</h3>
+                    <h3 id="commentModalTitle"><i class="fas fa-star"></i> Votre avis compte</h3>
                     <span class="close" onclick="closeModal('commentModal')" title="Fermer">&times;</span>
                 </div>
                 
@@ -956,7 +999,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     <form method="post" id="commentForm">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
                         <input type="hidden" name="action" value="ajouter_commentaire">
-                        <极好 type="hidden" name="id_produit" id="comment_produit_id">
+                        <input type="hidden" name="id_service" id="comment_service_id">
                         
                         <!-- Rating Section -->
                         <div class="rating-section">
@@ -970,7 +1013,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 <label for="star4" title="4 étoiles" data-value="4">★</label>
                                 <input type="radio" id="star3" name="note" value="3" />
                                 <label for="star3" title="3 étoiles" data-value="3">★</label>
-                                <input type="radio" id="star2" name="note" value="极好" />
+                                <input type="radio" id="star2" name="note" value="2" />
                                 <label for="star2" title="2 étoiles" data-value="2">★</label>
                                 <input type="radio" id="star1" name="note" value="1" />
                                 <label for="star1" title="1 étoile" data-value="1">★</label>
@@ -986,7 +1029,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 </label>
                                 <textarea name="commentaire" 
                                           id="commentaire" 
-                                          placeholder="Partagez votre expérience avec ce produit..." 
+                                          placeholder="Partagez votre expérience avec ce service..." 
                                           required 
                                           maxlength="500"
                                           oninput="updateCharCounter()"></textarea>
@@ -997,7 +1040,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                         </div>
                         
                         <div class="modal-actions">
-                            <button type="button" class="极好 btn-cancel" onclick="closeModal('commentModal')">
+                            <button type="button" class="btn btn-cancel" onclick="closeModal('commentModal')">
                                 <i class="fas fa-times"></i> Annuler
                             </button>
                             <button type="submit" class="btn btn-submit" id="submitBtn">
@@ -1013,23 +1056,22 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         <div id="shareModal" class="modal" role="dialog" aria-labelledby="shareModalTitle" aria-hidden="true">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="shareModalTitle"><i class="fas fa-share"></i> Partager ce produit</h3>
-                    <span class="close极好" onclick="closeModal('shareModal')" title="Fermer">&times;</span>
+                    <h3 id="shareModalTitle"><i class="fas fa-share"></i> Partager ce service</h3>
+                    <span class="close" onclick="closeModal('shareModal')" title="Fermer">&times;</span>
                 </div>
                 <div class="modal-body">
                     <div class="plateformes-partage" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px; margin-top: 20px;">
                         <button class="fab fa-facebook" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #3b5998;" onclick="shareOnPlatform('facebook')" title="Facebook"></button>
-                        <button class="fab fa-twitter" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #1da1f2;" onclick="shareOnPlatform('twitter')" title="Twitter"></button>
+                        <button class="fab fa-twitter" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 极好.3s ease; border: none; background: none; color: #1da1f2;" onclick="shareOnPlatform('twitter')" title="Twitter"></button>
                         <button class="fab fa-linkedin" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #0077b5;" onclick="shareOnPlatform('linkedin')" title="LinkedIn"></button>
-                        <button class="fab fa-whatsapp极好" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #25d366;" onclick="shareOnPlatform('whatsapp')" title="WhatsApp"></button>
-                        <button class="fas fa-envelope" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #d44638;" onclick="shareOn极好('email')" title="Email"></button>
+                        <button class="fab fa-whatsapp" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #25d366;" onclick="shareOnPlatform('whatsapp')" title="WhatsApp"></button>
+                        <button class="fas fa-envelope" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #d44638;" onclick="shareOnPlatform('email')" title="Email"></button>
                         <button class="fas fa-link" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #6c757d;" onclick="shareOnPlatform('lien')" title="Copier le lien"></button>
                     </div>
                     <form id="shareForm" method="post" style="display:none;">
                         <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
                         <input type="hidden" name="action" value="partager">
-                        <input type="hidden" name="id_produit" id="share_produit_id">
-                        <input type="hidden" name="id_formation" id="share_formation_id">
+                        <input type="hidden" name="id_service" id="share_service_id">
                         <input type="hidden" name="plateforme" id="share_platform">
                     </form>
                 </div>
@@ -1038,7 +1080,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
 
         <!-- Footer -->
         <footer class="reveal">
-            <small>&copy; <span id="year"></span> TermaDevs — Construit pour l'avenir</small>
+            <small>&copy; <span id="year"></span> JosNet — Construit pour l'avenir</small>
         </footer>
     </div>
 
@@ -1060,13 +1102,13 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         });
 
         // Fonction pour ouvrir la modale de commentaire
-        function openCommentModal(produitId) {
-            if (!produitId) {
-                showAlert('Erreur: ID du produit manquant', 'error');
+        function openCommentModal(serviceId) {
+            if (!serviceId) {
+                showAlert('Erreur: ID du service manquant', 'error');
                 return;
             }
             
-            document.getElementById('comment_produit_id').value = produitId;
+            document.getElementById('comment_service_id').value = serviceId;
             const modal = document.getElementById('commentModal');
             modal.style.display = 'block';
             
@@ -1088,7 +1130,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
-                modal.classList.remove极好();
+                modal.classList.remove('show');
                 setTimeout(() => {
                     modal.style.display = 'none';
                 }, 300);
@@ -1254,12 +1296,8 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
 
         // Fonction pour ouvrir la modale de partage
         function openShareModal(id, type) {
-            if (type === 'produit') {
-                document.getElementById('share_produit_id').value = id;
-                document.getElementById('share_formation_id').value = '';
-            } else {
-                document.getElementById('share_produit_id').value = '';
-                document.getElementById('share_formation_id').value = id;
+            if (type === 'service') {
+                document.getElementById('share_service_id').value = id;
             }
             
             const modal = document.getElementById('shareModal');
@@ -1289,7 +1327,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     message = 'Partagé sur Twitter !';
                     break;
                 case 'linkedin':
-                    message = '极好 sur LinkedIn !';
+                    message = 'Partagé sur LinkedIn !';
                     break;
                 case 'whatsapp':
                     message = 'Partagé sur WhatsApp !';
@@ -1309,9 +1347,9 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         }
 
         // Fonction pour ajouter au panier
-        function addToCart(produitId) {
-            if (!produitId) {
-                alert('Erreur: ID du produit manquant');
+        function addToCart(serviceId) {
+            if (!serviceId) {
+                alert('Erreur: ID du service manquant');
                 return;
             }
             
@@ -1319,25 +1357,6 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             const cartBtn = event.target;
             cartBtn.style.transform = 'scale(1.2)';
             cartBtn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                cartBtn.style.transform = 'scale(1)';
-                cartBtn.style.background = 'rgba(40, 167, 69, 0.1)';
-                alert('Produit ajouté au panier !');
-            }, 300);
-        }
-
-        // Fonction pour ajouter aux favoris
-        function addToFavorites(produitId) {
-            if (!produitId) {
-                alert('Erreur: ID du produit manquant');
-                return;
-            }
-            
-            // Animation du bouton
-            const favBtn = event.target;
-            favBtn.style.transform = 'scale(1.2)';
-            favBtn.style.background = '#ffc107';
             
             setTimeout(() => {
                 favBtn.style.transform = 'scale(1)';
@@ -1394,7 +1413,6 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             });
         });
 
-        // Fonctions pour les popups style WhatsApp
         let activePopup = null;
 
         function togglePopup(popupId) {
