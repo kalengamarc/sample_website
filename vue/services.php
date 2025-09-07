@@ -576,23 +576,336 @@
             .nom_service h1 {
                 font-size: 2em;
             }
+            
+        }
+        /* WhatsApp-like popup styles */
+        .whatsapp-popup {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .whatsapp-popup-header {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .whatsapp-popup-header i {
+            font-size: 20px;
+        }
+
+        .whatsapp-popup-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .whatsapp-popup-content {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .whatsapp-popup-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .whatsapp-popup-item:last-child {
+            border-bottom: none;
+        }
+
+        .whatsapp-popup-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #04221a;
+        }
+
+        .whatsapp-popup-item-content {
+            flex: 1;
+        }
+
+        .whatsapp-popup-item-title {
+            font-weight: 600;
+            color: #04221a;
+            margin-bottom: 3px;
+        }
+
+        .whatsapp-popup-item-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .whatsapp-popup-item-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .whatsapp-popup-footer {
+            padding: 10px 15px;
+            text-align: center;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        .whatsapp-popup-footer a {
+            color: #04221a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Badge for notifications */
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .user_message a {
+            position: relative;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .wrap {
+                padding: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .nav {
+                justify-content: center;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .rating label {
+                font-size: 28px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .nom_service h1 {
+                font-size: 2em;
+            }
+
+            .whatsapp-popup {
+                width: 280px;
+                right: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- User Message Icons -->
+<!-- User Message Icons -->
     <div class="user_message">
-        <a href="panier.php" title="Panier">
+        <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
+            <span class="badge">3</span>
         </a>
-        <a href="notifications.php" title="Notifications">
+        <a href="#" title="Notifications" onclick="togglePopup('notificationPopup'); return false;">
             <i class="icon fas fa-bell"></i>
+            <span class="badge">5</span>
         </a>
-        <a href="profil.php" title="Profil">
+        <a href="#" title="Profil" onclick="togglePopup('profilePopup'); return false;">
             <i class="icon fas fa-user"></i>
         </a>
     </div>
+
+    <!-- WhatsApp-style Popups -->
+    <div class="whatsapp-popup" id="cartPopup">
+        <div class="whatsapp-popup-header">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Votre Panier</h3>
+        </div>
+        <div class="whatsapp-popup-content">
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">iPhone 13 Pro</div>
+                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
+                </div>
+                <div class="whatsapp-popup-item-time">999€</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon">
+                    <i class="fas fa-headphones"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Écouteurs Bluetooth</div>
+                    <div class="whatsapp-popup-item-desc">Quantité: 2</div>
+                </div>
+                <div class="whatsapp-popup-item-time">79€</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Protection Écran</div>
+                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
+                </div>
+                <div class="whatsapp-popup-item-time">19€</div>
+            </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+            <a href="#">Total: 1176€ | Voir le panier complet</a>
+        </div>
+    </div>
+
+    <div class="whatsapp-popup" id="notificationPopup">
+        <div class="whatsapp-popup-header">
+            <i class="fas fa-bell"></i>
+            <h3>Notifications</h3>
+        </div>
+        <div class="whatsapp-popup-content">
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                    <i class="fas fa-shipping-fast" style="color: #1890ff;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Commande Expédiée</div>
+                    <div class="whatsapp-popup-item-desc">Votre commande #12345 a été expédiée</div>
+                </div>
+                <div class="whatsapp-popup-item-time">10:30</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                    <i class="fas fa-check-circle" style="color: #52c41a;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Paiement Confirmé</div>
+                    <div class="whatsapp-popup-item-desc">Votre paiement a été accepté</div>
+                </div>
+                <div class="whatsapp-popup-item-time">Hier</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
+                    <i class="fas fa-gift" style="color: #fa8c16;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Offre Spéciale</div>
+                    <div class="whatsapp-popup-item-desc">-20% sur tous les accessoires</div>
+                </div>
+                <div class="whatsapp-popup-item-time">Hier</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f9f0ff;">
+                    <i class="fas fa-users" style="color: #722ed1;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Nouveau Message</div>
+                    <div class="whatsapp-popup-item-desc">Vous avez un nouveau message</div>
+                </div>
+                <div class="whatsapp-popup-item-time">12/06</div>
+            </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+            <a href="#">Marquer tout comme lu</a>
+        </div>
+    </div>
+
+    <div class="whatsapp-popup" id="profilePopup">
+        <div class="whatsapp-popup-header">
+            <i class="fas fa-user"></i>
+            <h3>Mon Profil</h3>
+        </div>
+        <div class="whatsapp-popup-content">
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
+                    <i class="fas fa-user-circle" style="color: #04221a;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Jean Dupont</div>
+                    <div class="whatsapp-popup-item-desc">Membre depuis: Jan 2023</div>
+                </div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                    <i class="fas fa-envelope" style="color: #1890ff;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">jean.dupont@email.com</div>
+                    <div class="whatsapp-popup-item-desc">Adresse email vérifiée</div>
+                </div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                    <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Paris, France</div>
+                    <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
+                </div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
+                    <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">12 Commandes</div>
+                    <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
+                </div>
+            </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+            <a href="#">Modifier le profil</a>
+        </div>
+    </div>
+
 
     <div class="wrap">
         <!-- Header -->
@@ -612,6 +925,7 @@
             </div>
             
             <nav class="nav">
+                <a href="actualite.php" class="btn">Actualites</a>
                 <a href="produits.php" class="btn">Equipements</a>
                 <a href="services.php" class="btn">Services</a>
                 <a href="contact.php" class="btn">Contact</a>
@@ -1101,6 +1415,54 @@
                     this.style.transform = 'scale(1)';
                 });
             });
+        });
+
+        let activePopup = null;
+
+        function togglePopup(popupId) {
+            const popup = document.getElementById(popupId);
+            
+            // Fermer tous les autres popups
+            document.querySelectorAll('.whatsapp-popup').forEach(p => {
+                if (p.id !== popupId) {
+                    p.style.display = 'none';
+                }
+            });
+            
+            // Ouvrir ou fermer le popup actuel
+            if (popup.style.display === 'block') {
+                popup.style.display = 'none';
+                activePopup = null;
+            } else {
+                popup.style.display = 'block';
+                activePopup = popupId;
+            }
+        }
+
+        // Fermer les popups WhatsApp en cliquant à l'extérieur
+        document.addEventListener('click', function(e) {
+            if (activePopup) {
+                const popup = document.getElementById(activePopup);
+                const userMessageIcons = document.querySelector('.user_message');
+                
+                // Vérifier si le clic est en dehors du popup et des icônes
+                if (!popup.contains(e.target) && !userMessageIcons.contains(e.target)) {
+                    popup.style.display = 'none';
+                    activePopup = null;
+                }
+            }
+        });
+
+        // Fermer avec la touche Échap
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Fermer les popups WhatsApp
+                document.querySelectorAll('.whatsapp-popup').forEach(popup => {
+                    popup.style.display = 'none';
+                });
+                
+                activePopup = null;
+            }
         });
     </script>
 </body>

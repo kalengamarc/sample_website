@@ -304,7 +304,12 @@ public function updateFormation($id_formation, $titre, $description, $prix, $dur
         elseif ($heureRestant >= 0) {
             if (($heureRestant/24)>=30) {
                 return 'la formation en preparation il reste <b> '. round(($heureRestant/24)/30) .' mois et '. round($heureRestant/24)%30 .' jours';
-            }else{
+            }elseif (($heureRestant/24)<30 && ($heureRestant/24)>=1) {
+                return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
+            }elseif (($heureRestant/24)<1 && $heureRestant>=0) {
+                return 'la formation commence aujourd\'hui';
+            }
+            else{
                 return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
             }        
         }

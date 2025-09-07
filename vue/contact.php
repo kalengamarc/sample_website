@@ -107,6 +107,7 @@
             text-decoration: none;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
         }
 
         .user_message a:hover {
@@ -172,6 +173,15 @@
             display: flex;
             align-items: flex-start;
             margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .info-item:hover {
+            background: rgba(4, 34, 26, 0.05);
+            transform: translateX(5px);
         }
 
         .info-icon {
@@ -185,6 +195,12 @@
             justify-content: center;
             margin-right: 15px;
             flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover .info-icon {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(4, 34, 26, 0.3);
         }
 
         .info-content h3 {
@@ -431,6 +447,284 @@
             animation: fadeIn 1s ease forwards;
         }
 
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: popupFadeIn 0.4s ease;
+        }
+
+        @keyframes popupFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .popup-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .popup-icon.address {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+        }
+
+        .popup-icon.phone {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        }
+
+        .popup-icon.email {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        }
+
+        .popup-icon.cart {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .popup-icon.profile {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .popup-icon.notification {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        }
+
+        .popup-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #04221a;
+        }
+
+        .popup-body {
+            margin-bottom: 30px;
+        }
+
+        .popup-body p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .popup-body strong {
+            color: #04221a;
+            font-weight: 600;
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .popup-btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .popup-btn.primary {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+        }
+
+        .popup-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(4, 34, 26, 0.3);
+        }
+
+        .popup-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .popup-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+            transform: rotate(90deg);
+        }
+
+        /* WhatsApp-like popup styles */
+        .whatsapp-popup {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .whatsapp-popup-header {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .whatsapp-popup-header i {
+            font-size: 20px;
+        }
+
+        .whatsapp-popup-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .whatsapp-popup-content {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .whatsapp-popup-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .whatsapp-popup-item:last-child {
+            border-bottom: none;
+        }
+
+        .whatsapp-popup-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #04221a;
+        }
+
+        .whatsapp-popup-item-content {
+            flex: 1;
+        }
+
+        .whatsapp-popup-item-title {
+            font-weight: 600;
+            color: #04221a;
+            margin-bottom: 3px;
+        }
+
+        .whatsapp-popup-item-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .whatsapp-popup-item-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .whatsapp-popup-footer {
+            padding: 10px 15px;
+            text-align: center;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        .whatsapp-popup-footer a {
+            color: #04221a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Badge for notifications */
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .user_message a {
+            position: relative;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .wrap {
@@ -469,21 +763,190 @@
             .social-links {
                 justify-content: center;
             }
+            
+            .popup-content {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .popup-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .popup-icon {
+                margin-right: 0;
+            }
+            
+            .popup-actions {
+                flex-direction: column;
+            }
+
+            .whatsapp-popup {
+                width: 280px;
+                right: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- User Message Icons -->
     <div class="user_message">
-        <a href="panier.php" title="Panier">
+        <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
+            <span class="badge">3</span>
         </a>
-        <a href="notifications.php" title="Notifications">
+        <a href="#" title="Notifications" onclick="togglePopup('notificationPopup'); return false;">
             <i class="icon fas fa-bell"></i>
+            <span class="badge">5</span>
         </a>
-        <a href="profil.php" title="Profil">
+        <a href="#" title="Profil" onclick="togglePopup('profilePopup'); return false;">
             <i class="icon fas fa-user"></i>
         </a>
+    </div>
+
+    <!-- WhatsApp-style Popups -->
+    <div class="whatsapp-popup" id="cartPopup">
+        <div class="whatsapp-popup-header">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Votre Panier</h3>
+        </div>
+        <div class="whatsapp-popup-content">
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">iPhone 13 Pro</div>
+                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
+                </div>
+                <div class="whatsapp-popup-item-time">999€</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon">
+                    <i class="fas fa-headphones"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Écouteurs Bluetooth</div>
+                    <div class="whatsapp-popup-item-desc">Quantité: 2</div>
+                </div>
+                <div class="whatsapp-popup-item-time">79€</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Protection Écran</div>
+                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
+                </div>
+                <div class="whatsapp-popup-item-time">19€</div>
+            </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+            <a href="#">Total: 1176€ | Voir le panier complet</a>
+        </div>
+    </div>
+
+    <div class="whatsapp-popup" id="notificationPopup">
+        <div class="whatsapp-popup-header">
+            <i class="fas fa-bell"></i>
+            <h3>Notifications</h3>
+        </div>
+        <div class="whatsapp-popup-content">
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                    <i class="fas fa-shipping-fast" style="color: #1890ff;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Commande Expédiée</div>
+                    <div class="whatsapp-popup-item-desc">Votre commande #12345 a été expédiée</div>
+                </div>
+                <div class="whatsapp-popup-item-time">10:30</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                    <i class="fas fa-check-circle" style="color: #52c41a;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Paiement Confirmé</div>
+                    <div class="whatsapp-popup-item-desc">Votre paiement a été accepté</div>
+                </div>
+                <div class="whatsapp-popup-item-time">Hier</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
+                    <i class="fas fa-gift" style="color: #fa8c16;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Offre Spéciale</div>
+                    <div class="whatsapp-popup-item-desc">-20% sur tous les accessoires</div>
+                </div>
+                <div class="whatsapp-popup-item-time">Hier</div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f9f0ff;">
+                    <i class="fas fa-users" style="color: #722ed1;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Nouveau Message</div>
+                    <div class="whatsapp-popup-item-desc">Vous avez un nouveau message</div>
+                </div>
+                <div class="whatsapp-popup-item-time">12/06</div>
+            </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+            <a href="#">Marquer tout comme lu</a>
+        </div>
+    </div>
+
+    <div class="whatsapp-popup" id="profilePopup">
+        <div class="whatsapp-popup-header">
+            <i class="fas fa-user"></i>
+            <h3>Mon Profil</h3>
+        </div>
+        <div class="whatsapp-popup-content">
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
+                    <i class="fas fa-user-circle" style="color: #04221a;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Jean Dupont</div>
+                    <div class="whatsapp-popup-item-desc">Membre depuis: Jan 2023</div>
+                </div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                    <i class="fas fa-envelope" style="color: #1890ff;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">jean.dupont@email.com</div>
+                    <div class="whatsapp-popup-item-desc">Adresse email vérifiée</div>
+                </div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                    <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">Paris, France</div>
+                    <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
+                </div>
+            </div>
+            <div class="whatsapp-popup-item">
+                <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
+                    <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
+                </div>
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title">12 Commandes</div>
+                    <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
+                </div>
+            </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+            <a href="#">Modifier le profil</a>
+        </div>
     </div>
 
     <div class="wrap">
@@ -504,6 +967,7 @@
             </div>
             
             <nav class="nav">
+                <a href="actualite.php" class="btn">Actualites</a>
                 <a href="produits.php" class="btn">Equipements</a>
                 <a href="services.php" class="btn">Services</a>
                 <a href="contact.php" class="btn">Contact</a>
@@ -520,7 +984,7 @@
             <div class="contact-info">
                 <h2>Nos Coordonnées</h2>
                 
-                <div class="info-item">
+                <div class="info-item" onclick="showPopup('address')">
                     <div class="info-icon">
                         <i class="fas fa-map-marker-alt"></i>
                     </div>
@@ -530,7 +994,7 @@
                     </div>
                 </div>
                 
-                <div class="info-item">
+                <div class="info-item" onclick="showPopup('phone')">
                     <div class="info-icon">
                         <i class="fas fa-phone"></i>
                     </div>
@@ -540,7 +1004,7 @@
                     </div>
                 </div>
                 
-                <div class="info-item">
+                <div class="info-item" onclick="showPopup('email')">
                     <div class="info-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
@@ -599,8 +1063,7 @@
         <!-- FAQ Section -->
         <section class="faq-section reveal">
             <h2>Questions Fréquentes</h2>
-            
-            <div class="faq-item">
+                        <div class="faq-item">
                 <div class="faq-question">
                     <span>Quels sont vos horaires d'ouverture ?</span>
                     <i class="fas fa-chevron-down"></i>
@@ -647,6 +1110,87 @@
         </footer>
     </div>
 
+    <!-- Popup Templates -->
+    <div class="popup" id="addressPopup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup('addressPopup')">&times;</button>
+            <div class="popup-header">
+                <div class="popup-icon address">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h2 class="popup-title">Notre Adresse</h2>
+            </div>
+            <div class="popup-body">
+                <p><strong>Adresse complète :</strong><br>123 Avenue des Télécoms<br>75000 Paris, France</p>
+                <p><strong>Heures d'ouverture :</strong><br>Lundi - Vendredi: 9h00 - 18h00<br>Samedi: 10h00 - 16h00<br>Dimanche: Fermé</p>
+                <p><strong>Accès :</strong><br>Métro: Ligne 4 - Station Télécoms<br>Bus: Lignes 42, 67, 89<br>Parking: Stationnement souterrain disponible</p>
+            </div>
+            <div class="popup-actions">
+                <button class="popup-btn secondary" onclick="closePopup('addressPopup')">
+                    <i class="fas fa-times"></i> Fermer
+                </button>
+                <button class="popup-btn primary" onclick="openMaps()">
+                    <i class="fas fa-directions"></i> Itinéraire
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="phonePopup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup('phonePopup')">&times;</button>
+            <div class="popup-header">
+                <div class="popup-icon phone">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h2 class="popup-title">Nous Appeler</h2>
+            </div>
+            <div class="popup-body">
+                <p><strong>Service client :</strong><br>+33 1 23 45 67 89</p>
+                <p><strong>Support technique :</strong><br>+33 1 23 45 67 90</p>
+                <p><strong>Service commercial :</strong><br>+33 1 23 45 67 91</p>
+                <p><strong>Heures d'ouverture :</strong><br>Lundi - Vendredi: 9h00 - 18h00<br>Samedi: 10h00 - 16h00</p>
+                <p><strong>Urgences :</strong><br>Pour les urgences techniques en dehors des heures d'ouverture, composez le +33 6 12 34 56 78</p>
+            </div>
+            <div class="popup-actions">
+                <button class="popup-btn secondary" onclick="closePopup('phonePopup')">
+                    <i class="fas fa-times"></i> Fermer
+                </button>
+                <button class="popup-btn primary" onclick="callNumber('+33123456789')">
+                    <i class="fas fa-phone"></i> Appeler maintenant
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="emailPopup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup('emailPopup')">&times;</button>
+            <div class="popup-header">
+                <div class="popup-icon email">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h2 class="popup-title">Nous Écrire</h2>
+            </div>
+            <div class="popup-body">
+                <p><strong>Service client :</strong><br>contact@josnet.fr</p>
+                <p><strong>Support technique :</strong><br>support@josnet.fr</p>
+                <p><strong>Service commercial :</strong><br>commercial@josnet.fr</p>
+                <p><strong>Recrutement :</strong><br>recrutement@josnet.fr</p>
+                <p><strong>Partenariats :</strong><br>partenariats@josnet.fr</p>
+                <p><strong>Temps de réponse :</strong><br>Nous nous engageons à répondre à tous les emails dans un délai de 24 heures ouvrées.</p>
+            </div>
+            <div class="popup-actions">
+                <button class="popup-btn secondary" onclick="closePopup('emailPopup')">
+                    <i class="fas fa-times"></i> Fermer
+                </button>
+                <button class="popup-btn primary" onclick="sendEmail('contact@josnet.fr')">
+                    <i class="fas fa-envelope"></i> Envoyer un email
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
@@ -688,6 +1232,104 @@
                     alert(`Merci ${name} ! Votre message a été envoyé. Nous vous répondrons à l'adresse ${email} sous peu.`);
                     contactForm.reset();
                 });
+            }
+        });
+
+        // Fonctions pour les popups
+        function showPopup(type) {
+            const popup = document.getElementById(`${type}Popup`);
+            if (popup) {
+                popup.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closePopup(type) {
+            const popup = document.getElementById(`${type}Popup`);
+            if (popup) {
+                popup.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Fermer les popups en cliquant à l'extérieur
+        document.querySelectorAll('.popup').forEach(popup => {
+            popup.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+
+        // Fonctions d'action pour les boutons
+        function openMaps() {
+            window.open('https://www.google.com/maps?q=123+Avenue+des+Télécoms,75000+Paris,France', '_blank');
+            closePopup('addressPopup');
+        }
+
+        function callNumber(number) {
+            window.location.href = `tel:${number}`;
+            closePopup('phonePopup');
+        }
+
+        function sendEmail(email) {
+            window.location.href = `mailto:${email}`;
+            closePopup('emailPopup');
+        }
+
+        // Fonctions pour les popups style WhatsApp
+        let activePopup = null;
+
+        function togglePopup(popupId) {
+            const popup = document.getElementById(popupId);
+            
+            // Fermer tous les autres popups
+            document.querySelectorAll('.whatsapp-popup').forEach(p => {
+                if (p.id !== popupId) {
+                    p.style.display = 'none';
+                }
+            });
+            
+            // Ouvrir ou fermer le popup actuel
+            if (popup.style.display === 'block') {
+                popup.style.display = 'none';
+                activePopup = null;
+            } else {
+                popup.style.display = 'block';
+                activePopup = popupId;
+            }
+        }
+
+        // Fermer les popups WhatsApp en cliquant à l'extérieur
+        document.addEventListener('click', function(e) {
+            if (activePopup) {
+                const popup = document.getElementById(activePopup);
+                const userMessageIcons = document.querySelector('.user_message');
+                
+                // Vérifier si le clic est en dehors du popup et des icônes
+                if (!popup.contains(e.target) && !userMessageIcons.contains(e.target)) {
+                    popup.style.display = 'none';
+                    activePopup = null;
+                }
+            }
+        });
+
+        // Fermer avec la touche Échap
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Fermer les popups de contact
+                document.querySelectorAll('.popup').forEach(popup => {
+                    popup.style.display = 'none';
+                });
+                
+                // Fermer les popups WhatsApp
+                document.querySelectorAll('.whatsapp-popup').forEach(popup => {
+                    popup.style.display = 'none';
+                });
+                
+                document.body.style.overflow = 'auto';
+                activePopup = null;
             }
         });
     </script>
