@@ -807,10 +807,12 @@
     </div>
 
     <div class="whatsapp-popup" id="notificationPopup">
+        <!-- Notification Popup -->
         <div class="whatsapp-popup-header">
             <i class="fas fa-bell"></i>
             <h3>Notifications</h3>
         </div>
+        <!-- Notification Content -->
         <div class="whatsapp-popup-content">
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
@@ -822,6 +824,7 @@
                 </div>
                 <div class="whatsapp-popup-item-time">10:30</div>
             </div>
+            <!-- Notification Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
                     <i class="fas fa-check-circle" style="color: #52c41a;"></i>
@@ -832,6 +835,7 @@
                 </div>
                 <div class="whatsapp-popup-item-time">Hier</div>
             </div>
+            <!-- Notification Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
                     <i class="fas fa-gift" style="color: #fa8c16;"></i>
@@ -842,6 +846,7 @@
                 </div>
                 <div class="whatsapp-popup-item-time">Hier</div>
             </div>
+            <!-- Notification Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f9f0ff;">
                     <i class="fas fa-users" style="color: #722ed1;"></i>
@@ -852,18 +857,21 @@
                 </div>
                 <div class="whatsapp-popup-item-time">12/06</div>
             </div>
+            <!-- Notification Content -->
         </div>
         <div class="whatsapp-popup-footer">
             <a href="#">Marquer tout comme lu</a>
         </div>
     </div>
 
+    <!-- Profile Popup -->
     <div class="whatsapp-popup" id="profilePopup">
         <div class="whatsapp-popup-header">
             <i class="fas fa-user"></i>
             <h3>Mon Profil</h3>
         </div>
         <div class="whatsapp-popup-content">
+            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
                     <i class="fas fa-user-circle" style="color: #04221a;"></i>
@@ -873,6 +881,7 @@
                     <div class="whatsapp-popup-item-desc">Membre depuis: Jan 2023</div>
                 </div>
             </div>
+            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
                     <i class="fas fa-envelope" style="color: #1890ff;"></i>
@@ -882,6 +891,7 @@
                     <div class="whatsapp-popup-item-desc">Adresse email vérifiée</div>
                 </div>
             </div>
+            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
                     <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
@@ -891,6 +901,7 @@
                     <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
                 </div>
             </div>
+            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
                     <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
@@ -900,13 +911,14 @@
                     <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
                 </div>
             </div>
+            <!-- Profile Content -->
         </div>
         <div class="whatsapp-popup-footer">
             <a href="#">Modifier le profil</a>
         </div>
     </div>
 
-
+    <!-- Wrap -->   
     <div class="wrap">
         <!-- Header -->
         <header>
@@ -931,15 +943,16 @@
                 <a href="contact.php" class="btn">Contact</a>
             </nav>
         </header>
-
+        <!-- Header -->
         <!-- Page Title -->
         <div class="nom_service">
             <h1>NOS SERVICES DISPONIBLES</h1>
         </div>
-                
+        <!-- Page Title -->
         <!-- Services Section -->
         <section class="reveal" id="features">
             <div class="grid">
+                <!-- Services Content -->
                 <?php if (!empty($listeFormation['data'])): ?>
                     <?php foreach ($listeFormation['data'] as $formation): ?>
                         <article class="card" data-tilt>
@@ -948,7 +961,7 @@
                                      alt="<?='Image de '.htmlspecialchars($formation->getTitre())?>"
                                      onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNTU1Ij5JbWFnZSBub24gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+'">
                             </div>
-                            
+                            <!-- Services Content -->
                             <div class="card-content">
                                 <h3><?=htmlspecialchars(substr($formation->getTitre(), 0, 50))?></h3>
                                 <p><?=htmlspecialchars(substr($formation->getDescription(), 0, 100))?> . . .</p>
@@ -960,7 +973,7 @@
                                                 echo $etat;
                                             ?>
                               </p>
-                                
+                                <!-- Services Content -->
                                 <div class="alignements_icones">
                                     <button class="icon fa fa-comment" 
                                             onclick="openCommentModal(<?=$formation->getIdFormation()?>)" 
@@ -983,6 +996,7 @@
                         </article>
                     <?php endforeach; ?>
                 <?php else: ?>
+                    <!-- Services Content -->
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 15px;">
                         <h3 style="color: #666; margin-bottom: 20px;">Aucun service disponible</h3>
                         <p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux services.</p>
@@ -1042,7 +1056,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+                        <!-- Modal Actions -->
                         <div class="modal-actions">
                             <button type="button" class="btn btn-cancel" onclick="closeModal('commentModal')">
                                 <i class="fas fa-times"></i> Annuler
@@ -1063,6 +1077,7 @@
                     <h3 id="shareModalTitle"><i class="fas fa-share"></i> Partager ce service</h3>
                     <span class="close" onclick="closeModal('shareModal')" title="Fermer">&times;</span>
                 </div>
+                <!-- Modal Body -->
                 <div class="modal-body">
                     <div class="plateformes-partage" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px; margin-top: 20px;">
                         <button class="fab fa-facebook" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #3b5998;" onclick="shareOnPlatform('facebook')" title="Facebook"></button>
