@@ -344,7 +344,7 @@
                         <a href="liste_participant.php">Liste des participants</a>
                     </li>
                     <li>
-                        <a href="#">Inscrire un participant</a>
+                        <a href="AjoutParticipant.php">Inscrire un participant</a>
                     </li>
                 </ul>
             </li>

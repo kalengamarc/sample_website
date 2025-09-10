@@ -21,7 +21,8 @@ class UtilisateurController {
         string $role,
         string $description = '',
         $photoFile = null,
-        string $specialite = ''
+        string $specialite = '',
+        int $id_formation
     ): array {
         try {
             $photoPath = null;
@@ -47,7 +48,8 @@ class UtilisateurController {
                 $description,
                 $date_creation,
                 $photoPath,
-                $specialite
+                $specialite,
+                $id_formation
             );
 
             if ($this->requeteUtilisateur->ajouterUtilisateur($utilisateur)) {

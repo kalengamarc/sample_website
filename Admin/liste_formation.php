@@ -610,7 +610,6 @@
 <body> 
     <div class="header_dash">
         <div class="cont_dash">
-             <?php include_once('header.php');?>
             <div class="ail_fle">
                  <?php include_once('menu.php');?>
                 <div class="dashcontainu">

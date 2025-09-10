@@ -177,7 +177,8 @@ try {
                 $data['role'] ?? '',
                 $data['bio'] ?? '',
                 $photoPath,
-                $data['specialite'] ?? ''
+                $data['specialite'] ?? '',
+                $data['id_formation'] ?? ''
             );
             if ($data['role'] === 'formateur') {
                 $redirectPath = '../Admin/liste_formateur.php';
@@ -186,6 +187,40 @@ try {
             }
 
             break;
+
+        case 'user_participant':
+                //checkAdminPermission();
+                // Gestion de l'upload d'image pour les utilisateurs
+                $photoPath = null;
+                if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
+                    $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+                    if ($uploadResult['success']) {
+                        $photoPath = $uploadResult['filepath'];
+                    } else {
+                        sendJsonResponse($uploadResult);
+                        break;
+                    }
+                }
+                
+                $result = $userController->createUtilisateur(
+                    $data['nom'] ?? '',
+                    $data['prenom'] ?? '',
+                    $data['email'] ?? '',
+                    $data['password'] ?? '',
+                    $data['telephone'] ?? '',
+                    $data['role'] ?? '',
+                    $data['bio'] ?? '',
+                    $photoPath,
+                    $data['specialite'] ?? '',
+                    $data['id_formation'] ?? ''
+                );
+                if ($data['role'] === 'participant') {
+                    $redirectPath = '../Admin/liste_participant.php';
+                    header("Location: $redirectPath");
+                    exit;
+                }
+    
+                break;
 
         case 'user_get':
             checkAuthentication();

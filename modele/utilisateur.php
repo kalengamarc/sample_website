@@ -13,6 +13,7 @@ class Utilisateur {
     private $photo; // ✅ Ajout de l'attribut photo
     private $description; // ✅ Ajout de l'attribut description
     private $specialite; // ✅ Ajout de l'attribut specialite
+    private $id_formation;
 
     public function __construct(
         $id,
@@ -25,6 +26,7 @@ class Utilisateur {
         $description,
         $date_creation,
         $photo,
+        $id_formation,
         $specialite = '')
         {
         $this->id = $id;
@@ -38,6 +40,7 @@ class Utilisateur {
         $this->specialite = $specialite;
         $this->date_creation = $date_creation;
         $this->photo = $photo;
+        $this->id_formation = $id_formation;
     }
 
     // --- GETTERS ---
@@ -52,6 +55,7 @@ class Utilisateur {
     public function getTelephone() { return $this->telephone; }
     public function getDateCreation() { return $this->date_creation; }
     public function getPhoto() { return $this->photo; } // ✅ Getter photo
+    public function getIdFormation() { return $this->id_formation; } // ✅ Getter photo
 
     // --- SETTERS ---
     public function setNom($nom) { $this->nom = $nom; }
@@ -64,10 +68,13 @@ class Utilisateur {
     public function setSpecialite($specialite) { $this->specialite = $specialite; } // ✅ Setter specialite
     public function setDateCreation($date_creation) { $this->date_creation = $date_creation; }
     public function setPhoto($photo) { $this->photo = $photo; } // ✅ Setter photo
+    public function setIdFormation($id_formation) { $this->id_formation = $id_formation; } // ✅ Setter photo
 }
+
 
 class RequeteUtilisateur {
     private $crud;
+
     public function __construct() {
         $pdo = new Database();
         $this->crud = $pdo->getConnection();
@@ -75,9 +82,11 @@ class RequeteUtilisateur {
 
     // ✅ Ajouter utilisateur avec photo
     public function ajouterUtilisateur($utilisateur) {
-        $sql = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role,description, date_creation, photo, specialite) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $this->crud->prepare($sql);
+        $pdo = new Database();
+        $crud = $pdo->getConnection();
+        $sql = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role,description, date_creation, photo, specialite, id_formation) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $crud->prepare($sql);
         $params = [
             $utilisateur->getNom(),
             $utilisateur->getPrenom(),
@@ -88,22 +97,27 @@ class RequeteUtilisateur {
             $utilisateur->getDescription(),
             $utilisateur->getDateCreation(),
             $utilisateur->getPhoto(),
-            $utilisateur->getSpecialite()
+            $utilisateur->getSpecialite(),
+            $utilisateur->getIdFormation()
         ];
         return $stmt->execute($params);
     }
 
     public static function getUtilisateurByEmail($email) {
+        $pdo = new Database();
+        $crud = $pdo->getConnection();
         $sql = "SELECT * FROM utilisateurs WHERE email = ?";
         $stmt = $crud->prepare($sql);
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'], $row['id_formation']);
         }
         return null;
     }
     public function getUtilisateursByRole(string $role): array {
+        $pdo = new Database();
+        $crud = $pdo->getConnection();
     $sql = "SELECT * FROM utilisateurs WHERE role = ?";
     $stmt = $this->crud->prepare($sql);
     $stmt->execute([$role]);
@@ -122,7 +136,8 @@ class RequeteUtilisateur {
             $row['description'],
             $row['date_creation'],
             $row['photo'],
-            $row['specialite']
+            $row['specialite'],
+            $row['id_formation']
         );
     }
     return $utilisateurs;
@@ -135,7 +150,7 @@ class RequeteUtilisateur {
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'], $row['id_formation']);
         }
         return null;
     }
@@ -145,7 +160,7 @@ class RequeteUtilisateur {
         $stmt = $this->crud->query($sql);
         $utilisateurs = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite']);
+            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'], $row['id_formation']);
         }
         return $utilisateurs;
     }

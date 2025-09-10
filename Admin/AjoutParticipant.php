@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <?php
+    include_once"../controle/controleur_formation.php";
+    $formation = new FormationController();
+    $listeFormation = $formation->getAllFormations();
+    
+    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter une Formation</title>
+    <title>Ajouter un Participant</title>
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
-    <?php
-        include_once('../controle/controleur_utilisateur.php');
-        $userController = new UtilisateurController();
-        $formateurs = $userController->getUtilisateursByRole('formateur');
-    ?>
     <style>
         .header_dash {
             width: 100%;
@@ -106,11 +107,6 @@
             box-shadow: 0 0 0 3px rgba(255, 174, 43, 0.2);
         }
         
-        .form_group textarea {
-            height: 120px;
-            resize: vertical;
-        }
-        
         .form_row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -123,10 +119,10 @@
         }
         
         .image_preview {
-            width: 200px;
+            width: 150px;
             height: 150px;
             border: 2px dashed #021a12;
-            border-radius: 10px;
+            border-radius: 50%;
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
@@ -140,11 +136,13 @@
             height: 100%;
             object-fit: cover;
             display: none;
+            border-radius: 50%;
         }
         
         .default_text {
             color: #666;
             font-style: italic;
+            text-align: center;
         }
         
         .upload_btn {
@@ -230,23 +228,21 @@
             display: none;
         }
         
-        /* Styles pour les messages de réponse */
-        .btn-success-soft {
-            background-color: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid #28a745;
+        .password_toggle {
+            position: relative;
         }
         
-        .btn-danger-soft {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border: 1px solid #dc3545;
+        .password_toggle input {
+            padding-right: 40px;
         }
         
-        .btn-warning-soft {
-            background-color: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
-            border: 1px solid #ffc107;
+        .toggle_icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #021a12;
         }
         
         /* Menu styles */
@@ -324,6 +320,25 @@
             max-height: 200px;
         }
         
+        /* Styles pour les messages de réponse */
+        .btn-success-soft {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+        
+        .btn-danger-soft {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        
+        .btn-warning-soft {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+        
         @media (max-width: 768px) {
             .form_row {
                 grid-template-columns: 1fr;
@@ -334,7 +349,7 @@
             }
             
             .image_preview {
-                width: 150px;
+                width: 120px;
                 height: 120px;
             }
         }
@@ -343,12 +358,12 @@
 <body>
     <div class="header_dash">
         <div class="cont_dash">
-           
+    
             <div class="ail_fle">
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                     <div class="form_container">
-                        <h2 class="form_title">➕ Ajouter une Nouvelle Formation</h2>
+                        <h2 class="form_title">👨‍🏫 Ajouter un Nouveau Participant</h2>
                         
                         <!-- Affichage des messages de réponse -->
                         <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
@@ -359,13 +374,19 @@
                                         echo "<span class='btn btn-danger-soft col-md-12'>Veuillez renseigner tous les champs obligatoires</span>";
                                         break;
                                     case 200: 
-                                        echo "<span class='btn btn-success-soft col-md-12'>La formation a été ajoutée avec succès</span>";
+                                        echo "<span class='btn btn-success-soft col-md-12'>Le formateur a été ajouté avec succès</span>";
                                         break;
                                     case 300: 
-                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout de la formation</span>";
+                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout du formateur</span>";
                                         break;
                                     case 400: 
-                                        echo "<span class='btn btn-danger-soft col-md-12'>Le formateur sélectionné n'existe pas</span>";
+                                        echo "<span class='btn btn-danger-soft col-md-12'>L'email est déjà utilisé par un autre utilisateur</span>";
+                                        break;
+                                    case 401: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Les mots de passe ne correspondent pas</span>";
+                                        break;
+                                    case 402: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Le mot de passe doit contenir au moins 6 caractères</span>";
                                         break;
                                     case 403: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>Format de fichier non autorisé</span>";
@@ -381,71 +402,86 @@
                         <?php endif; ?>
                         
                         <div class="form_card">
-                            <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formationForm">
+                            <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formateurForm">
                                 <div class="form_row">
                                     <div class="form_group">
-                                        <label for="titre">Titre de la formation <span class="required">*</span></label>
-                                        <input type="text" id="titre" name="titre" value="<?= $_POST['titre'] ?? '' ?>" required>
-                                        <div class="error_message" id="titreError"></div>
+                                        <label for="nom">Nom <span class="required">*</span></label>
+                                        <input type="text" id="nom" name="nom" value="<?= $_POST['nom'] ?? '' ?>" required>
+                                        <div class="error_message" id="nomError"></div>
                                     </div>
                                     
                                     <div class="form_group">
-                                        <label for="prix">Prix (€) <span class="required">*</span></label>
-                                        <input type="number" id="prix" name="prix" step="0.01" min="0" value="<?= $_POST['prix'] ?? '' ?>" required>
-                                        <div class="error_message" id="prixError"></div>
+                                        <label for="prenom">Prénom <span class="required">*</span></label>
+                                        <input type="text" id="prenom" name="prenom" value="<?= $_POST['prenom'] ?? '' ?>" required>
+                                        <div class="error_message" id="prenomError"></div>
                                     </div>
                                 </div>
                                 
                                 <div class="form_row">
                                     <div class="form_group">
-                                        <label for="duree">Durée (heures) <span class="required">*</span></label>
-                                        <input type="number" id="duree" name="duree" min="1" value="<?= $_POST['duree'] ?? '' ?>" required>
-                                        <div class="error_message" id="dureeError"></div>
-                                    </div>
-                                    <div class="form_group">
-                                        <label for="duree">Debut de la formation <span class="required">*</span></label>
-                                        <input type="date" id="duree" name="debut_formation" min="1" value="<?= $_POST['debut_formation'] ?? '' ?>" required>
-                                        <div class="error_message" id="dureeError"></div>
+                                        <label for="email">Email <span class="required">*</span></label>
+                                        <input type="email" id="email" name="email" value="<?= $_POST['email'] ?? '' ?>" required>
+                                        <div class="error_message" id="emailError"></div>
                                     </div>
                                     
                                     <div class="form_group">
-                                        <label for="formateur">Formateur <span class="required">*</span></label>
-                                        <select id="formateur" name="id_formateur" required>
-                                            <option value="">Sélectionner un formateur</option>
-                                            <?php
-                                            // Charger les formateurs depuis la base de données
-                                            // Vous devrez adapter cette partie selon votre architecture
-                                            try {
-                                                foreach ($formateurs['data'] as $formateur) {
-                                                    $selected = (isset($_POST['id_formateur']) && $_POST['id_formateur'] == $formateur->getId()) ? 'selected' : '';
-                                                    echo "<option value='{$formateur->getId()}' $selected>{$formateur->getPrenom()} {$formateur->getNom()}</option>";
-                                                }
-                                               
-                                            } catch (Exception $e) {
-                                                echo "<option value=''>Erreur de chargement des formateurs</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                        <div class="error_message" id="formateurError"></div>
+                                        <label for="telephone">Téléphone</label>
+                                        <input type="tel" id="telephone" name="telephone" value="<?= $_POST['telephone'] ?? '' ?>">
+                                        <div class="error_message" id="telephoneError"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form_row">
+                                    <div class="form_group password_toggle">
+                                        <label for="password">Mot de passe <span class="required">*</span></label>
+                                        <input type="password" id="password" name="password" required>
+                                        <span class="toggle_icon" onclick="togglePassword('password')">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                        <div class="error_message" id="passwordError"></div>
+                                    </div>
+                                    
+                                    <div class="form_group password_toggle">
+                                        <label for="confirm_password">Confirmer le mot de passe <span class="required">*</span></label>
+                                        <input type="password" id="confirm_password" name="confirm_password" required>
+                                        <span class="toggle_icon" onclick="togglePassword('confirm_password')">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                        <div class="error_message" id="confirm_passwordError"></div>
                                     </div>
                                 </div>
                                 
                                 <div class="form_group">
-                                    <label for="description">Description <span class="required">*</span></label>
-                                    <textarea id="description" name="description" required><?= $_POST['description'] ?? '' ?></textarea>
-                                    <div class="error_message" id="descriptionError"></div>
+                                    <label for="specialite">Domaine <span class="required">*</span></label>
+                                    <input type="text" id="specialite" name="specialite" value="<?= $_POST['specialite'] ?? '' ?>" required>
+                                    <div class="error_message" id="specialiteError"></div>
+                                </div>
+                                <div class="form_group">
+                                    <label for="specialite">Formation <span class="required">*</span></label>
+                                    <select name="id_formation" id="specialite">
+                                        <?php foreach($listeFormation['data'] as $list):?>
+                                        <option value="<?=$list->getIdFormation()?>"><?=$list->getTitre()?></option>
+                                        <?php endforeach;?>
+                                    </select>
+                                    <div class="error_message" id="specialiteError"></div>
+                                </div>
+                                
+                                <div class="form_group">
+                                    <label for="bio">Biographie</label>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $_POST['bio'] ?? '' ?></textarea>
+                                    <div class="error_message" id="bioError"></div>
                                 </div>
                                 
                                 <div class="image_upload">
-                                    <label>Image de la formation</label>
+                                    <label>Photo de profil</label>
                                     <div class="image_preview" id="imagePreview">
                                         <img src="" alt="Aperçu" id="previewImage">
-                                        <span class="default-text" id="defaultText">Aucune image sélectionnée</span>
+                                        <span class="default-text" id="defaultText">Aucune photo</span>
                                     </div>
                                     
                                     <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
                                     <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
-                                        📷 Choisir une image
+                                        📷 Choisir une photo
                                     </button>
                                     <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
                                         🗑️ Supprimer
@@ -456,10 +492,11 @@
                                     </div>
                                 </div>
                                 
-                                <input type="hidden" name="do" value="create_formation">
+                                <input type="hidden" name="role" value="etudiant">
+                                <input type="hidden" name="do" value="user_participant">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    💾 Enregistrer la Formation
+                                    💾 Enregistrer le Formateur
                                 </button>
                             </form>
                         </div>
@@ -470,6 +507,22 @@
     </div>
 
     <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         // Gestion de l'aperçu de l'image
         document.getElementById('photo').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -517,14 +570,36 @@
             removeBtn.style.display = 'none';
         }
 
+        // Validation des mots de passe
+        function validatePassword() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            const errorElement = document.getElementById('confirm_passwordError');
+            
+            if (password.value !== confirmPassword.value) {
+                errorElement.textContent = 'Les mots de passe ne correspondent pas';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            
+            if (password.value.length < 6) {
+                errorElement.textContent = 'Le mot de passe doit contenir au moins 6 caractères';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            
+            errorElement.style.display = 'none';
+            return true;
+        }
+
         // Validation générale du formulaire
         function validateForm() {
             let isValid = true;
             
             // Valider tous les champs requis
-            const requiredFields = ['titre', 'prix', 'duree', 'id_formateur', 'description'];
+            const requiredFields = ['nom', 'prenom', 'email', 'password', 'specialite'];
             requiredFields.forEach(field => {
-                const input = document.querySelector(`[name="${field}"]`);
+                const input = document.getElementById(field);
                 const errorElement = document.getElementById(field + 'Error');
                 
                 if (!input.value.trim()) {
@@ -536,20 +611,20 @@
                 }
             });
             
-            // Validation des nombres
-            const prix = document.getElementById('prix');
-            const prixError = document.getElementById('prixError');
-            if (prix.value && parseFloat(prix.value) <= 0) {
-                prixError.textContent = 'Le prix doit être supérieur à 0';
-                prixError.style.display = 'block';
-                isValid = false;
+            // Validation email
+            const email = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            if (email.value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.value)) {
+                    emailError.textContent = 'Format d\'email invalide';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
             }
             
-            const duree = document.getElementById('duree');
-            const dureeError = document.getElementById('dureeError');
-            if (duree.value && parseInt(duree.value) <= 0) {
-                dureeError.textContent = 'La durée doit être supérieure à 0';
-                dureeError.style.display = 'block';
+            // Validation mot de passe
+            if (!validatePassword()) {
                 isValid = false;
             }
             
@@ -557,7 +632,7 @@
         }
 
         // Soumission du formulaire
-        document.getElementById('formationForm').addEventListener('submit', function(e) {
+        document.getElementById('formateurForm').addEventListener('submit', function(e) {
             // Valider le formulaire
             if (!validateForm()) {
                 e.preventDefault();
@@ -571,58 +646,49 @@
         });
 
         // Validation en temps réel
-        document.querySelectorAll('input[required], textarea[required], select[required]').forEach(input => {
+        document.querySelectorAll('input[required], textarea[required]').forEach(input => {
             input.addEventListener('blur', function() {
                 validateField(this);
             });
         });
 
         function validateField(field) {
-            const fieldName = field.name;
-            const errorElement = document.getElementById(fieldName + 'Error');
+            const errorElement = document.getElementById(field.id + 'Error');
             
-            if (!field.value.trim()) {
+            if (field.hasAttribute('required') && !field.value.trim()) {
                 errorElement.textContent = 'Ce champ est requis';
                 errorElement.style.display = 'block';
                 return false;
             }
             
-            if (field.type === 'number' && field.value <= 0) {
-                errorElement.textContent = 'La valeur doit être supérieure à 0';
-                errorElement.style.display = 'block';
-                return false;
+            if (field.type === 'email' && field.value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(field.value)) {
+                    errorElement.textContent = 'Format d\'email invalide';
+                    errorElement.style.display = 'block';
+                    return false;
+                }
             }
             
             errorElement.style.display = 'none';
             return true;
         }
 
-        // Charger les formateurs (vous devrez adapter cette fonction selon votre architecture)
-        function loadFormateurs() {
-            // Cette fonction devrait charger les formateurs depuis votre base de données
-            // Exemple avec une requête AJAX si nécessaire :
-            /*
-            fetch('../controle/index.php?do=get_formateurs')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('formateur');
-                    select.innerHTML = '<option value="">Sélectionner un formateur</option>';
-                    data.forEach(formateur => {
-                        const option = document.createElement('option');
-                        option.value = formateur.id;
-                        option.textContent = `${formateur.prenom} ${formateur.nom}`;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Erreur chargement formateurs:', error);
-                });
-            */
-        }
-
-        // Charger les formateurs au démarrage
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFormateurs();
+        // Vérification de l'email en temps réel
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const errorElement = document.getElementById('emailError');
+            
+            if (!email) return;
+            
+            // Vérification du format email d'abord
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return; // Ne pas vérifier si le format est invalide
+            }
+            
+            // Note: La vérification de l'unicité de l'email se fera côté serveur
+            // Vous pouvez ajouter une vérification AJAX ici si vous le souhaitez
         });
     </script>
 </body>
