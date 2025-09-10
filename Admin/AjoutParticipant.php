@@ -362,8 +362,8 @@
             <div class="ail_fle">
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
-                    <div class="form_container">
-                        <h2 class="form_title">👨‍🏫 Ajouter un Nouveau Participant</h2>
+                                    <div class="form_container">
+                        <h2 class="form_title">👨‍🎓 Ajouter un Nouveau Participant</h2>
                         
                         <!-- Affichage des messages de réponse -->
                         <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
@@ -374,10 +374,10 @@
                                         echo "<span class='btn btn-danger-soft col-md-12'>Veuillez renseigner tous les champs obligatoires</span>";
                                         break;
                                     case 200: 
-                                        echo "<span class='btn btn-success-soft col-md-12'>Le formateur a été ajouté avec succès</span>";
+                                        echo "<span class='btn btn-success-soft col-md-12'>Le participant a été ajouté avec succès</span>";
                                         break;
                                     case 300: 
-                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout du formateur</span>";
+                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout du participant</span>";
                                         break;
                                     case 400: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>L'email est déjà utilisé par un autre utilisateur</span>";
@@ -496,7 +496,7 @@
                                 <input type="hidden" name="do" value="user_participant">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    💾 Enregistrer le Formateur
+                                    💾 Enregistrer le Participant
                                 </button>
                             </form>
                         </div>

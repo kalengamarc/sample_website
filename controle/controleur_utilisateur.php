@@ -142,7 +142,9 @@ class UtilisateurController {
     public function getAllUtilisateurs(): array {
         try {
             $utilisateurs = $this->requeteUtilisateur->getAllUtilisateurs();
-            foreach ($utilisateurs as $u) //$u->setMotDePasse('');
+            foreach ($utilisateurs as $u) {
+                $u->setMotDePasse(''); // Masquer le mot de passe
+            }
             return ['success' => true, 'data' => $utilisateurs, 'count' => count($utilisateurs)];
         } catch (Exception $e) {
             return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
@@ -156,7 +158,7 @@ class UtilisateurController {
         string $email,
         string $telephone,
         string $role,
-        string $photo = null,
+        string $photo = null
     ): array {
         try {
             $existingUtilisateur = $this->requeteUtilisateur->getUtilisateurById($id);
