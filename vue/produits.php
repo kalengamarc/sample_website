@@ -553,7 +553,7 @@ unset($_SESSION['message_type']);
         }
 
         .btn-submit {
-            background: linear-gradient(135deg, #04221a 极好%, #2c5f2d 100%);
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
             color: white;
             position: relative;
             overflow: hidden;
@@ -580,7 +580,7 @@ unset($_SESSION['message_type']);
         }
 
         .alert-success {
-            background-color极好#d4edda;
+            background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
@@ -654,13 +654,13 @@ unset($_SESSION['message_type']);
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
             position: relative;
             transform: translateY(-50px);
-            transition极好transform 0.3s ease;
+            transition: transform 0.3s ease;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        .product-details-modal.show .product极好details-content {
+        .product-details-modal.show .product-details-content {
             transform: translateY(0);
         }
 
@@ -674,7 +674,7 @@ unset($_SESSION['message_type']);
             align-items: center;
         }
 
-极好.product-details-header h2 {
+        .product-details-header h2 {
             margin: 0;
             font-size: 2em;
             font-weight: 600;
@@ -752,12 +752,12 @@ unset($_SESSION['message_type']);
 
         .product-description-large {
             color: #666;
-极好line-height: 1.8;
+            line-height: 1.8;
             font-size: 1.1em;
             margin-bottom: 30px;
         }
 
-        .product-s极好specs {
+        .product-specs {
             background: white;
             padding: 20px;
             border-radius: 15px;
@@ -918,7 +918,7 @@ unset($_SESSION['message_type']);
         }
 
         .whatsapp-popup-header h3 {
-            font-size: 极好6px;
+            font-size: 16px;
             font-weight: 600;
         }
 
@@ -957,7 +957,7 @@ unset($_SESSION['message_type']);
 
         .whatsapp-popup-item-title {
             font-weight: 600;
-            color: #极好21a;
+            color: #04221a;
             margin-bottom: 3px;
         }
 
@@ -974,7 +974,7 @@ unset($_SESSION['message_type']);
         .whatsapp-popup-footer {
             padding: 10px 15px;
             text-align: center;
-            background: #f9极好f9;
+            background: #f9f9f9;
             border-top: 1px solid #eee;
         }
 
@@ -1117,7 +1117,7 @@ unset($_SESSION['message_type']);
     </div>
 
     <!-- WhatsApp-style Popups -->
-    <div class="whatsapp-popup"极好id="cartPopup">
+    <div class="whatsapp-popup" id="cartPopup">
         <div class="whatsapp-popup-header">
             <i class="fas fa-shopping-cart"></i>
             <h3>Votre Panier</h3>
@@ -1144,13 +1144,13 @@ unset($_SESSION['message_type']);
                 <div class="whatsapp-popup-item-time">79€</div>
             </div>
             <div class="whatsapp-popup-item">
-                <div class极好whatsapp-popup-item-icon">
+                <div class="whatsapp-popup-item-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
                     <div class="whatsapp-popup-item-title">Protection Écran</div>
                     <div class="whatsapp-popup-item-desc">Quantité: 1</div>
-                </极好div>
+                </div>
                 <div class="whatsapp-popup-item-time">19€</div>
             </div>
         </div>
@@ -1176,8 +1176,8 @@ unset($_SESSION['message_type']);
                 <div class="whatsapp-popup-item-time">10:30</div>
             </div>
             <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #f6极好ed;">
-                    <i class="fas fa-check-circle" style="极好or: #52c41a;"></i>
+                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                    <i class="fas fa-check-circle" style="color: #52c41a;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
                     <div class="whatsapp-popup-item-title">Paiement Confirmé</div>
@@ -1187,7 +1187,7 @@ unset($_SESSION['message_type']);
             </div>
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
-                    <i class="fas fa-gift" style="color: #fa8c16;"></极好i>
+                    <i class="fas fa-gift" style="color: #fa8c16;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
                     <div class="whatsapp-popup-item-title">Offre Spéciale</div>
@@ -1216,7 +1216,7 @@ unset($_SESSION['message_type']);
             <i class="fas fa-user"></i>
             <h3>Mon Profil</h3>
         </div>
-        <div class="whatsapp-pop极好up-content">
+        <div class="whatsapp-popup-content">
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
                     <i class="fas fa-user-circle" style="color: #04221a;"></i>
@@ -1227,7 +1227,7 @@ unset($_SESSION['message_type']);
                 </div>
             </div>
             <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style极好background-color: #e6f7ff;">
+                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
                     <i class="fas fa-envelope" style="color: #1890ff;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
@@ -1240,16 +1240,16 @@ unset($_SESSION['message_type']);
                     <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup极好item-title">Paris, France</div>
+                    <div class="whatsapp-popup-item-title">Paris, France</div>
                     <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
                 </div>
             </div>
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
-                    <i class="fas极好fa-shopping-bag" style="color: #fa8c16;"></i>
+                    <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">12 Commandes</极好div>
+                    <div class="whatsapp-popup-item-title">12 Commandes</div>
                     <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
                 </div>
             </div>
@@ -1274,7 +1274,7 @@ unset($_SESSION['message_type']);
                 <div class="logo" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M4 12c2-4 8-8 12-4" stroke="#04221a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                        <circle cx="12" cy="12" r="4" fill="#极好21a" />
+                        <circle cx="12" cy="12" r="4" fill="#04221a" />
                         <path d="M20 4l-4 4" stroke="#fff" stroke-opacity="0.06" stroke-width="1.2" />
                     </svg>
                 </div>
@@ -1306,7 +1306,7 @@ unset($_SESSION['message_type']);
                             <div class="image-container">
                                 <img src="<?='../controle/'.$produit->getPhoto()?>" 
                                      alt="<?='Image de '.htmlspecialchars($produit->getNom())?>"
-                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi极好+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNTU1Ij5JbWFnZSBub24gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+'">
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNTU1Ij5JbWFnZSBub24gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+'">
                             </div>
                             
                             <div class="card-content">
@@ -1338,7 +1338,7 @@ unset($_SESSION['message_type']);
                                                 title="<?= in_array($produit->getIdProduit(), $_SESSION['favoris'] ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
                                         </button>
                                     </form>
-                                    <button class="icon fas极好fa-share" 
+                                    <button class="icon fas fa-share" 
                                             onclick="openShareModal(<?=$produit->getIdProduit()?>, 'produit')" 
                                             title="Partager">
                                     </button>
@@ -1349,7 +1349,7 @@ unset($_SESSION['message_type']);
                 <?php else: ?>
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 15px;">
                         <h3 style="color: #666; margin-bottom: 20px;">Aucun produit disponible</h3>
-                        <极好p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux produits.</p>
+                        <p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux produits.</p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -1377,9 +1377,9 @@ unset($_SESSION['message_type']);
                                 <input type="radio" id="star5" name="note" value="5" />
                                 <label for="star5" title="5 étoiles" data-value="5">★</label>
                                 <input type="radio" id="star4" name="note" value="4" />
-                                <label for="star4" title="4 étoiles" data-value="4">★极好label>
+                                <label for="star4" title="4 étoiles" data-value="4">★</label>
                                 <input type="radio" id="star3" name="note" value="3" />
-                                <label for="star3" title="3 étoiles" data-value极好3">★</label>
+                                <label for="star3" title="3 étoiles" data-value="3">★</label>
                                 <input type="radio" id="star2" name="note" value="2" />
                                 <label for="star2" title="2 étoiles" data-value="2">★</label>
                                 <input type="radio" id="star1" name="note" value="1" />
@@ -1433,7 +1433,7 @@ unset($_SESSION['message_type']);
                         <button class="fab fa-linkedin" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #0077b5;" onclick="shareOnPlatform('linkedin')" title="LinkedIn"></button>
                         <button class="fab fa-whatsapp" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #25d366;" onclick="shareOnPlatform('whatsapp')" title="WhatsApp"></button>
                         <button class="fas fa-envelope" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #d44638;" onclick="shareOnPlatform('email')" title="Email"></button>
-                        <button class="fas fa-link" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none;极好color: #6c757d;" onclick="shareOnPlatform('lien')" title="Copier le lien"></button>
+                        <button class="fas fa-link" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #6c757d;" onclick="shareOnPlatform('lien')" title="Copier le lien"></button>
                     </div>
                 </div>
             </div>
@@ -1470,7 +1470,7 @@ unset($_SESSION['message_type']);
                                         <i class="fas fa-shopping-cart"></i> Ajouter au panier
                                     </button>
                                 </form>
-                                <form method极好post" style="display: inline;">
+                                <form method="post" style="display: inline;">
                                     <input type="hidden" name="action" value="ajouter_favoris">
                                     <input type="hidden" name="id_produit" id="details_favoris_id">
                                     <button type="submit" class="btn-details">
@@ -1667,7 +1667,7 @@ unset($_SESSION['message_type']);
 
         // Fonction pour ouvrir le popup de détails produit
         function openProductDetails(productId) {
-            if (!product极好) {
+            if (!productId) {
                 alert('Erreur: ID du produit manquant');
                 return;
             }
@@ -1761,7 +1761,7 @@ unset($_SESSION['message_type']);
                         <span class="star">★</span>
                         <span class="star empty">★</span>
                         <span class="star empty">★</span>
-                    </极好div>
+                    </div>
                     <div class="comment-text">Bon produit mais livraison un peu longue.</div>
                 </div>
             `;
@@ -1787,7 +1787,7 @@ unset($_SESSION['message_type']);
             
             // Animation d'ouverture
             setTimeout(() => {
-                modal.classList.add极好'show');
+                modal.classList.add('show');
             }, 10);
             
             modal.setAttribute('aria-hidden', 'false');
