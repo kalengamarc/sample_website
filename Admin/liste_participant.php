@@ -739,7 +739,7 @@
                                         <td><?= htmlspecialchars($user->getEmail()) ?></td>
                                         <td><?= htmlspecialchars($user->getTelephone()) ?></td>
                                         <td><?= htmlspecialchars($user->getSpecialite()) ?></td>
-                                        <td><?= htmlspecialchars($user->getIdFormation()) ?></td>
+                                        <td><?= $user->getIdFormation() ?></td>
                                         <td>
                                             <div class="action-buttons">
                                                 <a href="#" class="action-btn action-view" 
@@ -761,7 +761,7 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="supprimer.php?id=<?= $user->getId() ?>" 
-                                                   onclick="return confirm('Voulez-vous vraiment supprimer ce formateur ?')" 
+                                                   onclick="return confirm('Voulez-vous vraiment supprimer ce participant ?')" 
                                                    class="action-btn action-delete" 
                                                    title="Supprimer">
                                                     <i class="fas fa-trash"></i>
@@ -772,9 +772,9 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" style="text-align: center; padding: 30px; color: #6b7280;">
+                                    <td colspan="8" style="text-align: center; padding: 30px; color: #6b7280;">
                                         <i class="fas fa-user-slash" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
-                                        Aucun formateur trouvé
+                                        Aucun participant trouvé
                                     </td>
                                 </tr>
                             <?php endif; ?>
@@ -789,7 +789,7 @@
     <div class="modal" id="formateurModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-chalkboard-teacher"></i> Détails du Formateur</h2>
+                <h2><i class="fas fa-user-graduate"></i> Détails du Participant</h2>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             
@@ -865,24 +865,24 @@
     </div>
 
     <script>
-        // Fonction pour afficher les détails du formateur
-        function showFormateurDetails(formateur) {
+        // Fonction pour afficher les détails du participant
+        function showFormateurDetails(participant) {
             // Remplir les informations du modal
-            document.getElementById('modalPhoto').src = formateur.photo;
-            document.getElementById('modalPhoto').alt = `Photo de ${formateur.prenom} ${formateur.nom}`;
-            document.getElementById('modalName').textContent = `${formateur.prenom} ${formateur.nom}`;
-            document.getElementById('modalRole').textContent = formateur.role;
-            document.getElementById('modalSpecialite').textContent = formateur.specialite;
-            document.getElementById('modalEmail').textContent = formateur.email;
-            document.getElementById('modalTelephone').textContent = formateur.telephone || 'Non renseigné';
-            document.getElementById('modalDateCreation').textContent = formateur.date_creation ? new Date(formateur.date_creation).toLocaleDateString('fr-FR') : 'Date inconnue';
-            document.getElementById('modalId').textContent = `#${formateur.id}`;
+            document.getElementById('modalPhoto').src = participant.photo;
+            document.getElementById('modalPhoto').alt = `Photo de ${participant.prenom} ${participant.nom}`;
+            document.getElementById('modalName').textContent = `${participant.prenom} ${participant.nom}`;
+            document.getElementById('modalRole').textContent = participant.role;
+            document.getElementById('modalSpecialite').textContent = participant.specialite;
+            document.getElementById('modalEmail').textContent = participant.email;
+            document.getElementById('modalTelephone').textContent = participant.telephone || 'Non renseigné';
+            document.getElementById('modalDateCreation').textContent = participant.date_creation ? new Date(participant.date_creation).toLocaleDateString('fr-FR') : 'Date inconnue';
+            document.getElementById('modalId').textContent = `#${participant.id}`;
             
             // Afficher le modal
             document.getElementById('formateurModal').style.display = 'flex';
             
-            // Stocker l'ID du formateur pour l'édition
-            document.getElementById('formateurModal').dataset.formateurId = formateur.id;
+            // Stocker l'ID du participant pour l'édition
+            document.getElementById('formateurModal').dataset.formateurId = participant.id;
         }
         
         // Fonction pour fermer le modal
@@ -890,11 +890,11 @@
             document.getElementById('formateurModal').style.display = 'none';
         }
         
-        // Fonction pour éditer le formateur
+        // Fonction pour éditer le participant
         function editFormateur() {
-            const formateurId = document.getElementById('formateurModal').dataset.formateurId;
-            if (formateurId) {
-                window.location.href = `modifier.php?id=${formateurId}`;
+            const participantId = document.getElementById('formateurModal').dataset.formateurId;
+            if (participantId) {
+                window.location.href = `modifier.php?id=${participantId}`;
             }
         }
         

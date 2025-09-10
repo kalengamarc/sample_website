@@ -214,7 +214,7 @@ try {
                     $data['specialite'] ?? '',
                     $data['id_formation'] ?? ''
                 );
-                if ($data['role'] === 'participant') {
+                if ($data['role'] === 'etudiant') {
                     $redirectPath = '../Admin/liste_participant.php';
                     header("Location: $redirectPath");
                     exit;
