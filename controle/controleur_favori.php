@@ -1,7 +1,7 @@
 <?php
-require_once '../modele/favori.php';
-require_once '../modele/formation.php';
-require_once '../modele/produit.php';
+require_once __DIR__ . '/../modele/favori.php';
+require_once __DIR__ . '/../modele/formation.php';
+require_once __DIR__ . '/../modele/produit.php';
 
 
 class FavoriController {

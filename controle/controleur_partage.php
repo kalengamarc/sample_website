@@ -1,5 +1,5 @@
 <?php
-require_once '../modele/partage.php';
+require_once __DIR__ . '/../modele/partage.php';
 
 class PartageController {
     private $partageCRUD;

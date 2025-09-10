@@ -1,5 +1,5 @@
 <?php
-require_once '../modele/commentaire.php';
+require_once __DIR__ . '/../modele/commentaire.php';
 
 class CommentaireController {
     private $crudCommentaire;

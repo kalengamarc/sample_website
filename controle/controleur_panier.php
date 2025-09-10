@@ -1,6 +1,6 @@
 <?php
-require_once '../modele/panier.php';
-require_once '../modele/produit.php'; // Pour vérifier le stock
+require_once __DIR__ . '/../modele/panier.php';
+require_once __DIR__ . '/../modele/produit.php'; // Pour vérifier le stock
 
 class PanierController {
     private $crudPanier;

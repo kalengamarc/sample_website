@@ -17,13 +17,13 @@ require_once '../controle/controleur_produit.php';
 require_once '../controle/controleur.paiement.php';
 
 // Inclure les modèles
-require_once '../modele/utilisateur.php';
-require_once '../modele/formation.php';
-require_once '../modele/inscription.php';
-require_once '../modele/paiement.php';
-require_once '../modele/presence.php';
-require_once '../modele/produit.php';
-require_once '../modele/detail_commande.php';
+require_once __DIR__ . '/../modele/utilisateur.php';
+require_once __DIR__ . '/../modele/formation.php';
+require_once __DIR__ . '/../modele/inscription.php';
+require_once __DIR__ . '/../modele/paiement.php';
+require_once __DIR__ . '/../modele/presence.php';
+require_once __DIR__ . '/../modele/produit.php';
+require_once __DIR__ . '/../modele/detail_commande.php';
 
 // Fonction pour obtenir les données de la requête
 function getRequestData() {

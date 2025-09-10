@@ -7,6 +7,83 @@ include_once('../controle/controleur_produit.php');
 $produitController = new ProduitController();
 $produitsResult = $produitController->getAllProduits();
 $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
+
+// Traitement des actions sans API
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
+            case 'ajouter_commentaire':
+                if (isset($_POST['id_produit'], $_POST['note'], $_POST['commentaire'])) {
+                    // Traiter l'ajout de commentaire
+                    $result = $produitController->ajouterCommentaire(
+                        $_POST['id_produit'],
+                        $_SESSION['user_id'] ?? 1, // ID utilisateur par défaut pour la démo
+                        $_POST['note'],
+                        $_POST['commentaire']
+                    );
+                    
+                    if ($result['success']) {
+                        $_SESSION['message'] = "Commentaire ajouté avec succès!";
+                        $_SESSION['message_type'] = "success";
+                    } else {
+                        $_SESSION['message'] = "Erreur: " . $result['message'];
+                        $_SESSION['message_type'] = "error";
+                    }
+                    
+                    // Rediriger pour éviter la resoumission du formulaire
+                    header("Location: ".$_SERVER['PHP_SELF']);
+                    exit();
+                }
+                break;
+                
+            case 'ajouter_panier':
+                if (isset($_POST['id_produit'])) {
+                    // Ajouter au panier (stocké en session)
+                    if (!isset($_SESSION['panier'])) {
+                        $_SESSION['panier'] = [];
+                    }
+                    
+                    $_SESSION['panier'][] = $_POST['id_produit'];
+                    $_SESSION['message'] = "Produit ajouté au panier!";
+                    $_SESSION['message_type'] = "success";
+                    
+                    header("Location: ".$_SERVER['PHP_SELF']);
+                    exit();
+                }
+                break;
+                
+            case 'ajouter_favoris':
+                if (isset($_POST['id_produit'])) {
+                    // Ajouter aux favoris (stocké en session)
+                    if (!isset($_SESSION['favoris'])) {
+                        $_SESSION['favoris'] = [];
+                    }
+                    
+                    $produitId = $_POST['id_produit'];
+                    if (in_array($produitId, $_SESSION['favoris'])) {
+                        // Retirer des favoris
+                        $_SESSION['favoris'] = array_diff($_SESSION['favoris'], [$produitId]);
+                        $_SESSION['message'] = "Produit retiré des favoris!";
+                    } else {
+                        // Ajouter aux favoris
+                        $_SESSION['favoris'][] = $produitId;
+                        $_SESSION['message'] = "Produit ajouté aux favoris!";
+                    }
+                    $_SESSION['message_type'] = "success";
+                    
+                    header("Location: ".$_SERVER['PHP_SELF']);
+                    exit();
+                }
+                break;
+        }
+    }
+}
+
+// Récupérer les messages de session
+$message = $_SESSION['message'] ?? '';
+$message_type = $_SESSION['message_type'] ?? '';
+unset($_SESSION['message']);
+unset($_SESSION['message_type']);
 ?>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -236,6 +313,10 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
+        .fa-eye { 
+            color: #007bff; 
+            background: rgba(0, 123, 255, 0.1);
+        }
         .fa-comment { 
             color: #17a2b8; 
             background: rgba(23, 162, 184, 0.1);
@@ -257,6 +338,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             color: white !important;
         }
 
+        .fa-eye:hover { background: #007bff; }
         .fa-comment:hover { background: #17a2b8; }
         .fa-shopping-cart:hover { background: #28a745; }
         .fa-star:hover { background: #ffc107; }
@@ -279,6 +361,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
 
         .modal.show {
             opacity: 1;
+            display: block;
         }
 
         .modal-content {
@@ -288,7 +371,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             border-radius: 20px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 极好 25px 50px rgba(0,0,0,0.25);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
             position: relative;
             transform: translateY(-50px);
             transition: transform 0.3s ease;
@@ -368,7 +451,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             color: #ddd;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 极好px;
+            padding: 5px;
             border-radius: 50%;
         }
 
@@ -454,6 +537,9 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-cancel {
@@ -467,7 +553,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         }
 
         .btn-submit {
-            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            background: linear-gradient(135deg, #04221a 极好%, #2c5f2d 100%);
             color: white;
             position: relative;
             overflow: hidden;
@@ -494,7 +580,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         }
 
         .alert-success {
-            background-color: #d4edda;
+            background-color极好#d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
@@ -537,6 +623,273 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             animation: pulse 0.6s ease-in-out;
         }
 
+        /* Product Details Modal */
+        .product-details-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-details-modal.show {
+            opacity: 1;
+            display: block;
+        }
+
+        .product-details-content {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            margin: 1% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 1200px;
+            height: 95vh;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            position: relative;
+            transform: translateY(-50px);
+            transition极好transform 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-details-modal.show .product极好details-content {
+            transform: translateY(0);
+        }
+
+        .product-details-header {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+极好.product-details-header h2 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .product-details-close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-details-close:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .product-details-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .product-details-left {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .product-details-right {
+            flex: 1;
+            padding: 30px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .product-image-large {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .product-price-large {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c5f2d;
+            margin-bottom: 20px;
+        }
+
+        .product-description-large {
+            color: #666;
+极好line-height: 1.8;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .product-s极好specs {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-specs h4 {
+            color: #04221a;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .spec-value {
+            color: #666;
+        }
+        
+        .comments-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .comments-section h4 {
+            color: #04221a;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comments-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #04221a;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #04221a;
+        }
+
+        .comment-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .comment-rating {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 8px;
+        }
+
+        .comment-rating .star {
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .comment-rating .star.empty {
+            color: #ddd;
+        }
+
+        .comment-text {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-shrink: 0;
+        }
+
+        .btn-details {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(4, 34, 26, 0.3);
+        }
+
         /* WhatsApp-like popup styles */
         .whatsapp-popup {
             position: fixed;
@@ -565,7 +918,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         }
 
         .whatsapp-popup-header h3 {
-            font-size: 16px;
+            font-size: 极好6px;
             font-weight: 600;
         }
 
@@ -604,7 +957,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
 
         .whatsapp-popup-item-title {
             font-weight: 600;
-            color: #04221a;
+            color: #极好21a;
             margin-bottom: 3px;
         }
 
@@ -621,7 +974,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         .whatsapp-popup-footer {
             padding: 10px 15px;
             text-align: center;
-            background: #f9f9f9;
+            background: #f9极好f9;
             border-top: 1px solid #eee;
         }
 
@@ -702,6 +1055,47 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 width: 280px;
                 right: 10px;
             }
+            
+            /* Responsive pour le popup de détails produit */
+            .product-details-content {
+                width: 98%;
+                margin: 1% auto;
+                height: 95vh;
+            }
+            
+            .product-details-body {
+                flex-direction: column;
+            }
+            
+            .product-details-left,
+            .product-details-right {
+                flex: none;
+                padding: 20px;
+                min-height: 0;
+                overflow-y: auto;
+            }
+            
+            .product-image-large {
+                height: 250px;
+            }
+            
+            .product-price-large {
+                font-size: 2em;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn-details {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .comments-list {
+                max-height: 250px;
+            }
         }
     </style>
 </head>
@@ -711,7 +1105,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
-            <span class="badge">3</span>
+            <span class="badge"><?= count($_SESSION['panier'] ?? []) ?></span>
         </a>
         <a href="#" title="Notifications" onclick="togglePopup('notificationPopup'); return false;">
             <i class="icon fas fa-bell"></i>
@@ -723,7 +1117,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
     </div>
 
     <!-- WhatsApp-style Popups -->
-    <div class="whatsapp-popup" id="cartPopup">
+    <div class="whatsapp-popup"极好id="cartPopup">
         <div class="whatsapp-popup-header">
             <i class="fas fa-shopping-cart"></i>
             <h3>Votre Panier</h3>
@@ -750,13 +1144,13 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 <div class="whatsapp-popup-item-time">79€</div>
             </div>
             <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
+                <div class极好whatsapp-popup-item-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
                     <div class="whatsapp-popup-item-title">Protection Écran</div>
                     <div class="whatsapp-popup-item-desc">Quantité: 1</div>
-                </div>
+                </极好div>
                 <div class="whatsapp-popup-item-time">19€</div>
             </div>
         </div>
@@ -782,8 +1176,8 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 <div class="whatsapp-popup-item-time">10:30</div>
             </div>
             <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
-                    <i class="fas fa-check-circle" style="color: #52c41a;"></i>
+                <div class="whatsapp-popup-item-icon" style="background-color: #f6极好ed;">
+                    <i class="fas fa-check-circle" style="极好or: #52c41a;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
                     <div class="whatsapp-popup-item-title">Paiement Confirmé</div>
@@ -793,7 +1187,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             </div>
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
-                    <i class="fas fa-gift" style="color: #fa8c16;"></i>
+                    <i class="fas fa-gift" style="color: #fa8c16;"></极好i>
                 </div>
                 <div class="whatsapp-popup-item-content">
                     <div class="whatsapp-popup-item-title">Offre Spéciale</div>
@@ -822,7 +1216,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             <i class="fas fa-user"></i>
             <h3>Mon Profil</h3>
         </div>
-        <div class="whatsapp-popup-content">
+        <div class="whatsapp-pop极好up-content">
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
                     <i class="fas fa-user-circle" style="color: #04221a;"></i>
@@ -833,7 +1227,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 </div>
             </div>
             <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                <div class="whatsapp-popup-item-icon" style极好background-color: #e6f7ff;">
                     <i class="fas fa-envelope" style="color: #1890ff;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
@@ -846,16 +1240,16 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Paris, France</div>
+                    <div class="whatsapp-popup极好item-title">Paris, France</div>
                     <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
                 </div>
             </div>
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
-                    <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
+                    <i class="fas极好fa-shopping-bag" style="color: #fa8c16;"></i>
                 </div>
                 <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">12 Commandes</div>
+                    <div class="whatsapp-popup-item-title">12 Commandes</极好div>
                     <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
                 </div>
             </div>
@@ -865,6 +1259,14 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
         </div>
     </div>
 
+    <!-- Message de notification -->
+    <?php if (!empty($message)): ?>
+    <div class="notification notification-<?= $message_type ?>" style="position: fixed; top: 20px; right: 20px; z-index: 10000; padding: 15px; border-radius: 5px; color: white; background: <?= $message_type === 'success' ? '#28a745' : '#dc3545' ?>;">
+        <?= $message ?>
+        <button onclick="this.parentElement.style.display='none'" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">×</button>
+    </div>
+    <?php endif; ?>
+
     <div class="wrap">
         <!-- Header -->
         <header>
@@ -872,8 +1274,8 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 <div class="logo" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M4 12c2-4 8-8 12-4" stroke="#04221a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                        <circle cx="12" cy="12" r="4" fill="#04221a" />
-                        <path d="M20 4l-4 极好" stroke="#fff" stroke-opacity="0.06" stroke-width="1.2" />
+                        <circle cx="12" cy="12" r="4" fill="#极好21a" />
+                        <path d="M20 4l-4 4" stroke="#fff" stroke-opacity="0.06" stroke-width="1.2" />
                     </svg>
                 </div>
                 <div>
@@ -904,7 +1306,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                             <div class="image-container">
                                 <img src="<?='../controle/'.$produit->getPhoto()?>" 
                                      alt="<?='Image de '.htmlspecialchars($produit->getNom())?>"
-                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNTU1Ij5JbWFnZSBub24gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+'">
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi极好+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNTU1Ij5JbWFnZSBub24gZGlzcG9uaWJsZTwvdGV4dD4KPC9zdmc+'">
                             </div>
                             
                             <div class="card-content">
@@ -915,19 +1317,28 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 <p><?=htmlspecialchars($produit->getDescription())?></p>
                                 
                                 <div class="alignements_icones">
+                                    <button class="icon fas fa-eye" 
+                                            onclick="openProductDetails(<?=$produit->getIdProduit()?>)" 
+                                            title="Voir détails">
+                                    </button>
                                     <button class="icon fa fa-comment" 
                                             onclick="openCommentModal(<?=$produit->getIdProduit()?>)" 
                                             title="Commenter">
                                     </button>
-                                    <button class="icon fas fa-shopping-cart" 
-                                            onclick="addToCart(<?=$produit->getIdProduit()?>)" 
-                                            title="Ajouter au panier">
-                                    </button>
-                                    <button class="icon fas fa-star" 
-                                            onclick="addToFavorites(<?=$produit->getIdProduit()?>)" 
-                                            title="Ajouter aux favoris">
-                                    </button>
-                                    <button class="icon fas fa-share" 
+                                    <form method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="ajouter_panier">
+                                        <input type="hidden" name="id_produit" value="<?=$produit->getIdProduit()?>">
+                                        <button type="submit" class="icon fas fa-shopping-cart" title="Ajouter au panier">
+                                        </button>
+                                    </form>
+                                    <form method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="ajouter_favoris">
+                                        <input type="hidden" name="id_produit" value="<?=$produit->getIdProduit()?>">
+                                        <button type="submit" class="icon fas fa-star <?= in_array($produit->getIdProduit(), $_SESSION['favoris'] ?? []) ? 'favori-actif' : '' ?>" 
+                                                title="<?= in_array($produit->getIdProduit(), $_SESSION['favoris'] ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                                        </button>
+                                    </form>
+                                    <button class="icon fas极好fa-share" 
                                             onclick="openShareModal(<?=$produit->getIdProduit()?>, 'produit')" 
                                             title="Partager">
                                     </button>
@@ -938,7 +1349,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 <?php else: ?>
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 15px;">
                         <h3 style="color: #666; margin-bottom: 20px;">Aucun produit disponible</h3>
-                        <p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux produits.</p>
+                        <极好p style="color: #999;">Revenez plus tard pour découvrir nos nouveaux produits.</p>
                     </div>
                 <?php endif; ?>
             </div>
@@ -954,9 +1365,8 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 
                 <div class="modal-body">
                     <form method="post" id="commentForm">
-                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
                         <input type="hidden" name="action" value="ajouter_commentaire">
-                        <input type="hidden" name="id_service" id="comment_service_id">
+                        <input type="hidden" name="id_produit" id="comment_produit_id">
                         
                         <!-- Rating Section -->
                         <div class="rating-section">
@@ -967,9 +1377,9 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 <input type="radio" id="star5" name="note" value="5" />
                                 <label for="star5" title="5 étoiles" data-value="5">★</label>
                                 <input type="radio" id="star4" name="note" value="4" />
-                                <label for="star4" title="4 étoiles" data-value="4">★</label>
+                                <label for="star4" title="4 étoiles" data-value="4">★极好label>
                                 <input type="radio" id="star3" name="note" value="3" />
-                                <label for="star3" title="3 étoiles" data-value="3">★</label>
+                                <label for="star3" title="3 étoiles" data-value极好3">★</label>
                                 <input type="radio" id="star2" name="note" value="2" />
                                 <label for="star2" title="2 étoiles" data-value="2">★</label>
                                 <input type="radio" id="star1" name="note" value="1" />
@@ -986,7 +1396,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                                 </label>
                                 <textarea name="commentaire" 
                                           id="commentaire" 
-                                          placeholder="Partagez votre expérience avec ce service..." 
+                                          placeholder="Partagez votre expérience avec ce produit..." 
                                           required 
                                           maxlength="500"
                                           oninput="updateCharCounter()"></textarea>
@@ -1014,37 +1424,88 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 id="shareModalTitle"><i class="fas fa-share"></i> Partager ce produit</h3>
-                    <span class="close极好" onclick="closeModal('shareModal')" title="Fermer">&times;</span>
+                    <span class="close" onclick="closeModal('shareModal')" title="Fermer">&times;</span>
                 </div>
                 <div class="modal-body">
                     <div class="plateformes-partage" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px; margin-top: 20px;">
                         <button class="fab fa-facebook" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #3b5998;" onclick="shareOnPlatform('facebook')" title="Facebook"></button>
                         <button class="fab fa-twitter" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #1da1f2;" onclick="shareOnPlatform('twitter')" title="Twitter"></button>
                         <button class="fab fa-linkedin" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #0077b5;" onclick="shareOnPlatform('linkedin')" title="LinkedIn"></button>
-                        <button class="fab fa-whatsapp极好" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #25d366;" onclick="shareOnPlatform('whatsapp')" title="WhatsApp"></button>
-                        <button class="fas fa-envelope" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #d44638;" onclick="shareOn极好('email')" title="Email"></button>
-                        <button class="fas fa-link" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #6c757d;" onclick="shareOnPlatform('lien')" title="Copier le lien"></button>
+                        <button class="fab fa-whatsapp" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #25d366;" onclick="shareOnPlatform('whatsapp')" title="WhatsApp"></button>
+                        <button class="fas fa-envelope" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #d44638;" onclick="shareOnPlatform('email')" title="Email"></button>
+                        <button class="fas fa-link" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none;极好color: #6c757d;" onclick="shareOnPlatform('lien')" title="Copier le lien"></button>
                     </div>
-                    <form id="shareForm" method="post" style="display:none;">
-                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
-                        <input type="hidden" name="action" value="partager">
-                        <input type="hidden" name="id_produit" id="share_produit_id">
-                        <input type="hidden" name="id_formation" id="share_formation_id">
-                        <input type="hidden" name="plateforme" id="share_platform">
-                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Modal -->
+        <div id="productDetailsModal" class="product-details-modal" role="dialog" aria-labelledby="productDetailsTitle" aria-hidden="true">
+            <div class="product-details-content">
+                <div class="product-details-header">
+                    <h2 id="productDetailsTitle"><i class="fas fa-box"></i> Détails du produit</h2>
+                    <span class="product-details-close" onclick="closeProductDetails()" title="Fermer">&times;</span>
+                </div>
+                
+                <div class="product-details-body">
+                    <div class="product-details-left">
+                        <img id="productDetailsImage" class="product-image-large" src="" alt="Image du produit">
+                        
+                        <div class="product-info">
+                            <div id="productDetailsPrice" class="product-price-large"></div>
+                            <div id="productDetailsDescription" class="product-description-large"></div>
+                            
+                            <div class="product-specs">
+                                <h4><i class="fas fa-info-circle"></i> Spécifications</h4>
+                                <div id="productSpecs">
+                                    <!-- Les spécifications seront chargées dynamiquement -->
+                                </div>
+                            </div>
+                            
+                            <div class="product-actions">
+                                <form method="post" style="display: inline;">
+                                    <input type="hidden" name="action" value="ajouter_panier">
+                                    <input type="hidden" name="id_produit" id="details_produit_id">
+                                    <button type="submit" class="btn-details">
+                                        <i class="fas fa-shopping-cart"></i> Ajouter au panier
+                                    </button>
+                                </form>
+                                <form method极好post" style="display: inline;">
+                                    <input type="hidden" name="action" value="ajouter_favoris">
+                                    <input type="hidden" name="id_produit" id="details_favoris_id">
+                                    <button type="submit" class="btn-details">
+                                        <i class="fas fa-star"></i> Ajouter aux favoris
+                                    </button>
+                                </form>
+                                <button class="btn-details" onclick="openShareModalFromDetails()">
+                                    <i class="fas fa-share"></i> Partager
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-details-right">
+                        <div class="comments-section">
+                            <h4><i class="fas fa-comments"></i> Avis clients</h4>
+                            <div id="productComments" class="comments-list">
+                                <!-- Les commentaires seront chargés dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
         <footer class="reveal">
-            <small>&copy; <span id="year"></span> TermaDevs — Construit pour l'avenir</small>
+            <small>&copy; <span id="year"></span> JosNet — Construit pour l'avenir</small>
         </footer>
     </div>
 
     <script>
         // Variables globales
         let currentRating = 0;
+        let currentProductId = null;
         const ratingTexts = {
             1: "Très décevant 😞",
             2: "Pas terrible 😐", 
@@ -1053,26 +1514,280 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             5: "Excellent ! 🤩"
         };
 
+        // Données des produits (simulées - à remplacer par des données réelles)
+        const productsData = {
+            <?php if (!empty($produits)): ?>
+                <?php foreach ($produits as $produit): ?>
+                    <?=$produit->getIdProduit()?>: {
+                        id: <?=$produit->getIdProduit()?>,
+                        nom: "<?=addslashes($produit->getNom())?>",
+                        description: "<?=addslashes($produit->getDescription())?>",
+                        prix: <?=method_exists($produit, 'getPrix') ? $produit->getPrix() : 0?>,
+                        photo: "<?=addslashes($produit->getPhoto())?>",
+                        specifications: {
+                            "Marque": "<?=addslashes($produit->getNom())?>",
+                            "Catégorie": "Équipement télécom",
+                            "Garantie": "2 ans",
+                            "Stock": "En stock"
+                        }
+                    },
+                <?php endforeach; ?>
+            <?php endif; ?>
+        };
+
+        // Fonction pour afficher les notifications
+        function showNotification(message, type = 'info') {
+            // Créer l'élément de notification
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Ajouter les styles si pas déjà présents
+            if (!document.querySelector('#notification-styles')) {
+                const styles = document.createElement('style');
+                styles.id = 'notification-styles';
+                styles.textContent = `
+                    .notification {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: white;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                        padding: 15px 20px;
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        z-index: 10000;
+                        min-width: 300px;
+                        animation: slideInRight 0.3s ease;
+                    }
+                    
+                    .notification-success {
+                        border-left: 4px solid #28a745;
+                    }
+                    
+                    .notification-error {
+                        border-left: 4px solid #dc3545;
+                    }
+                    
+                    .notification-info {
+                        border-left: 4px solid #17a2b8;
+                    }
+                    
+                    .notification-content {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        flex: 1;
+                    }
+                    
+                    .notification-content i {
+                        font-size: 18px;
+                    }
+                    
+                    .notification-success .notification-content i {
+                        color: #28a745;
+                    }
+                    
+                    .notification-error .notification-content i {
+                        color: #dc3545;
+                    }
+                    
+                    .notification-info .notification-content i {
+                        color: #17a2b8;
+                    }
+                    
+                    .notification-close {
+                        background: none;
+                        border: none;
+                        color: #666;
+                        cursor: pointer;
+                        padding: 5px;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .notification-close:hover {
+                        background: #f0f0f0;
+                        color: #333;
+                    }
+                    
+                    @keyframes slideInRight {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                `;
+                document.head.appendChild(styles);
+            }
+            
+            // Ajouter la notification au DOM
+            document.body.appendChild(notification);
+            
+            // Supprimer automatiquement après 5 secondes
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideInRight 0.3s ease reverse';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
             initializeStarRating();
             document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // Masquer automatiquement les notifications après 5 secondes
+            setTimeout(() => {
+                const notification = document.querySelector('.notification');
+                if (notification) {
+                    notification.style.display = 'none';
+                }
+            }, 5000);
         });
 
-        // Fonction pour ouvrir la modale de commentaire
-        function openCommentModal(serviceId) {
-            if (!serviceId) {
-                showAlert('Erreur: ID du service manquant', 'error');
+        // Fonction pour ouvrir le popup de détails produit
+        function openProductDetails(productId) {
+            if (!product极好) {
+                alert('Erreur: ID du produit manquant');
                 return;
             }
             
-            document.getElementById('comment_service_id').value = serviceId;
-            const modal = document.getElementById('commentModal');
+            currentProductId = productId;
+            const product = productsData[productId];
+            
+            if (!product) {
+                alert('Erreur: Produit non trouvé');
+                return;
+            }
+            
+            // Remplir les informations du produit
+            document.getElementById('productDetailsTitle').innerHTML = `<i class="fas fa-box"></i> ${product.nom}`;
+            document.getElementById('productDetailsImage').src = `../controle/${product.photo}`;
+            document.getElementById('productDetailsImage').alt = `Image de ${product.nom}`;
+            document.getElementById('productDetailsPrice').textContent = `${product.prix.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('productDetailsDescription').textContent = product.description;
+            document.getElementById('details_produit_id').value = productId;
+            document.getElementById('details_favoris_id').value = productId;
+            
+            // Remplir les spécifications
+            const specsContainer = document.getElementById('productSpecs');
+            specsContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(product.specifications)) {
+                const specItem = document.createElement('div');
+                specItem.className = 'spec-item';
+                specItem.innerHTML = `
+                    <span class="spec-label">${key}:</span>
+                    <span class="spec-value">${value}</span>
+                `;
+                specsContainer.appendChild(specItem);
+            }
+            
+            // Charger les commentaires
+            loadProductComments(productId);
+            
+            // Afficher le modal
+            const modal = document.getElementById('productDetailsModal');
             modal.style.display = 'block';
             
             // Animation d'ouverture
             setTimeout(() => {
                 modal.classList.add('show');
+            }, 10);
+            
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        // Fonction pour fermer le popup de détails produit
+        function closeProductDetails() {
+            const modal = document.getElementById('productDetailsModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                modal.setAttribute('aria-hidden', 'true');
+                currentProductId = null;
+            }
+        }
+
+        // Fonction pour charger les commentaires d'un produit
+        function loadProductComments(productId) {
+            const commentsContainer = document.getElementById('productComments');
+            
+            // Pour cette version sans API, on simule des commentaires
+            commentsContainer.innerHTML = `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">Utilisateur #123</span>
+                        <span class="comment-date">15 juin 2023</span>
+                    </div>
+                    <div class="comment-rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star empty">★</span>
+                    </div>
+                    <div class="comment-text">Produit de très bonne qualité, je recommande!</div>
+                </div>
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">Utilisateur #456</span>
+                        <span class="comment-date">10 juin 2023</span>
+                    </div>
+                    <div class="comment-rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star empty">★</span>
+                        <span class="star empty">★</span>
+                    </极好div>
+                    <div class="comment-text">Bon produit mais livraison un peu longue.</div>
+                </div>
+            `;
+        }
+
+        // Fonctions pour les actions depuis le popup de détails
+        function openShareModalFromDetails() {
+            if (currentProductId) {
+                openShareModal(currentProductId, 'produit');
+            }
+        }
+
+        // Fonction pour ouvrir la modale de commentaire
+        function openCommentModal(produitId) {
+            if (!produitId) {
+                alert('Erreur: ID du produit manquant');
+                return;
+            }
+            
+            document.getElementById('comment_produit_id').value = produitId;
+            const modal = document.getElementById('commentModal');
+            modal.style.display = 'block';
+            
+            // Animation d'ouverture
+            setTimeout(() => {
+                modal.classList.add极好'show');
             }, 10);
             
             modal.setAttribute('aria-hidden', 'false');
@@ -1177,67 +1892,14 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             }
         }
 
-        // Validation et soumission du formulaire
-        document.getElementById('commentForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const commentaire = document.getElementById('commentaire').value.trim();
-            const rating = document.querySelector('input[name="note"]:checked');
-            
-            if (!rating) {
-                showAlert('Veuillez sélectionner une note.', 'error');
-                return false;
-            }
-            
-            if (commentaire.length === 0) {
-                showAlert('Veuillez saisir un commentaire.', 'error');
-                return false;
-            }
-            
-            if (commentaire.length > 500) {
-                showAlert('Le commentaire ne peut pas dépasser 500 caractères.', 'error');
-                return false;
-            }
-            
-            // Simulation d'envoi
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
-            
-            setTimeout(() => {
-                showAlert('Commentaire ajouté avec succès !', 'success');
-                setTimeout(() => {
-                    closeModal('commentModal');
-                }, 1500);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publier';
-            }, 1500);
-        });
-
-        // Réinitialiser le formulaire
-        function resetForm() {
-            document.getElementById('commentForm').reset();
-            currentRating = 0;
-            resetStars();
-            document.getElementById('ratingText').textContent = 'Cliquez sur les étoiles pour noter';
-            document.getElementById('charCount').textContent = '0';
-            document.querySelector('.char-counter').classList.remove('warning');
-            
-            // Supprimer les alertes
-            const alert = document.querySelector('.alert');
-            if (alert) alert.remove();
+        // Fonction pour afficher les alertes
+        function showAlert(message, type) {
+            // Créer une alerte simple
+            alert(message);
         }
 
         // Fonction pour ouvrir la modale de partage
         function openShareModal(id, type) {
-            if (type === 'produit') {
-                document.getElementById('share_produit_id').value = id;
-                document.getElementById('share_formation_id').value = '';
-            } else {
-                document.getElementById('share_produit_id').value = '';
-                document.getElementById('share_formation_id').value = id;
-            }
-            
             const modal = document.getElementById('shareModal');
             modal.style.display = 'block';
             setTimeout(() => {
@@ -1253,8 +1915,6 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 return;
             }
             
-            document.getElementById('share_platform').value = platform;
-            
             // Simulation de partage
             let message = '';
             switch(platform) {
@@ -1265,7 +1925,7 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     message = 'Partagé sur Twitter !';
                     break;
                 case 'linkedin':
-                    message = '极好 sur LinkedIn !';
+                    message = 'Partagé sur LinkedIn !';
                     break;
                 case 'whatsapp':
                     message = 'Partagé sur WhatsApp !';
@@ -1274,52 +1934,21 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                     message = 'Envoyé par email !';
                     break;
                 case 'lien':
-                    message = 'Lien copié dans le presse-papiers !';
-                    break;
+                    // Copier le lien dans le presse-papiers
+                    navigator.clipboard.writeText(window.location.href)
+                        .then(() => {
+                            alert('Lien copié dans le presse-papiers !');
+                        })
+                        .catch(err => {
+                            alert('Erreur lors de la copie du lien');
+                        });
+                    return;
                 default:
                     message = 'Partagé avec succès !';
             }
             
             alert(message);
             closeModal('shareModal');
-        }
-
-        // Fonction pour ajouter au panier
-        function addToCart(produitId) {
-            if (!produitId) {
-                alert('Erreur: ID du produit manquant');
-                return;
-            }
-            
-            // Animation du bouton
-            const cartBtn = event.target;
-            cartBtn.style.transform = 'scale(1.2)';
-            cartBtn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                cartBtn.style.transform = 'scale(1)';
-                cartBtn.style.background = 'rgba(40, 167, 69, 0.1)';
-                alert('Produit ajouté au panier !');
-            }, 300);
-        }
-
-        // Fonction pour ajouter aux favoris
-        function addToFavorites(produitId) {
-            if (!produitId) {
-                alert('Erreur: ID du produit manquant');
-                return;
-            }
-            
-            // Animation du bouton
-            const favBtn = event.target;
-            favBtn.style.transform = 'scale(1.2)';
-            favBtn.style.background = '#ffc107';
-            
-            setTimeout(() => {
-                favBtn.style.transform = 'scale(1)';
-                favBtn.style.background = 'rgba(255, 193, 7, 0.1)';
-                alert('Produit ajouté aux favoris !');
-            }, 300);
         }
 
         // Fermer les modales en cliquant en dehors
@@ -1336,6 +1965,12 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                         resetForm();
                     }
                 }
+            }
+            
+            // Gestion du popup de détails produit
+            const productDetailsModal = document.getElementById('productDetailsModal');
+            if (event.target === productDetailsModal) {
+                closeProductDetails();
             }
         });
 
@@ -1354,6 +1989,12 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                         resetForm();
                     }
                 });
+                
+                // Fermer le popup de détails produit
+                const productDetailsModal = document.getElementById('productDetailsModal');
+                if (productDetailsModal && productDetailsModal.style.display === 'block') {
+                    closeProductDetails();
+                }
             }
         });
 
@@ -1393,8 +2034,8 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
             }
         }
 
-        // Fermer les popups WhatsApp en cliquant à l'extérieur
-        document.addEventListener('click', function(e) {
+       // Fermer les popups WhatsApp en cliquant à l'extérieur
+       document.addEventListener('click', function(e) {
             if (activePopup) {
                 const popup = document.getElementById(activePopup);
                 const userMessageIcons = document.querySelector('.user_message');
@@ -1418,6 +2059,16 @@ $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
                 activePopup = null;
             }
         });
+
+        // Réinitialiser le formulaire
+        function resetForm() {
+            document.getElementById('commentForm').reset();
+            currentRating = 0;
+            resetStars();
+            document.getElementById('ratingText').textContent = 'Cliquez sur les étoiles pour noter';
+            document.getElementById('charCount').textContent = '0';
+            document.querySelector('.char-counter').classList.remove('warning');
+        }
     </script>
 </body>
 </html>

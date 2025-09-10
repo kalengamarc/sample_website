@@ -8,6 +8,83 @@
     $utilisateur = new UtilisateurController();
     $formations = new FormationController();
     $listeFormation = $formations->getAllFormations();
+    
+    // Traitement des actions sans API
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['action'])) {
+            switch ($_POST['action']) {
+                case 'ajouter_commentaire':
+                    if (isset($_POST['id_service'], $_POST['note'], $_POST['commentaire'])) {
+                        // Traiter l'ajout de commentaire
+                        $result = $formations->ajouterCommentaire(
+                            $_POST['id_service'],
+                            $_SESSION['user_id'] ?? 1, // ID utilisateur par défaut pour la démo
+                            $_POST['note'],
+                            $_POST['commentaire']
+                        );
+                        
+                        if ($result['success']) {
+                            $_SESSION['message'] = "Commentaire ajouté avec succès!";
+                            $_SESSION['message_type'] = "success";
+                        } else {
+                            $_SESSION['message'] = "Erreur: " . $result['message'];
+                            $_SESSION['message_type'] = "error";
+                        }
+                        
+                        // Rediriger pour éviter la resoumission du formulaire
+                        header("Location: ".$_SERVER['PHP_SELF']);
+                        exit();
+                    }
+                    break;
+                    
+                case 'ajouter_panier':
+                    if (isset($_POST['id_service'])) {
+                        // Ajouter au panier (stocké en session)
+                        if (!isset($_SESSION['panier'])) {
+                            $_SESSION['panier'] = [];
+                        }
+                        
+                        $_SESSION['panier'][] = $_POST['id_service'];
+                        $_SESSION['message'] = "Service ajouté au panier!";
+                        $_SESSION['message_type'] = "success";
+                        
+                        header("Location: ".$_SERVER['PHP_SELF']);
+                        exit();
+                    }
+                    break;
+                    
+                case 'ajouter_favoris':
+                    if (isset($_POST['id_service'])) {
+                        // Ajouter aux favoris (stocké en session)
+                        if (!isset($_SESSION['favoris'])) {
+                            $_SESSION['favoris'] = [];
+                        }
+                        
+                        $serviceId = $_POST['id_service'];
+                        if (in_array($serviceId, $_SESSION['favoris'])) {
+                            // Retirer des favoris
+                            $_SESSION['favoris'] = array_diff($_SESSION['favoris'], [$serviceId]);
+                            $_SESSION['message'] = "Service retiré des favoris!";
+                        } else {
+                            // Ajouter aux favoris
+                            $_SESSION['favoris'][] = $serviceId;
+                            $_SESSION['message'] = "Service ajouté aux favoris!";
+                        }
+                        $_SESSION['message_type'] = "success";
+                        
+                        header("Location: ".$_SERVER['PHP_SELF']);
+                        exit();
+                    }
+                    break;
+            }
+        }
+    }
+    
+    // Récupérer les messages de session
+    $message = $_SESSION['message'] ?? '';
+    $message_type = $_SESSION['message_type'] ?? '';
+    unset($_SESSION['message']);
+    unset($_SESSION['message_type']);
     ?>
   
     <meta charset="utf-8" />
@@ -115,11 +192,29 @@
             text-decoration: none;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .user_message a:hover {
             transform: translateY(-2px);
             background: yellowgreen;
+        }
+
+        /* Badge for notifications */
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
         }
 
         /* Title Section */
@@ -228,14 +323,19 @@
         .icon:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            color: white !important;
         }
 
+        .fa-eye { 
+            color: #007bff; 
+            background: rgba(0, 123, 255, 0.1);
+        }
         .fa-comment { 
             color: #17a2b8; 
             background: rgba(23, 162, 184, 0.1);
         }
         .fa-shopping-cart { 
-            color: #0c521cff; 
+            color: #28a745; 
             background: rgba(40, 167, 69, 0.1);
         }
         .fa-star { 
@@ -247,10 +347,7 @@
             background: rgba(111, 66, 193, 0.1);
         }
 
-        .icon:hover {
-            color: white !important;
-        }
-
+        .fa-eye:hover { background: #007bff; }
         .fa-comment:hover { background: #17a2b8; }
         .fa-shopping-cart:hover { background: #28a745; }
         .fa-star:hover { background: #ffc107; }
@@ -351,6 +448,7 @@
             justify-content: center;
             gap: 5px;
             margin-bottom: 10px;
+            flex-direction: row-reverse;
         }
 
         .rating input {
@@ -366,10 +464,10 @@
             border-radius: 50%;
         }
 
+        .rating input:checked ~ label,
         .rating label:hover,
-        .rating label:hover ~ label,
-        .rating input:checked ~ label {
-            color: #ffc107;
+        .rating label:hover ~ label {
+            color: #ffc107 !important;
             text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
             transform: scale(1.1);
         }
@@ -499,85 +597,261 @@
             border: 1px solid #f5c6cb;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            margin-top: 50px;
+        /* Service Details Modal */
+        .service-details-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .service-details-modal.show {
+            opacity: 1;
+        }
+
+        .service-details-content {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            margin: 1% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 1200px;
+            height: 95vh;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            position: relative;
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-details-modal.show .service-details-content {
+            transform: translateY(0);
+        }
+
+        .service-details-header {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-details-header h2 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .service-details-close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .service-details-close:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        .service-details-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .service-details-left {
+            flex: 1;
             padding: 30px;
-            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .service-details-right {
+            flex: 1;
+            padding: 30px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .service-image-large {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
             border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .service-info {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .service-description-large {
+            color: #666;
+            line-height: 1.8;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .service-specs {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .service-specs h4 {
+            color: #04221a;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .spec-value {
             color: #666;
         }
 
-        /* Animations */
-        @keyframes slideIn {
-            from {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .service-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-shrink: 0;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .btn-details {
+            background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .pulse {
-            animation: pulse 0.6s ease-in-out;
+        .btn-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(4, 34, 26, 0.3);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .wrap {
-                padding: 15px;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            
-            .nav {
-                justify-content: center;
-            }
-            
-            .grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-            }
-            
-            .modal-body {
-                padding: 20px;
-            }
-            
-            .rating label {
-                font-size: 28px;
-            }
-            
-            .modal-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .nom_service h1 {
-                font-size: 2em;
-            }
-            
+        .comments-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
+        .comments-section h4 {
+            color: #04221a;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comments-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #04221a;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #04221a;
+        }
+
+        .comment-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .comment-rating {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 8px;
+        }
+
+        .comment-rating .star {
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .comment-rating .star.empty {
+            color: #ddd;
+        }
+
+        .comment-text {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
         /* WhatsApp-like popup styles */
         .whatsapp-popup {
             position: fixed;
@@ -672,25 +946,131 @@
             font-weight: 600;
         }
 
-        /* Badge for notifications */
-        .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #dc2626;
-            color: white;
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            color: #666;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 10000;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        .notification-success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .notification-error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .notification-info {
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .notification-content i {
+            font-size: 18px;
+        }
+        
+        .notification-success .notification-content i {
+            color: #28a745;
+        }
+        
+        .notification-error .notification-content i {
+            color: #dc3545;
+        }
+        
+        .notification-info .notification-content i {
+            color: #17a2b8;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #04221a;
             border-radius: 50%;
             width: 20px;
             height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
         }
 
-        .user_message a {
-            position: relative;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Responsive Design */
@@ -743,16 +1123,52 @@
                 width: 280px;
                 right: 10px;
             }
+            
+            .service-details-content {
+                width: 98%;
+                margin: 1% auto;
+                height: 95vh;
+            }
+            
+            .service-details-body {
+                flex-direction: column;
+            }
+            
+            .service-details-left,
+            .service-details-right {
+                flex: none;
+                padding: 20px;
+                min-height: 0;
+                overflow-y: auto;
+            }
+            
+            .service-image-large {
+                height: 250px;
+            }
+            
+            .service-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn-details {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .comments-list {
+                max-height: 250px;
+            }
         }
     </style>
 </head>
 
 <body>
-<!-- User Message Icons -->
+    <!-- User Message Icons -->
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
-            <span class="badge">3</span>
+            <span class="badge"><?= count($_SESSION['panier'] ?? []) ?></span>
         </a>
         <a href="#" title="Notifications" onclick="togglePopup('notificationPopup'); return false;">
             <i class="icon fas fa-bell"></i>
@@ -770,49 +1186,22 @@
             <h3>Votre Panier</h3>
         </div>
         <div class="whatsapp-popup-content">
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
-                    <i class="fas fa-mobile-alt"></i>
+            <div id="cartContent">
+                <div style="text-align: center; padding: 20px; color: #666;">
+                    <i class="fas fa-spinner fa-spin"></i> Chargement...
                 </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">iPhone 13 Pro</div>
-                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
-                </div>
-                <div class="whatsapp-popup-item-time">999€</div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
-                    <i class="fas fa-headphones"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Écouteurs Bluetooth</div>
-                    <div class="whatsapp-popup-item-desc">Quantité: 2</div>
-                </div>
-                <div class="whatsapp-popup-item-time">79€</div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Protection Écran</div>
-                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
-                </div>
-                <div class="whatsapp-popup-item-time">19€</div>
             </div>
         </div>
         <div class="whatsapp-popup-footer">
-            <a href="#">Total: 1176€ | Voir le panier complet</a>
+            <a href="#" onclick="viewFullCart()">Voir le panier complet</a>
         </div>
     </div>
 
     <div class="whatsapp-popup" id="notificationPopup">
-        <!-- Notification Popup -->
         <div class="whatsapp-popup-header">
             <i class="fas fa-bell"></i>
             <h3>Notifications</h3>
         </div>
-        <!-- Notification Content -->
         <div class="whatsapp-popup-content">
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
@@ -824,7 +1213,6 @@
                 </div>
                 <div class="whatsapp-popup-item-time">10:30</div>
             </div>
-            <!-- Notification Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
                     <i class="fas fa-check-circle" style="color: #52c41a;"></i>
@@ -835,7 +1223,6 @@
                 </div>
                 <div class="whatsapp-popup-item-time">Hier</div>
             </div>
-            <!-- Notification Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
                     <i class="fas fa-gift" style="color: #fa8c16;"></i>
@@ -846,7 +1233,6 @@
                 </div>
                 <div class="whatsapp-popup-item-time">Hier</div>
             </div>
-            <!-- Notification Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f9f0ff;">
                     <i class="fas fa-users" style="color: #722ed1;"></i>
@@ -857,21 +1243,18 @@
                 </div>
                 <div class="whatsapp-popup-item-time">12/06</div>
             </div>
-            <!-- Notification Content -->
         </div>
         <div class="whatsapp-popup-footer">
             <a href="#">Marquer tout comme lu</a>
         </div>
     </div>
 
-    <!-- Profile Popup -->
     <div class="whatsapp-popup" id="profilePopup">
         <div class="whatsapp-popup-header">
             <i class="fas fa-user"></i>
             <h3>Mon Profil</h3>
         </div>
         <div class="whatsapp-popup-content">
-            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
                     <i class="fas fa-user-circle" style="color: #04221a;"></i>
@@ -881,7 +1264,6 @@
                     <div class="whatsapp-popup-item-desc">Membre depuis: Jan 2023</div>
                 </div>
             </div>
-            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
                     <i class="fas fa-envelope" style="color: #1890ff;"></i>
@@ -891,7 +1273,6 @@
                     <div class="whatsapp-popup-item-desc">Adresse email vérifiée</div>
                 </div>
             </div>
-            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
                     <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
@@ -901,7 +1282,6 @@
                     <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
                 </div>
             </div>
-            <!-- Profile Content -->
             <div class="whatsapp-popup-item">
                 <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
                     <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
@@ -911,12 +1291,19 @@
                     <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
                 </div>
             </div>
-            <!-- Profile Content -->
         </div>
         <div class="whatsapp-popup-footer">
             <a href="#">Modifier le profil</a>
         </div>
     </div>
+
+    <!-- Message de notification -->
+    <?php if (!empty($message)): ?>
+    <div class="notification notification-<?= $message_type ?>" style="position: fixed; top: 20px; right: 20px; z-index: 10000; padding: 15px; border-radius: 5px; color: white; background: <?= $message_type === 'success' ? '#28a745' : '#dc3545' ?>;">
+        <?= $message ?>
+        <button onclick="this.parentElement.style.display='none'" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">×</button>
+    </div>
+    <?php endif; ?>
 
     <!-- Wrap -->   
     <div class="wrap">
@@ -966,27 +1353,36 @@
                                 <h3><?=htmlspecialchars(substr($formation->getTitre(), 0, 50))?></h3>
                                 <p><?=htmlspecialchars(substr($formation->getDescription(), 0, 100))?> . . .</p>
                                 <p>
-                                          <?php
-                                                $duree = $formation->getDuree();
-                                                $dateDebut = $formation->getDebutFormation();
-                                                $etat = $formations->getTempsRestantFinFormation($dateDebut,$duree);
-                                                echo $etat;
-                                            ?>
-                              </p>
+                                    <?php
+                                        $duree = $formation->getDuree();
+                                        $dateDebut = $formation->getDebutFormation();
+                                        $etat = $formations->getTempsRestantFinFormation($dateDebut,$duree);
+                                        echo $etat;
+                                    ?>
+                                </p>
                                 <!-- Services Content -->
                                 <div class="alignements_icones">
+                                    <button class="icon fas fa-eye" 
+                                            onclick="openServiceDetails(<?=$formation->getIdFormation()?>)" 
+                                            title="Voir détails">
+                                    </button>
                                     <button class="icon fa fa-comment" 
                                             onclick="openCommentModal(<?=$formation->getIdFormation()?>)" 
                                             title="Commenter">
                                     </button>
-                                    <button class="icon fas fa-shopping-cart" 
-                                            onclick="addToCart(<?=$formation->getIdFormation()?>)" 
-                                            title="Ajouter au panier">
-                                    </button>
-                                    <button class="icon fas fa-star" 
-                                            onclick="addToFavorites(<?=$formation->getIdFormation()?>)" 
-                                            title="Ajouter aux favoris">
-                                    </button>
+                                    <form method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="ajouter_panier">
+                                        <input type="hidden" name="id_service" value="<?=$formation->getIdFormation()?>">
+                                        <button type="submit" class="icon fas fa-shopping-cart" title="Ajouter au panier">
+                                        </button>
+                                    </form>
+                                    <form method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="ajouter_favoris">
+                                        <input type="hidden" name="id_service" value="<?=$formation->getIdFormation()?>">
+                                        <button type="submit" class="icon fas fa-star <?= in_array($formation->getIdFormation(), $_SESSION['favoris'] ?? []) ? 'favori-actif' : '' ?>" 
+                                                title="<?= in_array($formation->getIdFormation(), $_SESSION['favoris'] ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                                        </button>
+                                    </form>
                                     <button class="icon fas fa-share" 
                                             onclick="openShareModal(<?=$formation->getIdFormation()?>, 'service')" 
                                             title="Partager">
@@ -1015,7 +1411,6 @@
                 
                 <div class="modal-body">
                     <form method="post" id="commentForm">
-                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
                         <input type="hidden" name="action" value="ajouter_commentaire">
                         <input type="hidden" name="id_service" id="comment_service_id">
                         
@@ -1081,18 +1476,68 @@
                 <div class="modal-body">
                     <div class="plateformes-partage" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px; margin-top: 20px;">
                         <button class="fab fa-facebook" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #3b5998;" onclick="shareOnPlatform('facebook')" title="Facebook"></button>
-                        <button class="fab fa-twitter" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 极好.3s ease; border: none; background: none; color: #1da1f2;" onclick="shareOnPlatform('twitter')" title="Twitter"></button>
+                        <button class="fab fa-twitter" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #1da1f2;" onclick="shareOnPlatform('twitter')" title="Twitter"></button>
                         <button class="fab fa-linkedin" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #0077b5;" onclick="shareOnPlatform('linkedin')" title="LinkedIn"></button>
                         <button class="fab fa-whatsapp" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #25d366;" onclick="shareOnPlatform('whatsapp')" title="WhatsApp"></button>
                         <button class="fas fa-envelope" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #d44638;" onclick="shareOnPlatform('email')" title="Email"></button>
                         <button class="fas fa-link" style="font-size: 24px; cursor: pointer; padding: 15px; border-radius: 50%; transition: all 0.3s ease; border: none; background: none; color: #6c757d;" onclick="shareOnPlatform('lien')" title="Copier le lien"></button>
                     </div>
-                    <form id="shareForm" method="post" style="display:none;">
-                        <input type="hidden" name="csrf_token" value="<?=$_SESSION['csrf_token'] ?? ''?>">
-                        <input type="hidden" name="action" value="partager">
-                        <input type="hidden" name="id_service" id="share_service_id">
-                        <input type="hidden" name="plateforme" id="share_platform">
-                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Details Modal -->
+        <div id="serviceDetailsModal" class="service-details-modal" role="dialog" aria-labelledby="serviceDetailsTitle" aria-hidden="true">
+            <div class="service-details-content">
+                <div class="service-details-header">
+                    <h2 id="serviceDetailsTitle"><i class="fas fa-graduation-cap"></i> Détails du service</h2>
+                    <span class="service-details-close" onclick="closeServiceDetails()" title="Fermer">&times;</span>
+                </div>
+                
+                <div class="service-details-body">
+                    <div class="service-details-left">
+                        <img id="serviceDetailsImage" class="service-image-large" src="" alt="Image du service">
+                        
+                        <div class="service-info">
+                            <div id="serviceDetailsDescription" class="service-description-large"></div>
+                            
+                            <div class="service-specs">
+                                <h4><i class="fas fa-info-circle"></i> Informations du service</h4>
+                                <div id="serviceSpecs">
+                                    <!-- Les spécifications seront chargées dynamiquement -->
+                                </div>
+                            </div>
+                            
+                            <div class="service-actions">
+                                <form method="post" style="display: inline;">
+                                    <input type="hidden" name="action" value="ajouter_panier">
+                                    <input type="hidden" name="id_service" id="details_service_id">
+                                    <button type="submit" class="btn-details">
+                                        <i class="fas fa-shopping-cart"></i> Ajouter au panier
+                                    </button>
+                                </form>
+                                <form method="post" style="display: inline;">
+                                    <input type="hidden" name="action" value="ajouter_favoris">
+                                    <input type="hidden" name="id_service" id="details_favoris_id">
+                                    <button type="submit" class="btn-details">
+                                        <i class="fas fa-star"></i> Ajouter aux favoris
+                                    </button>
+                                </form>
+                                <button class="btn-details" onclick="openShareModalFromServiceDetails()">
+                                    <i class="fas fa-share"></i> Partager
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-details-right">
+                        <div class="comments-section">
+                            <h4><i class="fas fa-comments"></i> Avis clients</h4>
+                            <div id="serviceComments" class="comments-list">
+                                <!-- Les commentaires seront chargés dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1106,6 +1551,7 @@
     <script>
         // Variables globales
         let currentRating = 0;
+        let currentServiceId = null;
         const ratingTexts = {
             1: "Très décevant 😞",
             2: "Pas terrible 😐", 
@@ -1114,16 +1560,154 @@
             5: "Excellent ! 🤩"
         };
 
+        // Données des services (simulées - à remplacer par des données réelles)
+        const servicesData = {
+            <?php if (!empty($listeFormation['data'])): ?>
+                <?php foreach ($listeFormation['data'] as $formation): ?>
+                    <?=$formation->getIdFormation()?>: {
+                        id: <?=$formation->getIdFormation()?>,
+                        titre: "<?=addslashes($formation->getTitre())?>",
+                        description: "<?=addslashes($formation->getDescription())?>",
+                        photo: "<?=addslashes($formation->getPhoto())?>",
+                        duree: "<?=addslashes($formation->getDuree())?>",
+                        dateDebut: "<?=addslashes($formation->getDebutFormation())?>",
+                        specifications: {
+                            "Titre": "<?=addslashes($formation->getTitre())?>",
+                            "Durée": "<?=addslashes($formation->getDuree())?>",
+                            "Date de début": "<?=addslashes($formation->getDebutFormation())?>",
+                            "Type": "Formation"
+                        }
+                    },
+                <?php endforeach; ?>
+            <?php endif; ?>
+        };
+
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
             initializeStarRating();
             document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // Masquer automatiquement les notifications après 5 secondes
+            setTimeout(() => {
+                const notification = document.querySelector('.notification');
+                if (notification) {
+                    notification.style.display = 'none';
+                }
+            }, 5000);
         });
+
+        // Fonction pour ouvrir le popup de détails service
+        function openServiceDetails(serviceId) {
+            if (!serviceId) {
+                alert('Erreur: ID du service manquant');
+                return;
+            }
+            
+            currentServiceId = serviceId;
+            const service = servicesData[serviceId];
+            
+            if (!service) {
+                alert('Erreur: Service non trouvé');
+                return;
+            }
+            
+            // Remplir les informations du service
+            document.getElementById('serviceDetailsTitle').innerHTML = `<i class="fas fa-graduation-cap"></i> ${service.titre}`;
+            document.getElementById('serviceDetailsImage').src = `../controle/${service.photo}`;
+            document.getElementById('serviceDetailsImage').alt = `Image de ${service.titre}`;
+            document.getElementById('serviceDetailsDescription').textContent = service.description;
+            document.getElementById('details_service_id').value = serviceId;
+            document.getElementById('details_favoris_id').value = serviceId;
+            
+            // Remplir les spécifications
+            const specsContainer = document.getElementById('serviceSpecs');
+            specsContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(service.specifications)) {
+                const specItem = document.createElement('div');
+                specItem.className = 'spec-item';
+                specItem.innerHTML = `
+                    <span class="spec-label">${key}:</span>
+                    <span class="spec-value">${value}</span>
+                `;
+                specsContainer.appendChild(specItem);
+            }
+            
+            // Charger les commentaires
+            loadServiceComments(serviceId);
+            
+            // Afficher le modal
+            const modal = document.getElementById('serviceDetailsModal');
+            modal.style.display = 'block';
+            
+            // Animation d'ouverture
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+            
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        // Fonction pour fermer le popup de détails service
+        function closeServiceDetails() {
+            const modal = document.getElementById('serviceDetailsModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                modal.setAttribute('aria-hidden', 'true');
+                currentServiceId = null;
+            }
+        }
+
+        // Fonction pour charger les commentaires d'un service
+        function loadServiceComments(serviceId) {
+            const commentsContainer = document.getElementById('serviceComments');
+            
+            // Pour cette version sans API, on simule des commentaires
+            commentsContainer.innerHTML = `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">Utilisateur #123</span>
+                        <span class="comment-date">15 juin 2023</span>
+                    </div>
+                    <div class="comment-rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star empty">★</span>
+                    </div>
+                    <div class="comment-text">Formation très complète et instructeur compétent. Je recommande!</div>
+                </div>
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">Utilisateur #456</span>
+                        <span class="comment-date">10 juin 2023</span>
+                    </div>
+                    <div class="comment-rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star empty">★</span>
+                        <span class="star empty">★</span>
+                    </div>
+                    <div class="comment-text">Contenu intéressant mais le rythme était un peu trop rapide pour moi.</div>
+                </div>
+            `;
+        }
+
+        // Fonctions pour les actions depuis le popup de détails service
+        function openShareModalFromServiceDetails() {
+            if (currentServiceId) {
+                openShareModal(currentServiceId, 'service');
+            }
+        }
 
         // Fonction pour ouvrir la modale de commentaire
         function openCommentModal(serviceId) {
             if (!serviceId) {
-                showAlert('Erreur: ID du service manquant', 'error');
+                alert('Erreur: ID du service manquant');
                 return;
             }
             
@@ -1238,79 +1822,10 @@
             }
         }
 
-        // Validation et soumission du formulaire
-        document.getElementById('commentForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const commentaire = document.getElementById('commentaire').value.trim();
-            const rating = document.querySelector('input[name="note"]:checked');
-            
-            if (!rating) {
-                showAlert('Veuillez sélectionner une note.', 'error');
-                return false;
-            }
-            
-            if (commentaire.length === 0) {
-                showAlert('Veuillez saisir un commentaire.', 'error');
-                return false;
-            }
-            
-            if (commentaire.length > 500) {
-                showAlert('Le commentaire ne peut pas dépasser 500 caractères.', 'error');
-                return false;
-            }
-            
-            // Simulation d'envoi
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
-            
-            setTimeout(() => {
-                showAlert('Commentaire ajouté avec succès !', 'success');
-                setTimeout(() => {
-                    closeModal('commentModal');
-                }, 1500);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publier';
-            }, 1500);
-        });
-
         // Fonction pour afficher les alertes
         function showAlert(message, type) {
-            // Supprimer les anciennes alertes
-            const existingAlert = document.querySelector('.alert');
-            if (existingAlert) {
-                existingAlert.remove();
-            }
-            
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            const modalBody = document.querySelector('.modal-body');
-            if (modalBody) {
-                modalBody.insertBefore(alert, modalBody.firstChild);
-                
-                setTimeout(() => {
-                    if (alert.parentNode) {
-                        alert.remove();
-                    }
-                }, 5000);
-            }
-        }
-
-        // Réinitialiser le formulaire
-        function resetForm() {
-            document.getElementById('commentForm').reset();
-            currentRating = 0;
-            resetStars();
-            document.getElementById('ratingText').textContent = 'Cliquez sur les étoiles pour noter';
-            document.getElementById('charCount').textContent = '0';
-            document.querySelector('.char-counter').classList.remove('warning');
-            
-            // Supprimer les alertes
-            const alert = document.querySelector('.alert');
-            if (alert) alert.remove();
+            // Créer une alerte simple
+            alert(message);
         }
 
         // Fonction pour ouvrir la modale de partage
@@ -1334,8 +1849,6 @@
                 return;
             }
             
-            document.getElementById('share_platform').value = platform;
-            
             // Simulation de partage
             let message = '';
             switch(platform) {
@@ -1355,33 +1868,21 @@
                     message = 'Envoyé par email !';
                     break;
                 case 'lien':
-                    message = 'Lien copié dans le presse-papiers !';
-                    break;
+                    // Copier le lien dans le presse-papiers
+                    navigator.clipboard.writeText(window.location.href)
+                        .then(() => {
+                            alert('Lien copié dans le presse-papiers !');
+                        })
+                        .catch(err => {
+                            alert('Erreur lors de la copie du lien');
+                        });
+                    return;
                 default:
                     message = 'Partagé avec succès !';
             }
             
             alert(message);
             closeModal('shareModal');
-        }
-
-        // Fonction pour ajouter au panier
-        function addToCart(serviceId) {
-            if (!serviceId) {
-                alert('Erreur: ID du service manquant');
-                return;
-            }
-            
-            // Animation du bouton
-            const cartBtn = event.target;
-            cartBtn.style.transform = 'scale(1.2)';
-            cartBtn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                favBtn.style.transform = 'scale(1)';
-                favBtn.style.background = 'rgba(255, 193, 7, 0.1)';
-                alert('Produit ajouté aux favoris !');
-            }, 300);
         }
 
         // Fermer les modales en cliquant en dehors
@@ -1398,6 +1899,12 @@
                         resetForm();
                     }
                 }
+            }
+            
+            // Gestion du popup de détails service
+            const serviceDetailsModal = document.getElementById('serviceDetailsModal');
+            if (event.target === serviceDetailsModal) {
+                closeServiceDetails();
             }
         });
 
@@ -1416,6 +1923,12 @@
                         resetForm();
                     }
                 });
+                
+                // Fermer le popup de détails service
+                const serviceDetailsModal = document.getElementById('serviceDetailsModal');
+                if (serviceDetailsModal && serviceDetailsModal.style.display === 'block') {
+                    closeServiceDetails();
+                }
             }
         });
 
@@ -1479,6 +1992,16 @@
                 activePopup = null;
             }
         });
+
+        // Réinitialiser le formulaire
+        function resetForm() {
+            document.getElementById('commentForm').reset();
+            currentRating = 0;
+            resetStars();
+            document.getElementById('ratingText').textContent = 'Cliquez sur les étoiles pour noter';
+            document.getElementById('charCount').textContent = '0';
+            document.querySelector('.char-counter').classList.remove('warning');
+        }
     </script>
 </body>
 </html>
