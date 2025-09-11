@@ -116,14 +116,16 @@
         .image_preview {
             width: 100px;
             height: 100px;
-            border: 1px solid gold;
             border-radius: 50%;
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            box-shadow:1px 2px 15px solid gold;
+            border:1px solid gold;
+            position:relative;
             background: rgba(255, 255, 255, 0.8);
+            z-index: 0;
         }
         
         .image_preview img {
@@ -141,13 +143,18 @@
         }
         
         .upload_btn {
-            background: #021a12;
-            color: white;
-            padding: 10px 20px;
+            
+            padding: 6px;
             border: none;
-            border-radius: 6px;
+            border-radius: 48%;
+            background-color:#05f07a;
+            color:white;
+            font-size:20px;
             cursor: pointer;
-            margin: 5px;
+            position:absolute; 
+            z-index: 1;
+            top:66px;
+            left:65px;
             transition: all 0.3s ease;
         }
         
@@ -346,6 +353,7 @@
             .image_preview {
                 width: 120px;
                 height: 120px;
+                
             }
         }
     </style>
@@ -358,19 +366,21 @@
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                     <div class="form_container">
-                        <h2 class="form_title"> Ajouter un Nouveau Formateur</h2>
+                        <h2 class="form_title">Ajouter un Nouveau admin</h2>
 
-                         <div class="image_upload">
+                        <div class="image_upload">
                                     <label>Photo de profil</label>
                                     <div class="image_preview" id="imagePreview">
-                                        <img src="" alt="Aperçu" id="previewImage">
+                                        <img src="../vue/defi7/images/Student day _ Premium Photo.jpeg" alt="Aperçu" id="previewImage">
                                         <span class="default-text" id="defaultText">Aucune photo</span>
+
+                                        <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
+                                        <i class="fas fa-plus-circle" ></i>
+                                    </button>
                                     </div>
                                     
                                     <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
-                                    <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
-                                        📷 Choisir une photo
-                                    </button>
+                                    
                                     <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
                                         🗑️ Supprimer
                                     </button>
@@ -392,7 +402,7 @@
                                         echo "<span class='btn btn-success-soft col-md-12'>Le formateur a été ajouté avec succès</span>";
                                         break;
                                     case 300: 
-                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout du formateur</span>";
+                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout d'admin</span>";
                                         break;
                                     case 400: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>L'email est déjà utilisé par un autre utilisateur</span>";
@@ -466,25 +476,15 @@
                                     </div>
                                 </div>
                                 
-                                <div class="form_group">
-                                    <label for="specialite">Spécialité <span class="required">*</span></label>
-                                    <input type="text" id="specialite" name="specialite" value="<?= $_POST['specialite'] ?? '' ?>" required>
-                                    <div class="error_message" id="specialiteError"></div>
-                                </div>
                                 
-                                <div class="form_group">
-                                    <label for="bio">Biographie</label>
-                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $_POST['bio'] ?? '' ?></textarea>
-                                    <div class="error_message" id="bioError"></div>
-                                </div>
                                 
-                               
+                                
                                 
                                 <input type="hidden" name="role" value="formateur">
                                 <input type="hidden" name="do" value="user_create">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                     Enregistrer le Formateur
+                                    Enregistrer un nouveau Admin
                                 </button>
                             </form>
                         </div>

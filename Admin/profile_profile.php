@@ -266,7 +266,7 @@
 
 /*=================================================
     SITTINGS SIDE
-==================================================*/
+==================================================
 .settings_side{
     width: 25%;
     height: 25vh;
@@ -311,7 +311,7 @@
     text-decoration: none;
     color: #021a12;
     margin-top: 5px;
-}
+}*/
 </style>
 <body>
     <div class="header_dash">
@@ -326,7 +326,7 @@
             ?>
                 <div class="dashcontainu">
                     <div class="settings_side">
-                         <!--PARAMETTRES-->
+                         <!--PARAMETTRES--><!--
                         <div class="listedesmarametres">
                             <div class="iconssss">
                                 <i class="fas fa-user"></i>
@@ -340,7 +340,7 @@
                                 <i class="fas fa-user"></i>
                                 <a href="#">Notifications</a>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                     <div class="tabl_contnu">
                        <div class="profile_div">
