@@ -721,6 +721,9 @@
                         <tbody>
                             <?php
                             include_once('../controle/controleur_utilisateur.php');
+                            include_once('../controle/controleur_formation.php');
+
+                            $formation = new FormationController();
                             $utilisateurCtrl = new UtilisateurController();
                             $usersData = $utilisateurCtrl->getUtilisateursByRole('etudiant');
                             ?>
@@ -739,7 +742,11 @@
                                         <td><?= htmlspecialchars($user->getEmail()) ?></td>
                                         <td><?= htmlspecialchars($user->getTelephone()) ?></td>
                                         <td><?= htmlspecialchars($user->getSpecialite()) ?></td>
-                                        <td><?= $user->getIdFormation() ?></td>
+                                        <?php
+                                        $titre = $formation->getFormation($user->getIdFormation());
+                                        
+                                        ?>
+                                        <td><?= $titre['data']->getTitre() ?></td>
                                         <td>
                                             <div class="action-buttons">
                                                 <a href="#" class="action-btn action-view" 

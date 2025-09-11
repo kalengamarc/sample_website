@@ -22,7 +22,7 @@ class UtilisateurController {
         string $description = '',
         $photoFile = null,
         string $specialite = '',
-        $id_formation = ''
+        $id_formation = '2'
     ): array {
         try {
             $photoPath = null;

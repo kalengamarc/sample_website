@@ -177,8 +177,7 @@ try {
                 $data['role'] ?? '',
                 $data['bio'] ?? '',
                 $photoPath,
-                $data['specialite'] ?? '',
-                $data['id_formation'] ?? ''
+                $data['specialite'] ?? ''
             );
             if ($data['role'] === 'formateur') {
                 $redirectPath = '../Admin/liste_formateur.php';
@@ -214,6 +213,7 @@ try {
                     $data['specialite'] ?? '',
                     $data['id_formation'] ?? ''
                 );
+                
                 if ($data['role'] === 'etudiant') {
                     $redirectPath = '../Admin/liste_participant.php';
                     header("Location: $redirectPath");
