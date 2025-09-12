@@ -468,7 +468,8 @@ try {
                 $data['categorie'] ?? '',
                 $photoPath
             );
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_updateStock':

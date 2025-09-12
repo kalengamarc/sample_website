@@ -358,7 +358,7 @@
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                     <div class="form_container">
-                        <h2 class="form_title"> Ajouter un Nouveau Formateur</h2>
+                        <h2 class="form_title"><?= $isEdit ? '✏️ Modifier le Formateur' : '➕ Ajouter un Nouveau Formateur' ?></h2>
 
                          <div class="image_upload">
                                     <label>Photo de profil</label>
@@ -381,7 +381,30 @@
                                 </div>
                         
                         <!-- Affichage des messages de réponse -->
-                        <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
+                        <?php
+session_start();
+if(!isset($_SESSION['user'])){
+    header('location:../vue/connexion.html');
+}
+
+// Vérifier si on est en mode modification
+$isEdit = isset($_GET['resp']) && !empty($_GET['resp']);
+$formateur = null;
+
+if ($isEdit) {
+    include_once('../controle/controleur_utilisateur.php');
+    $utilisateurCtrl = new UtilisateurController();
+    $formateurData = $utilisateurCtrl->getUtilisateur($_GET['resp']);
+    
+    if ($formateurData['success']) {
+        $formateur = $formateurData['data'];
+    } else {
+        // Rediriger si le formateur n'existe pas
+        header('location: liste_formateur.php');
+        exit;
+    }
+}
+?>
                             <div class="col-md-12 mb-4">
                                 <?php  
                                 switch($_GET['resp']) {
@@ -414,20 +437,19 @@
                                 }
                                 ?>
                             </div>
-                        <?php endif; ?>
                         
                         <div class="form_card">
                             <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formateurForm">
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="nom">Nom <span class="required">*</span></label>
-                                        <input type="text" id="nom" name="nom" value="<?= $_POST['nom'] ?? '' ?>" required>
+                                        <input type="text" id="nom" name="nom" value="<?= $formateur ? $formateur->getNom() : ($_POST['nom'] ?? '') ?>" required>
                                         <div class="error_message" id="nomError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="prenom">Prénom <span class="required">*</span></label>
-                                        <input type="text" id="prenom" name="prenom" value="<?= $_POST['prenom'] ?? '' ?>" required>
+                                        <input type="text" id="prenom" name="prenom" value="<?= $formateur ? $formateur->getPrenom() : ($_POST['prenom'] ?? '') ?>" required>
                                         <div class="error_message" id="prenomError"></div>
                                     </div>
                                 </div>
@@ -435,13 +457,13 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="email">Email <span class="required">*</span></label>
-                                        <input type="email" id="email" name="email" value="<?= $_POST['email'] ?? '' ?>" required>
+                                        <input type="email" id="email" name="email" value="<?= $formateur ? $formateur->getEmail() : ($_POST['email'] ?? '') ?>" required>
                                         <div class="error_message" id="emailError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="telephone">Téléphone</label>
-                                        <input type="tel" id="telephone" name="telephone" value="<?= $_POST['telephone'] ?? '' ?>">
+                                        <input type="tel" id="telephone" name="telephone" value="<?= $formateur ? $formateur->getTelephone() : ($_POST['telephone'] ?? '') ?>" required>
                                         <div class="error_message" id="telephoneError"></div>
                                     </div>
                                 </div>
@@ -449,7 +471,7 @@
                                 <div class="form_row">
                                     <div class="form_group password_toggle">
                                         <label for="password">Mot de passe <span class="required">*</span></label>
-                                        <input type="password" id="password" name="password" required>
+                                        <input type="password" id="password" name="password" <?= $isEdit ? '' : 'required' ?>>
                                         <span class="toggle_icon" onclick="togglePassword('password')">
                                             <i class="fas fa-eye"></i>
                                         </span>
@@ -458,7 +480,10 @@
                                     
                                     <div class="form_group password_toggle">
                                         <label for="confirm_password">Confirmer le mot de passe <span class="required">*</span></label>
-                                        <input type="password" id="confirm_password" name="confirm_password" required>
+                                        <input type="password" id="mot_de_passe" name="mot_de_passe" <?= $isEdit ? '' : 'required' ?>>
+                                        <?php if ($isEdit): ?>
+                                        <small class="form-text text-muted">Laissez vide pour conserver le mot de passe actuel</small>
+                                        <?php endif; ?>
                                         <span class="toggle_icon" onclick="togglePassword('confirm_password')">
                                             <i class="fas fa-eye"></i>
                                         </span>
@@ -468,23 +493,24 @@
                                 
                                 <div class="form_group">
                                     <label for="specialite">Spécialité <span class="required">*</span></label>
-                                    <input type="text" id="specialite" name="specialite" value="<?= $_POST['specialite'] ?? '' ?>" required>
+                                    <input type="text" id="specialite" name="specialite" value="<?= $formateur ? $formateur->getSpecialite() : ($_POST['specialite'] ?? '') ?>" required>
                                     <div class="error_message" id="specialiteError"></div>
                                 </div>
                                 
                                 <div class="form_group">
                                     <label for="bio">Biographie</label>
-                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $_POST['bio'] ?? '' ?></textarea>
+                                    <textarea id="bio" name="bio" placeholder="Parlez-nous de votre expérience..."><?= $formateur ? $formateur->getBio() : ($_POST['bio'] ?? '') ?></textarea>
                                     <div class="error_message" id="bioError"></div>
                                 </div>
                                 
-                               
-                                
                                 <input type="hidden" name="role" value="formateur">
-                                <input type="hidden" name="do" value="user_create">
+                                <input type="hidden" name="do" value="<?= $isEdit ? 'formateur_update' : 'formateur_create' ?>">
+                                <?php if ($isEdit): ?>
+                                <input type="hidden" name="id" value="<?= $formateur->getId() ?>">
+                                <?php endif; ?>
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                     Enregistrer le Formateur
+                                    <?= $isEdit ? '✏️ Modifier le Formateur' : '💾 Enregistrer le Formateur' ?>
                                 </button>
                             </form>
                         </div>

@@ -755,10 +755,10 @@
                                                    title="Voir détails">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="modifier.php?id=<?= $user->getId() ?>" class="action-btn action-edit" title="Modifier">
+                                                <a href="AjoutFormateur.php?resp=<?= $user->getId() ?>" class="action-btn action-edit" title="Modifier">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="supprimer.php?id=<?= $user->getId() ?>" 
+                                                <a href="../controle/index.php?do=formateur_delete&id=<?= $user->getId() ?>" 
                                                    onclick="return confirm('Voulez-vous vraiment supprimer ce formateur ?')" 
                                                    class="action-btn action-delete" 
                                                    title="Supprimer">
