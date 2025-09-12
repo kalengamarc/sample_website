@@ -498,10 +498,14 @@
                                 </div>
                                 
                                 <input type="hidden" name="role" value="etudiant">
-                                <input type="hidden" name="do" value="user_participant">
+                                <input type="hidden" name="do" value="<?= $participant['data']->getId() ?>? participant_update : participant_create">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
+                                    <?php if ($participant['data']->getId() > 0): ?>
+                                    💾 Modifier le Participant
+                                    <?php else: ?>
                                     💾 Enregistrer le Participant
+                                    <?php endif; ?>
                                 </button>
                             </form>
                         </div>
