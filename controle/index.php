@@ -111,8 +111,7 @@ function deleteImage($filepath) {
 // Traitement de la requête
 try {
     $data = getRequestData();
-    $do = $data['do'] ?? '';
-
+    $do = $data['do'] ?? $_GET['do'] ?? '';
     // Initialiser les contrôleurs
     $userController = new UtilisateurController();
     $formationController = new FormationController();
@@ -478,7 +477,8 @@ try {
                 $data['id'] ?? 0,
                 $data['stock'] ?? 0
             );
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_increaseStock':
@@ -487,7 +487,8 @@ try {
                 $data['id'] ?? 0,
                 $data['quantity'] ?? 0
             );
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_decreaseStock':
@@ -496,13 +497,14 @@ try {
                 $data['id'] ?? 0,
                 $data['quantity'] ?? 0
             );
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_delete':
             checkAuthentication();
             // Supprimer la photo du produit si elle existe
-            $produit = $produitController->getProduit($data['id'] ?? 0);
+            $produit = $produitController->getProduit($_GET['id'] ?? 0);
             if ($produit['success'] && $produit['data']->getPhoto()) {
                 $photoPath = $produit['data']->getPhoto();
                 if (file_exists(__DIR__ . '/' . $photoPath)) {
@@ -510,8 +512,9 @@ try {
                 }
             }
             
-            $result = $produitController->deleteProduit($data['id'] ?? 0);
-            sendJsonResponse($result);
+            $result = $produitController->deleteProduit($_GET['id'] ?? 0);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_getByCategorie':
@@ -522,23 +525,27 @@ try {
         case 'produit_getLowStock':
             checkAuthentication();
             $result = $produitController->getLowStockProduits($data['threshold'] ?? 10);
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_search':
             $result = $produitController->searchProduits($data['searchTerm'] ?? '');
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_getStats':
             checkAuthentication();
             $result = $produitController->getStats();
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         case 'produit_getCategories':
             $result = $produitController->getCategories();
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_equipement.php");
+            exit;
             break;
 
         // Gestion des inscriptions

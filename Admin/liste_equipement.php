@@ -598,8 +598,8 @@
                                                     })">
                                                         <i class="fas fa-eye"></i>
                                                     </div>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
+                                                    <a href="AjoutProduit.php?resp=<?= $produit->getIdProduit() ?>"><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
+                                                    <a href="../controle/index.php?do=produit_delete&id=<?= $produit->getIdProduit() ?>"> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
                                                 </div>
                                             </td>
                                     </tr>
@@ -687,14 +687,14 @@
                 </div>
                 
                 <div class="action-buttons">
-                    <a href="#" class="action-btn btn-edit" id="editBtn">
+                    <a href="AjoutProduit.php?resp=<?= $produit->getIdProduit() ?>" class="action-btn btn-edit" id="editBtn">
                         <i class="fas fa-edit"></i>
                         Modifier
                     </a>
-                    <button class="action-btn btn-delete" id="deleteBtn">
+                    <a href="../controle/index.php?do=produit_delete&id=<?= $produit->getIdProduit() ?>" class="action-btn btn-delete" id="deleteBtn">
                         <i class="fas fa-trash"></i>
                         Supprimer
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -706,7 +706,7 @@
             document.getElementById('cardName').textContent = data.nom || 'Nom du Produit';
             document.getElementById('cardCategory').textContent = data.categorie || 'Catégorie';
             document.getElementById('cardCategoryInfo').textContent = data.categorie || 'Catégorie';
-            document.getElementById('cardPrice').textContent = (data.prix || '0') + ' €';
+            document.getElementById('cardPrice').textContent = (data.prix || '0') + ' Fbu';
             document.getElementById('cardDescription').textContent = data.description || 'Aucune description disponible';
             
             // Gestion de la photo

@@ -8,8 +8,12 @@
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
     <?php
         include_once('../controle/controleur_utilisateur.php');
+        include_once('../controle/controleur_produit.php');
         $userController = new UtilisateurController();
         $formateurs = $userController->getUtilisateursByRole('formateur');
+        $idProduit = isset($_GET['resp']) ? $_GET['resp'] : null;
+        $ProduitController = new ProduitController();
+        $produit = $ProduitController->getProduit($idProduit);
     ?>
     <style>
         .header_dash {
@@ -383,24 +387,25 @@
                         <div class="form_card">
                             <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formationForm">
                                 <div class="form_row">
+                                    <input type="hidden" name="id" value="<?= $produit['data']->getIdProduit() ?? '' ?>">
                                     <div class="form_group">
                                         <label for="titre">Nom de l'equipement<span class="required">*</span></label>
-                                        <input type="text" id="titre" name="nom" value="<?= $_POST['nom'] ?? '' ?>" required>
+                                        <input type="text" id="titre" name="nom" value="<?= $produit['data']->getNom() ?? '' ?>" required>
                                         <div class="error_message" id="titreError"></div>
                                     </div>
                                     <div class="form_group">
                                         <label for="titre">Descriptiion<span class="required">*</span></label>
-                                        <input type="text" id="titre" name="description" value="<?= $_POST['description'] ?? '' ?>" required>
+                                        <input type="text" id="titre" name="description" value="<?= $produit['data']->getDescription() ?? '' ?>" required>
                                         <div class="error_message" id="titreError"></div>
                                     </div>
                                     <div class="form_group">
                                         <label for="titre">Stock<span class="required">*</span></label>
-                                        <input type="text" id="titre" name="stock" value="<?= $_POST['stock'] ?? '' ?>" required>
+                                        <input type="text" id="titre" name="stock" value="<?= $produit['data']->getStock() ?? '' ?>" required>
                                         <div class="error_message" id="titreError"></div>
                                     </div>
                                     <div class="form_group">
                                         <label for="prix">Prix (Fbu) <span class="required">*</span></label>
-                                        <input type="number" id="prix" name="prix" step="0.01" min="0" value="<?= $_POST['prix'] ?? '' ?>" required>
+                                        <input type="number" id="prix" name="prix" step="0.01" min="0" value="<?= $produit['data']->getPrix() ?? '' ?>" required>
                                         <div class="error_message" id="prixError"></div>
                                     </div>
                                 </div>
@@ -408,7 +413,7 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="duree"> Categorie <span class="required">*</span></label>
-                                        <input type="text" id="duree" name="categorie"  value="<?= $_POST['categorie'] ?? '' ?>" required>
+                                        <input type="text" id="duree" name="categorie"  value="<?= $produit['data']->getCategorie() ?? '' ?>" required>
                                         <div class="error_message" id="dureeError"></div>
                                     </div>
                                     
@@ -435,9 +440,7 @@
                                         Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
                                     </div>
                                 </div>
-                                
-                                <input type="hidden" name="do" value="produit_create">
-                                
+                                <input type="hidden" name="do" value="<?=$_GET['resp'] ? "produit_update" : "produit_create" ?>">
                                 <button type="submit" class="submit_btn" id="submitBtn">
                                     💾 Enregistrer la Formation
                                 </button>
