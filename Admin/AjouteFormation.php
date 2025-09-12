@@ -10,6 +10,7 @@
         include_once('../controle/controleur_utilisateur.php');
         $userController = new UtilisateurController();
         $formateurs = $userController->getUtilisateursByRole('formateur');
+        $isEdit = $_GET['resp'];
     ?>
     <style>
         .header_dash {
@@ -352,10 +353,7 @@
                         
                         <!-- Affichage des messages de réponse -->
                         <?php
-session_start();
-if(!isset($_SESSION['user'])){
-    header('location:../vue/connexion.html');
-}
+
 
 // Vérifier si on est en mode modification
 $isEdit = isset($_GET['resp']) && !empty($_GET['resp']);
@@ -397,11 +395,10 @@ if ($isEdit) {
                                         echo "<span class='btn btn-danger-soft col-md-12'>Fichier trop volumineux (max 5MB)</span>";
                                         break;
                                     default: 
-                                        echo "<span class='btn btn-warning-soft col-md-12'>Réponse inconnue du serveur</span>";
+                                        echo "<span class='btn btn-warning-soft col-md-12'></span>";
                                 }
                                 ?>
                             </div>
-                        <?php endif; ?>
                         
                         <div class="form_card">
                             <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formationForm">
@@ -483,6 +480,7 @@ if ($isEdit) {
                                 <?php if ($isEdit): ?>
                                 <input type="hidden" name="id" value="<?= $formation->getIdFormation() ?>">
                                 <?php endif; ?>
+
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
                                     <?= $isEdit ? '✏️ Modifier la Formation' : '💾 Enregistrer la Formation' ?>

@@ -791,14 +791,14 @@ foreach($listeFormation['data'] as $liste){
                 </div>
                 
                 <div class="action-buttons">
-                    <a href="#" class="action-btn btn-edit" id="editBtn">
+                    <a href="AjouteFormation.php?resp=<?= $liste->getIdFormation() ?>" class="action-btn btn-edit" id="editBtn">
                         <i class="fas fa-edit"></i>
                         Modifier
                     </a>
-                    <button class="action-btn btn-delete" id="deleteBtn">
+                    <a href="../controle/index.php?do=formation_delete&id=<?= $liste->getIdFormation() ?>" class="action-btn btn-delete" id="deleteBtn">
                         <i class="fas fa-trash"></i>
                         Supprimer
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

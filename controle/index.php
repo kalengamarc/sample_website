@@ -301,6 +301,153 @@ try {
             sendJsonResponse($result);
             break;
 
+        // Gestion des formateurs
+        case 'formateur_create':
+            $photoPath = null;
+            if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+                if ($uploadResult['success']) {
+                    $photoPath = $uploadResult['filepath'];
+                } else {
+                    header("Location: ../Admin/AjoutFormateur.php?resp=403");
+                    exit;
+                }
+            }
+            
+            $result = $userController->createUtilisateur(
+                $data['nom'] ?? '',
+                $data['prenom'] ?? '',
+                $data['email'] ?? '',
+                $data['mot_de_passe'] ?? '',
+                $data['telephone'] ?? '',
+                'formateur',
+                $data['bio'] ?? '',
+                $photoPath,
+                $data['specialite'] ?? ''
+            );
+            header("Location: ../Admin/liste_formateur.php");
+            exit;
+            break;
+
+        case 'formateur_update':
+            $existingUser = $userController->getUtilisateur($data['id'] ?? 0);
+            $photoPath = $existingUser['success'] ? $existingUser['data']->getPhoto() : null;
+            
+            if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
+                if ($photoPath && file_exists(__DIR__ . '/' . $photoPath)) {
+                    unlink(__DIR__ . '/' . $photoPath);
+                }
+                
+                $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+                if ($uploadResult['success']) {
+                    $photoPath = $uploadResult['filepath'];
+                } else {
+                    header("Location: ../Admin/AjoutFormateur.php?resp=" . $data['id'] . "&error=403");
+                    exit;
+                }
+            }
+            
+            $result = $userController->updateUtilisateur(
+                $data['id'] ?? 0,
+                $data['nom'] ?? '',
+                $data['prenom'] ?? '',
+                $data['email'] ?? '',
+                $data['telephone'] ?? '',
+                'formateur',
+                $photoPath
+            );
+            header("Location: ../Admin/liste_formateur.php");
+            exit;
+            break;
+
+        case 'formateur_delete':
+            $user = $userController->getUtilisateur($data['id'] ?? 0);
+            if ($user['success'] && $user['data']->getPhoto()) {
+                $photoPath = $user['data']->getPhoto();
+                if (file_exists(__DIR__ . '/' . $photoPath)) {
+                    unlink(__DIR__ . '/' . $photoPath);
+                }
+            }
+            
+            $result = $userController->deleteUtilisateur($data['id'] ?? 0);
+            header("Location: ../Admin/liste_formateur.php");
+            exit;
+            break;
+
+        // Gestion des participants
+        case 'participant_create':
+            $photoPath = null;
+            if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+                if ($uploadResult['success']) {
+                    $photoPath = $uploadResult['filepath'];
+                } else {
+                    header("Location: ../Admin/AjoutParticipant.php?resp=403");
+                    exit;
+                }
+            }
+            
+            $result = $userController->createUtilisateur(
+                $data['nom'] ?? '',
+                $data['prenom'] ?? '',
+                $data['email'] ?? '',
+                $data['mot_de_passe'] ?? '',
+                $data['telephone'] ?? '',
+                'etudiant',
+                $data['bio'] ?? '',
+                $photoPath,
+                $data['specialite'] ?? '',
+                $data['id_formation'] ?? ''
+            );
+            header("Location: ../Admin/liste_participant.php");
+            exit;
+            break;
+
+        case 'participant_update':
+            $existingUser = $userController->getUtilisateur($data['id'] ?? 0);
+            $photoPath = $existingUser['success'] ? $existingUser['data']->getPhoto() : null;
+            
+            if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
+                if ($photoPath && file_exists(__DIR__ . '/' . $photoPath)) {
+                    unlink(__DIR__ . '/' . $photoPath);
+                }
+                
+                $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+                if ($uploadResult['success']) {
+                    $photoPath = $uploadResult['filepath'];
+                } else {
+                    header("Location: ../Admin/AjoutParticipant.php?resp=" . $data['id'] . "&error=403");
+                    exit;
+                }
+            }
+            
+            $result = $userController->updateUtilisateur(
+                $data['id'] ?? 0,
+                $data['nom'] ?? '',
+                $data['prenom'] ?? '',
+                $data['email'] ?? '',
+                $data['telephone'] ?? '',
+                'etudiant',
+                $photoPath
+            );
+            header("Location: ../Admin/liste_participant.php");
+            exit;
+            break;
+
+        case 'participant_delete':
+            $user = $userController->getUtilisateur($data['id'] ?? 0);
+            if ($user['success'] && $user['data']->getPhoto()) {
+                $photoPath = $user['data']->getPhoto();
+                if (file_exists(__DIR__ . '/' . $photoPath)) {
+                    unlink(__DIR__ . '/' . $photoPath);
+                }
+            }
+            
+            $result = $userController->deleteUtilisateur($data['id'] ?? 0);
+            header("Location: ../Admin/liste_participant.php");
+            exit;
+            break;
+
         // Gestion des formations
         case 'create_formation':
             //checkAuthentication();
@@ -341,7 +488,7 @@ try {
             break;
 
         case 'formation_update':
-            checkAuthentication();
+            //checkAuthentication();
             // Gestion de l'upload d'image pour la mise à jour
             $photoPath = $data['existing_photo'] ?? null;
             if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
@@ -369,11 +516,12 @@ try {
                 $data['debut_formation'] ?? 0,
                 $photoPath
             );
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_formation.php");
+            exit;
             break;
 
         case 'formation_delete':
-            checkAuthentication();
+            //checkAuthentication();
             // Supprimer la photo de la formation si elle existe
             $formation = $formationController->getFormation($data['id'] ?? 0);
             if ($formation['success'] && $formation['data']->getPhoto()) {
@@ -384,12 +532,14 @@ try {
             }
             
             $result = $formationController->deleteFormation($data['id'] ?? 0);
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_formation.php");
+            exit;
             break;
 
         case 'formation_search':
             $result = $formationController->searchFormations($data['searchTerm'] ?? '');
-            sendJsonResponse($result);
+            header("Location: ../Admin/liste_formation.php");
+            exit;
             break;
 
         case 'formation_getByFormateur':

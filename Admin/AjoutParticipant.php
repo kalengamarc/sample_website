@@ -2,9 +2,14 @@
 <html lang="fr">
 <head>
     <?php
-    include_once"../controle/controleur_formation.php";
+    include_once '../controle/controleur_formation.php';
+    include_once '../controle/controleur_utilisateur.php';
     $formation = new FormationController();
     $listeFormation = $formation->getAllFormations();
+    $id = isset($_GET['resp']) ? $_GET['resp'] : null;
+    $id = (int) $id;
+    $participantController = new UtilisateurController();
+    $participant = $participantController->getUtilisateur($id);
     
     ?>
     <meta charset="UTF-8">
@@ -69,7 +74,7 @@
             background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
             padding: 30px;
-            margin-bottom: 20px;
+            margin-bottom: 0px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -363,48 +368,87 @@
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                                     <div class="form_container">
-                        <h2 class="form_title"><?= $isEdit ? '✏️ Modifier le Participant' : '➕ Ajouter un Nouveau Participant' ?></h2>
+                        <h2 class="form_title">👨‍🎓 Ajouter un Nouveau Participant</h2>
                         
                         <!-- Affichage des messages de réponse -->
-                        <?php
-session_start();
-if(!isset($_SESSION['user'])){
-    header('location:../vue/connexion.html');
-}
-
-// Vérifier si on est en mode modification
-$isEdit = isset($_GET['resp']) && !empty($_GET['resp']);
-$participant = null;
-
-if ($isEdit) {
-    include_once('../controle/controleur_utilisateur.php');
-    $utilisateurCtrl = new UtilisateurController();
-    $participantData = $utilisateurCtrl->getUtilisateur($_GET['resp']);
-    
-    if ($participantData['success']) {
-        $participant = $participantData['data'];
-    } else {
-        // Rediriger si le participant n'existe pas
-        header('location: liste_participant.php');
-        exit;
-    }
-}
-?>
+                        <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
                             <div class="col-md-12 mb-4">
                                 <?php  
                                 switch($_GET['resp']) {
                                     case 10: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>Veuillez renseigner tous les champs obligatoires</span>";
-{{ ... }}
+                                        break;
+                                    case 200: 
+                                        echo "<span class='btn btn-success-soft col-md-12'>Le participant a été ajouté avec succès</span>";
+                                        break;
+                                    case 300: 
+                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout du participant</span>";
+                                        break;
+                                    case 400: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>L'email est déjà utilisé par un autre utilisateur</span>";
+                                        break;
+                                    case 401: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Les mots de passe ne correspondent pas</span>";
+                                        break;
+                                    case 402: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Le mot de passe doit contenir au moins 6 caractères</span>";
+                                        break;
+                                    case 403: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Format de fichier non autorisé</span>";
+                                        break;
+                                    case 404: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Fichier trop volumineux (max 5MB)</span>";
+                                        break;
+                                    default: 
+                                        echo "<span class='btn btn-warning-soft col-md-12'>Réponse inconnue du serveur</span>";
+                                }
+                                ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="form_card">
+                            <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formateurForm">
+                                <div class="form_row">
+                                    <div class="form_group">
+                                        <label for="nom">Nom <span class="required">*</span></label>
+                                        <input type="text" id="nom" name="nom" value="<?= $participant['data']->getNom() ?? '' ?>" required>
+                                        <div class="error_message" id="nomError"></div>
+                                    </div>
+                                    
+                                    <div class="form_group">
+                                        <label for="prenom">Prénom <span class="required">*</span></label>
+                                        <input type="text" id="prenom" name="prenom" value="<?= $participant['data']->getPrenom() ?? '' ?>" required>
+                                        <div class="error_message" id="prenomError"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form_row">
+                                    <div class="form_group">
+                                        <label for="email">Email <span class="required">*</span></label>
+                                        <input type="email" id="email" name="email" value="<?= $participant['data']->getEmail() ?? '' ?>" required>
+                                        <div class="error_message" id="emailError"></div>
+                                    </div>
+                                    
+                                    <div class="form_group">
+                                        <label for="telephone">Téléphone</label>
+                                        <input type="tel" id="telephone" name="telephone" value="<?= $participant['data']->getTelephone() ?? '' ?>">
+                                        <div class="error_message" id="telephoneError"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form_row">
+                                    <div class="form_group password_toggle">
+                                        <label for="password">Mot de passe <span class="required">*</span></label>
+                                        <input type="password" id="password" name="password" value="" required>
+                                        <span class="toggle_icon" onclick="togglePassword('password')">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
                                         <div class="error_message" id="passwordError"></div>
                                     </div>
                                     
                                     <div class="form_group password_toggle">
                                         <label for="confirm_password">Confirmer le mot de passe <span class="required">*</span></label>
-                                        <input type="password" id="mot_de_passe" name="mot_de_passe" <?= $isEdit ? '' : 'required' ?>>
-                                        <?php if ($isEdit): ?>
-                                        <small class="form-text text-muted">Laissez vide pour conserver le mot de passe actuel</small>
-                                        <?php endif; ?>
+                                        <input type="password" id="confirm_password" name="confirm_password" value="" required>
                                         <span class="toggle_icon" onclick="togglePassword('confirm_password')">
                                             <i class="fas fa-eye"></i>
                                         </span>
@@ -414,7 +458,7 @@ if ($isEdit) {
                                 
                                 <div class="form_group">
                                     <label for="specialite">Domaine <span class="required">*</span></label>
-                                        <input type="text" id="specialite" name="specialite" value="<?= $participant ? $participant->getSpecialite() : ($_POST['specialite'] ?? '') ?>" required>
+                                    <input type="text" id="specialite" name="specialite" value="<?= $participant['data']->getSpecialite() ?? '' ?>" required>
                                     <div class="error_message" id="specialiteError"></div>
                                 </div>
                                 <div class="form_group">
@@ -429,31 +473,41 @@ if ($isEdit) {
                                 
                                 <div class="form_group">
                                     <label for="bio">Biographie</label>
-                                    <textarea id="bio" name="bio" placeholder="Parlez-nous de vous..."><?= $participant ? $participant->getBio() : ($_POST['bio'] ?? '') ?></textarea>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $participant['data']->getDescription() ?? '' ?></textarea>
                                     <div class="error_message" id="bioError"></div>
                                 </div>
                                 
                                 <div class="image_upload">
                                     <label>Photo de profil</label>
-{{ ... }}
+                                    <div class="image_preview" id="imagePreview">
+                                        <img src="" alt="Aperçu" id="previewImage">
+                                        <span class="default-text" id="defaultText">Aucune photo</span>
+                                    </div>
+                                    
+                                    <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
+                                    <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
+                                        📷 Choisir une photo
+                                    </button>
+                                    <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
+                                        🗑️ Supprimer
+                                    </button>
+                                    
+                                    <div class="upload_info">
                                         Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
                                     </div>
                                 </div>
                                 
                                 <input type="hidden" name="role" value="etudiant">
-                                <input type="hidden" name="do" value="<?= $isEdit ? 'participant_update' : 'participant_create' ?>">
-                                <?php if ($isEdit): ?>
-                                <input type="hidden" name="id" value="<?= $participant->getId() ?>">
-                                <?php endif; ?>
+                                <input type="hidden" name="do" value="user_participant">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    <?= $isEdit ? '✏️ Modifier le Participant' : '💾 Enregistrer le Participant' ?>
+                                    💾 Enregistrer le Participant
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
-{{ ... }}
+            </div>
         </div>
     </div>
 

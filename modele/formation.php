@@ -95,9 +95,9 @@ class RequeteFormation {
         return $formations;
     }
 
-    // ✅ Mettre à jour une formation
+    // Mettre à jour une formation
     public function mettreAJourFormation($formation) {
-        $sql = "UPDATE formations SET titre = ?, description = ?, prix = ?, duree = ?, id_formateur = ?, debut_formation, photo = ?
+        $sql = "UPDATE formations SET titre = ?, description = ?, prix = ?, duree = ?, id_formateur = ?, debut_formation = ?, photo = ?
                 WHERE id_formation = ?";
         $stmt = $this->crud->prepare($sql);
         $params = [
@@ -113,11 +113,45 @@ class RequeteFormation {
         return $stmt->execute($params);
     }
 
-    // ✅ Supprimer une formation
+    // Supprimer une formation avec gestion des contraintes
     public function supprimerFormation($id) {
-        $sql = "DELETE FROM formations WHERE id_formation = ?";
-        $stmt = $this->crud->prepare($sql);
-        return $stmt->execute([$id]);
+        try {
+            // Commencer une transaction
+            $this->crud->beginTransaction();
+            
+            // 1. D'abord récupérer les IDs des inscriptions pour cette formation
+            $sqlGetInscriptions = "SELECT id_inscription FROM inscriptions WHERE id_formation = ?";
+            $stmtGetInscriptions = $this->crud->prepare($sqlGetInscriptions);
+            $stmtGetInscriptions->execute([$id]);
+            $inscriptions = $stmtGetInscriptions->fetchAll(PDO::FETCH_COLUMN);
+            
+            // 2. Supprimer les présences liées à ces inscriptions
+            if (!empty($inscriptions)) {
+                $placeholders = str_repeat('?,', count($inscriptions) - 1) . '?';
+                $sqlPresences = "DELETE FROM presences WHERE id_inscription IN ($placeholders)";
+                $stmtPresences = $this->crud->prepare($sqlPresences);
+                $stmtPresences->execute($inscriptions);
+            }
+            
+            // 3. Supprimer les inscriptions (contrainte RESTRICT)
+            $sqlInscriptions = "DELETE FROM inscriptions WHERE id_formation = ?";
+            $stmtInscriptions = $this->crud->prepare($sqlInscriptions);
+            $stmtInscriptions->execute([$id]);
+            
+            // 4. Supprimer la formation (les autres tables ont CASCADE)
+            $sqlFormation = "DELETE FROM formations WHERE id_formation = ?";
+            $stmtFormation = $this->crud->prepare($sqlFormation);
+            $result = $stmtFormation->execute([$id]);
+            
+            // Valider la transaction
+            $this->crud->commit();
+            return $result;
+            
+        } catch (Exception $e) {
+            // Annuler la transaction en cas d'erreur
+            $this->crud->rollback();
+            throw new Exception("Erreur lors de la suppression de la formation: " . $e->getMessage());
+        }
     }
 
     // ✅ Rechercher une formation par mot-clé
@@ -134,4 +168,3 @@ class RequeteFormation {
     }
 }
 ?>
-a
