@@ -582,7 +582,7 @@
                                         <td><?=$produit->getNom()?></td>
                                         <td><?=substr($produit->getDescription(), 0, 50)?>...</td>
                                         <td><?=$produit->getCategorie()?></td>
-                                        <td><?=$produit->getPrix()?> €</td>
+                                        <td><?=$produit->getPrix()?> Fbu</td>
                                         <td><?=$produit->getStock()?></td>
                                         <td><img src="../controle/<?=$produit->getPhoto()?>" alt="Equipement" class="product-image">
                                         </td>
@@ -598,8 +598,8 @@
                                                     })">
                                                         <i class="fas fa-eye"></i>
                                                     </div>
-                                                    <a href=""><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
-                                                    <a href=""> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
+                                                    <a href="AjoutProduit.php?resp=<?= $produit->getIdProduit() ?>"><div class="modifier" data-tooltip="modifier"><i class="fas fa-edit"></i></div></a>
+                                                    <a href="../controle/index.php?do=produit_delete&id=<?= $produit->getIdProduit() ?>"> <div class="supprimer_" data-tooltip="supprimer"><i class="fas fa-trash"></i></div></a>
                                                 </div>
                                             </td>
                                     </tr>
@@ -608,8 +608,8 @@
                                 </table>
                                 <div style="display:flex; justify-content:center; align-items:center; margin-top:20px; padding:15px; gap:30px; background: linear-gradient(135deg, #00110a, #1a1a1a); color:gold; border-radius:10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
                                     <h3><i class="fas fa-boxes"></i> Stock Total : <?=$produits['stats']['total_stock'] ?>   </h3>
-                                    <h3><i class="fas fa-chart-line"></i> Moyenne de Prix: <?=$produits['stats']['average_price'] ?> €   </h3>
-                                    <h3><i class="fas fa-euro-sign"></i> Montant Total: <?=$produits['stats']['total_valeur'] ?> €   </h3>
+                                    <h3><i class="fas fa-chart-line"></i> Moyenne de Prix: <?=$produits['stats']['average_price'] ?> Fbu   </h3>
+                                    <h3><i class="fas fa-euro-sign"></i> Montant Total: <?=$produits['stats']['total_valeur'] ?> Fbu  </h3>
                                 </div>
                         </div> 
                     </div>
@@ -687,14 +687,14 @@
                 </div>
                 
                 <div class="action-buttons">
-                    <a href="#" class="action-btn btn-edit" id="editBtn">
+                    <a href="AjoutProduit.php?resp=<?= $produit->getIdProduit() ?>" class="action-btn btn-edit" id="editBtn">
                         <i class="fas fa-edit"></i>
                         Modifier
                     </a>
-                    <button class="action-btn btn-delete" id="deleteBtn">
+                    <a href="../controle/index.php?do=produit_delete&id=<?= $produit->getIdProduit() ?>" class="action-btn btn-delete" id="deleteBtn">
                         <i class="fas fa-trash"></i>
                         Supprimer
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -706,7 +706,7 @@
             document.getElementById('cardName').textContent = data.nom || 'Nom du Produit';
             document.getElementById('cardCategory').textContent = data.categorie || 'Catégorie';
             document.getElementById('cardCategoryInfo').textContent = data.categorie || 'Catégorie';
-            document.getElementById('cardPrice').textContent = (data.prix || '0') + ' €';
+            document.getElementById('cardPrice').textContent = (data.prix || '0') + ' Fbu';
             document.getElementById('cardDescription').textContent = data.description || 'Aucune description disponible';
             
             // Gestion de la photo

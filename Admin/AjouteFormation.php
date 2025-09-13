@@ -10,6 +10,7 @@
         include_once('../controle/controleur_utilisateur.php');
         $userController = new UtilisateurController();
         $formateurs = $userController->getUtilisateursByRole('formateur');
+        $isEdit = $_GET['resp'];
     ?>
     <style>
         .header_dash {
@@ -348,10 +349,30 @@
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                     <div class="form_container">
-                        <h2 class="form_title">➕ Ajouter une Nouvelle Formation</h2>
+                        <h2 class="form_title"><?= $isEdit ? '✏️ Modifier la Formation' : '➕ Ajouter une Nouvelle Formation' ?></h2>
                         
                         <!-- Affichage des messages de réponse -->
-                        <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
+                        <?php
+
+
+// Vérifier si on est en mode modification
+$isEdit = isset($_GET['resp']) && !empty($_GET['resp']);
+$formation = null;
+
+if ($isEdit) {
+    include_once('../controle/controleur_formation.php');
+    $formationCtrl = new FormationController();
+    $formationData = $formationCtrl->getFormation($_GET['resp']);
+    
+    if ($formationData['success']) {
+        $formation = $formationData['data'];
+    } else {
+        // Rediriger si la formation n'existe pas
+        header('location: liste_formation.php');
+        exit;
+    }
+}
+?>
                             <div class="col-md-12 mb-4">
                                 <?php  
                                 switch($_GET['resp']) {
@@ -374,24 +395,23 @@
                                         echo "<span class='btn btn-danger-soft col-md-12'>Fichier trop volumineux (max 5MB)</span>";
                                         break;
                                     default: 
-                                        echo "<span class='btn btn-warning-soft col-md-12'>Réponse inconnue du serveur</span>";
+                                        echo "<span class='btn btn-warning-soft col-md-12'></span>";
                                 }
                                 ?>
                             </div>
-                        <?php endif; ?>
                         
                         <div class="form_card">
                             <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formationForm">
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="titre">Titre de la formation <span class="required">*</span></label>
-                                        <input type="text" id="titre" name="titre" value="<?= $_POST['titre'] ?? '' ?>" required>
+                                        <input type="text" id="titre" name="titre" value="<?= $formation ? $formation->getTitre() : ($_POST['titre'] ?? '') ?>" required>
                                         <div class="error_message" id="titreError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="prix">Prix (€) <span class="required">*</span></label>
-                                        <input type="number" id="prix" name="prix" step="0.01" min="0" value="<?= $_POST['prix'] ?? '' ?>" required>
+                                        <input type="number" id="prix" name="prix" step="0.01" min="0" value="<?= $formation ? $formation->getPrix() : ($_POST['prix'] ?? '') ?>" required>
                                         <div class="error_message" id="prixError"></div>
                                     </div>
                                 </div>
@@ -399,12 +419,12 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="duree">Durée (heures) <span class="required">*</span></label>
-                                        <input type="number" id="duree" name="duree" min="1" value="<?= $_POST['duree'] ?? '' ?>" required>
+                                        <input type="number" id="duree" name="duree" min="1" value="<?= $formation ? $formation->getDuree() : ($_POST['duree'] ?? '') ?>" required>
                                         <div class="error_message" id="dureeError"></div>
                                     </div>
                                     <div class="form_group">
                                         <label for="duree">Debut de la formation <span class="required">*</span></label>
-                                        <input type="date" id="duree" name="debut_formation" min="1" value="<?= $_POST['debut_formation'] ?? '' ?>" required>
+                                        <input type="date" id="debut_formation" name="debut_formation" min="1" value="<?= $formation ? $formation->getDebutFormation() : ($_POST['debut_formation'] ?? '') ?>" required>
                                         <div class="error_message" id="dureeError"></div>
                                     </div>
                                     
@@ -432,7 +452,7 @@
                                 
                                 <div class="form_group">
                                     <label for="description">Description <span class="required">*</span></label>
-                                    <textarea id="description" name="description" required><?= $_POST['description'] ?? '' ?></textarea>
+                                    <textarea id="description" name="description" required><?= $formation ? $formation->getDescription() : ($_POST['description'] ?? '') ?></textarea>
                                     <div class="error_message" id="descriptionError"></div>
                                 </div>
                                 
@@ -456,10 +476,14 @@
                                     </div>
                                 </div>
                                 
-                                <input type="hidden" name="do" value="create_formation">
+                                <input type="hidden" name="do" value="<?= $isEdit ? 'formation_update' : 'formation_create' ?>">
+                                <?php if ($isEdit): ?>
+                                <input type="hidden" name="id" value="<?= $formation->getIdFormation() ?>">
+                                <?php endif; ?>
+
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    💾 Enregistrer la Formation
+                                    <?= $isEdit ? '✏️ Modifier la Formation' : '💾 Enregistrer la Formation' ?>
                                 </button>
                             </form>
                         </div>

@@ -26,8 +26,8 @@ class Utilisateur {
         $description,
         $date_creation,
         $photo,
-        $id_formation,
-        $specialite = '')
+        $specialite = '',
+        $id_formation)
         {
         $this->id = $id;
         $this->nom = $nom;
@@ -111,7 +111,7 @@ class RequeteUtilisateur {
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['id_formation'], $row['specialite']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'],  $row['specialite'], $row['id_formation']);
         }
         return null;
     }
@@ -136,8 +136,8 @@ class RequeteUtilisateur {
             $row['description'],
             $row['date_creation'],
             $row['photo'],
-            $row['id_formation'],
-            $row['specialite']
+            $row['specialite'],
+            $row['id_formation']
         );
     }
     return $utilisateurs;
@@ -150,7 +150,7 @@ class RequeteUtilisateur {
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['id_formation'], $row['specialite']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'],  $row['id_formation']);
         }
         return null;
     }
@@ -160,7 +160,7 @@ class RequeteUtilisateur {
         $stmt = $this->crud->query($sql);
         $utilisateurs = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['id_formation'], $row['specialite']);
+            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'],$row['id_formation']);
         }
         return $utilisateurs;
     }

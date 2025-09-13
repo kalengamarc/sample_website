@@ -2,9 +2,14 @@
 <html lang="fr">
 <head>
     <?php
-    include_once"../controle/controleur_formation.php";
+    include_once '../controle/controleur_formation.php';
+    include_once '../controle/controleur_utilisateur.php';
     $formation = new FormationController();
     $listeFormation = $formation->getAllFormations();
+    $id = isset($_GET['resp']) ? $_GET['resp'] : null;
+    $id = (int) $id;
+    $participantController = new UtilisateurController();
+    $participant = $participantController->getUtilisateur($id);
     
     ?>
     <meta charset="UTF-8">
@@ -69,7 +74,7 @@
             background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
             padding: 30px;
-            margin-bottom: 20px;
+            margin-bottom: 0px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -406,13 +411,13 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="nom">Nom <span class="required">*</span></label>
-                                        <input type="text" id="nom" name="nom" value="<?= $_POST['nom'] ?? '' ?>" required>
+                                        <input type="text" id="nom" name="nom" value="<?= $participant['data']->getNom() ?? '' ?>" required>
                                         <div class="error_message" id="nomError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="prenom">Prénom <span class="required">*</span></label>
-                                        <input type="text" id="prenom" name="prenom" value="<?= $_POST['prenom'] ?? '' ?>" required>
+                                        <input type="text" id="prenom" name="prenom" value="<?= $participant['data']->getPrenom() ?? '' ?>" required>
                                         <div class="error_message" id="prenomError"></div>
                                     </div>
                                 </div>
@@ -420,13 +425,13 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="email">Email <span class="required">*</span></label>
-                                        <input type="email" id="email" name="email" value="<?= $_POST['email'] ?? '' ?>" required>
+                                        <input type="email" id="email" name="email" value="<?= $participant['data']->getEmail() ?? '' ?>" required>
                                         <div class="error_message" id="emailError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="telephone">Téléphone</label>
-                                        <input type="tel" id="telephone" name="telephone" value="<?= $_POST['telephone'] ?? '' ?>">
+                                        <input type="tel" id="telephone" name="telephone" value="<?= $participant['data']->getTelephone() ?? '' ?>">
                                         <div class="error_message" id="telephoneError"></div>
                                     </div>
                                 </div>
@@ -434,7 +439,7 @@
                                 <div class="form_row">
                                     <div class="form_group password_toggle">
                                         <label for="password">Mot de passe <span class="required">*</span></label>
-                                        <input type="password" id="password" name="password" required>
+                                        <input type="password" id="password" name="password" value="" required>
                                         <span class="toggle_icon" onclick="togglePassword('password')">
                                             <i class="fas fa-eye"></i>
                                         </span>
@@ -443,7 +448,7 @@
                                     
                                     <div class="form_group password_toggle">
                                         <label for="confirm_password">Confirmer le mot de passe <span class="required">*</span></label>
-                                        <input type="password" id="confirm_password" name="confirm_password" required>
+                                        <input type="password" id="confirm_password" name="confirm_password" value="" required>
                                         <span class="toggle_icon" onclick="togglePassword('confirm_password')">
                                             <i class="fas fa-eye"></i>
                                         </span>
@@ -453,7 +458,7 @@
                                 
                                 <div class="form_group">
                                     <label for="specialite">Domaine <span class="required">*</span></label>
-                                    <input type="text" id="specialite" name="specialite" value="<?= $_POST['specialite'] ?? '' ?>" required>
+                                    <input type="text" id="specialite" name="specialite" value="<?= $participant['data']->getSpecialite() ?? '' ?>" required>
                                     <div class="error_message" id="specialiteError"></div>
                                 </div>
                                 <div class="form_group">
@@ -468,7 +473,7 @@
                                 
                                 <div class="form_group">
                                     <label for="bio">Biographie</label>
-                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $_POST['bio'] ?? '' ?></textarea>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $participant['data']->getDescription() ?? '' ?></textarea>
                                     <div class="error_message" id="bioError"></div>
                                 </div>
                                 
@@ -493,10 +498,14 @@
                                 </div>
                                 
                                 <input type="hidden" name="role" value="etudiant">
-                                <input type="hidden" name="do" value="user_participant">
+                                <input type="hidden" name="do" value="<?= $participant['data']->getId() ?>? participant_update : participant_create">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
+                                    <?php if ($participant['data']->getId() > 0): ?>
+                                    💾 Modifier le Participant
+                                    <?php else: ?>
                                     💾 Enregistrer le Participant
+                                    <?php endif; ?>
                                 </button>
                             </form>
                         </div>

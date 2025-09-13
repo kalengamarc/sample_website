@@ -3,18 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter une Formation</title>
+    <title>Ajouter un Formateur</title>
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
-    <?php
-        include_once('../controle/controleur_utilisateur.php');
-        include_once('../controle/controleur_produit.php');
-        $userController = new UtilisateurController();
-        $formateurs = $userController->getUtilisateursByRole('formateur');
-        $idProduit = isset($_GET['resp']) ? $_GET['resp'] : null;
-        $ProduitController = new ProduitController();
-        $produit = $ProduitController->getProduit($idProduit);
-    ?>
     <style>
         .header_dash {
             width: 100%;
@@ -63,9 +54,10 @@
         }
         
         .form_title {
-            color: #021a12;
+            color: rgba(0,0,0,0.7);
             margin-bottom: 20px;
             text-align: center;
+            font-size:18px;
         }
         
         .form_card {
@@ -94,7 +86,7 @@
         .form_group select {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid #021a12;
+            border: 1px solid #021a12;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
             color: #021a12;
@@ -110,11 +102,6 @@
             box-shadow: 0 0 0 3px rgba(255, 174, 43, 0.2);
         }
         
-        .form_group textarea {
-            height: 120px;
-            resize: vertical;
-        }
-        
         .form_row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -127,16 +114,18 @@
         }
         
         .image_preview {
-            width: 200px;
-            height: 150px;
-            border: 2px dashed #021a12;
-            border-radius: 10px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            box-shadow:1px 2px 15px solid gold;
+            border:1px solid gold;
+            position:relative;
             background: rgba(255, 255, 255, 0.8);
+            z-index: 0;
         }
         
         .image_preview img {
@@ -144,21 +133,28 @@
             height: 100%;
             object-fit: cover;
             display: none;
+            border-radius: 50%;
         }
         
         .default_text {
             color: #666;
             font-style: italic;
+            text-align: center;
         }
         
         .upload_btn {
-            background: #021a12;
-            color: white;
-            padding: 10px 20px;
+            
+            padding: 6px;
             border: none;
-            border-radius: 6px;
+            border-radius: 48%;
+            background-color:#05f07a;
+            color:white;
+            font-size:20px;
             cursor: pointer;
-            margin: 5px;
+            position:absolute; 
+            z-index: 1;
+            top:66px;
+            left:65px;
             transition: all 0.3s ease;
         }
         
@@ -234,23 +230,21 @@
             display: none;
         }
         
-        /* Styles pour les messages de réponse */
-        .btn-success-soft {
-            background-color: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid #28a745;
+        .password_toggle {
+            position: relative;
         }
         
-        .btn-danger-soft {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border: 1px solid #dc3545;
+        .password_toggle input {
+            padding-right: 40px;
         }
         
-        .btn-warning-soft {
-            background-color: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
-            border: 1px solid #ffc107;
+        .toggle_icon {
+            position: absolute;
+            right: 15px;
+            top: 45px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #021a12;
         }
         
         /* Menu styles */
@@ -328,6 +322,25 @@
             max-height: 200px;
         }
         
+        /* Styles pour les messages de réponse */
+        .btn-success-soft {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+        
+        .btn-danger-soft {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        
+        .btn-warning-soft {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+        
         @media (max-width: 768px) {
             .form_row {
                 grid-template-columns: 1fr;
@@ -338,8 +351,9 @@
             }
             
             .image_preview {
-                width: 150px;
+                width: 120px;
                 height: 120px;
+                
             }
         }
     </style>
@@ -347,12 +361,34 @@
 <body>
     <div class="header_dash">
         <div class="cont_dash">
-            <?php include_once('header.php'); ?>
+          
             <div class="ail_fle">
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                     <div class="form_container">
-                        <h2 class="form_title">➕ Ajouter une Nouvelle Formation</h2>
+                        <h2 class="form_title">Ajouter un Nouveau admin</h2>
+
+                        <div class="image_upload">
+                                    <label>Photo de profil</label>
+                                    <div class="image_preview" id="imagePreview">
+                                        <img src="../vue/defi7/images/Student day _ Premium Photo.jpeg" alt="Aperçu" id="previewImage">
+                                        <span class="default-text" id="defaultText">Aucune photo</span>
+
+                                        <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
+                                        <i class="fas fa-plus-circle" ></i>
+                                    </button>
+                                    </div>
+                                    
+                                    <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
+                                    
+                                    <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
+                                        🗑️ Supprimer
+                                    </button>
+                                    
+                                    <div class="upload_info">
+                                        Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
+                                    </div>
+                                </div>
                         
                         <!-- Affichage des messages de réponse -->
                         <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
@@ -363,13 +399,19 @@
                                         echo "<span class='btn btn-danger-soft col-md-12'>Veuillez renseigner tous les champs obligatoires</span>";
                                         break;
                                     case 200: 
-                                        echo "<span class='btn btn-success-soft col-md-12'>La formation a été ajoutée avec succès</span>";
+                                        echo "<span class='btn btn-success-soft col-md-12'>Le formateur a été ajouté avec succès</span>";
                                         break;
                                     case 300: 
-                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout de la formation</span>";
+                                        echo "<span class='btn btn-warning-soft col-md-12'>Une erreur est survenue lors de l'ajout d'admin</span>";
                                         break;
                                     case 400: 
-                                        echo "<span class='btn btn-danger-soft col-md-12'>Le formateur sélectionné n'existe pas</span>";
+                                        echo "<span class='btn btn-danger-soft col-md-12'>L'email est déjà utilisé par un autre utilisateur</span>";
+                                        break;
+                                    case 401: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Les mots de passe ne correspondent pas</span>";
+                                        break;
+                                    case 402: 
+                                        echo "<span class='btn btn-danger-soft col-md-12'>Le mot de passe doit contenir au moins 6 caractères</span>";
                                         break;
                                     case 403: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>Format de fichier non autorisé</span>";
@@ -385,64 +427,64 @@
                         <?php endif; ?>
                         
                         <div class="form_card">
-                            <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formationForm">
+                            <form method="POST" action="../controle/index.php" enctype="multipart/form-data" id="formateurForm">
                                 <div class="form_row">
-                                    <input type="hidden" name="id" value="<?= $produit['data']->getIdProduit() ?? '' ?>">
                                     <div class="form_group">
-                                        <label for="titre">Nom de l'equipement<span class="required">*</span></label>
-                                        <input type="text" id="titre" name="nom" value="<?= $produit['data']->getNom() ?? '' ?>" required>
-                                        <div class="error_message" id="titreError"></div>
+                                        <label for="nom">Nom <span class="required">*</span></label>
+                                        <input type="text" id="nom" name="nom" value="<?= $_POST['nom'] ?? '' ?>" required>
+                                        <div class="error_message" id="nomError"></div>
                                     </div>
+                                    
                                     <div class="form_group">
-                                        <label for="titre">Descriptiion<span class="required">*</span></label>
-                                        <input type="text" id="titre" name="description" value="<?= $produit['data']->getDescription() ?? '' ?>" required>
-                                        <div class="error_message" id="titreError"></div>
-                                    </div>
-                                    <div class="form_group">
-                                        <label for="titre">Stock<span class="required">*</span></label>
-                                        <input type="text" id="titre" name="stock" value="<?= $produit['data']->getStock() ?? '' ?>" required>
-                                        <div class="error_message" id="titreError"></div>
-                                    </div>
-                                    <div class="form_group">
-                                        <label for="prix">Prix (Fbu) <span class="required">*</span></label>
-                                        <input type="number" id="prix" name="prix" step="0.01" min="0" value="<?= $produit['data']->getPrix() ?? '' ?>" required>
-                                        <div class="error_message" id="prixError"></div>
+                                        <label for="prenom">Prénom <span class="required">*</span></label>
+                                        <input type="text" id="prenom" name="prenom" value="<?= $_POST['prenom'] ?? '' ?>" required>
+                                        <div class="error_message" id="prenomError"></div>
                                     </div>
                                 </div>
                                 
                                 <div class="form_row">
                                     <div class="form_group">
-                                        <label for="duree"> Categorie <span class="required">*</span></label>
-                                        <input type="text" id="duree" name="categorie"  value="<?= $produit['data']->getCategorie() ?? '' ?>" required>
-                                        <div class="error_message" id="dureeError"></div>
+                                        <label for="email">Email <span class="required">*</span></label>
+                                        <input type="email" id="email" name="email" value="<?= $_POST['email'] ?? '' ?>" required>
+                                        <div class="error_message" id="emailError"></div>
                                     </div>
                                     
-                                        <div class="error_message" id="formateurError"></div>
+                                    <div class="form_group">
+                                        <label for="telephone">Téléphone</label>
+                                        <input type="tel" id="telephone" name="telephone" value="<?= $_POST['telephone'] ?? '' ?>">
+                                        <div class="error_message" id="telephoneError"></div>
                                     </div>
                                 </div>
                                 
-                                <div class="image_upload">
-                                    <label>Image de la formation</label>
-                                    <div class="image_preview" id="imagePreview">
-                                        <img src="" alt="Aperçu" id="previewImage">
-                                        <span class="default-text" id="defaultText">Aucune image sélectionnée</span>
+                                <div class="form_row">
+                                    <div class="form_group password_toggle">
+                                        <label for="password">Mot de passe <span class="required">*</span></label>
+                                        <input type="password" id="password" name="password" required>
+                                        <span class="toggle_icon" onclick="togglePassword('password')">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                        <div class="error_message" id="passwordError"></div>
                                     </div>
                                     
-                                    <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
-                                    <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
-                                        📷 Choisir une image
-                                    </button>
-                                    <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
-                                        🗑️ Supprimer
-                                    </button>
-                                    
-                                    <div class="upload_info">
-                                        Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
+                                    <div class="form_group password_toggle">
+                                        <label for="confirm_password">Confirmer le mot de passe <span class="required">*</span></label>
+                                        <input type="password" id="confirm_password" name="confirm_password" required>
+                                        <span class="toggle_icon" onclick="togglePassword('confirm_password')">
+                                            <i class="fas fa-eye"></i>
+                                        </span>
+                                        <div class="error_message" id="confirm_passwordError"></div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="do" value="<?=$_GET['resp'] ? "produit_update" : "produit_create" ?>">
+                                
+                                
+                                
+                                
+                                
+                                <input type="hidden" name="role" value="formateur">
+                                <input type="hidden" name="do" value="user_create">
+                                
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    💾 Enregistrer la Formation
+                                    Enregistrer un nouveau Admin
                                 </button>
                             </form>
                         </div>
@@ -453,6 +495,22 @@
     </div>
 
     <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         // Gestion de l'aperçu de l'image
         document.getElementById('photo').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -500,14 +558,36 @@
             removeBtn.style.display = 'none';
         }
 
+        // Validation des mots de passe
+        function validatePassword() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            const errorElement = document.getElementById('confirm_passwordError');
+            
+            if (password.value !== confirmPassword.value) {
+                errorElement.textContent = 'Les mots de passe ne correspondent pas';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            
+            if (password.value.length < 6) {
+                errorElement.textContent = 'Le mot de passe doit contenir au moins 6 caractères';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            
+            errorElement.style.display = 'none';
+            return true;
+        }
+
         // Validation générale du formulaire
         function validateForm() {
             let isValid = true;
             
             // Valider tous les champs requis
-            const requiredFields = ['nom', 'description', 'stock', 'prix', 'categorie'];
+            const requiredFields = ['nom', 'prenom', 'email', 'password', 'specialite'];
             requiredFields.forEach(field => {
-                const input = document.querySelector(`[name="${field}"]`);
+                const input = document.getElementById(field);
                 const errorElement = document.getElementById(field + 'Error');
                 
                 if (!input.value.trim()) {
@@ -518,11 +598,29 @@
                     errorElement.style.display = 'none';
                 }
             });
+            
+            // Validation email
+            const email = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            if (email.value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.value)) {
+                    emailError.textContent = 'Format d\'email invalide';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+            }
+            
+            // Validation mot de passe
+            if (!validatePassword()) {
+                isValid = false;
+            }
+            
             return isValid;
         }
 
         // Soumission du formulaire
-        document.getElementById('formationForm').addEventListener('submit', function(e) {
+        document.getElementById('formateurForm').addEventListener('submit', function(e) {
             // Valider le formulaire
             if (!validateForm()) {
                 e.preventDefault();
@@ -536,58 +634,49 @@
         });
 
         // Validation en temps réel
-        document.querySelectorAll('input[required], textarea[required], select[required]').forEach(input => {
+        document.querySelectorAll('input[required], textarea[required]').forEach(input => {
             input.addEventListener('blur', function() {
                 validateField(this);
             });
         });
 
         function validateField(field) {
-            const fieldName = field.name;
-            const errorElement = document.getElementById(fieldName + 'Error');
+            const errorElement = document.getElementById(field.id + 'Error');
             
-            if (!field.value.trim()) {
+            if (field.hasAttribute('required') && !field.value.trim()) {
                 errorElement.textContent = 'Ce champ est requis';
                 errorElement.style.display = 'block';
                 return false;
             }
             
-            if (field.type === 'number' && field.value <= 0) {
-                errorElement.textContent = 'La valeur doit être supérieure à 0';
-                errorElement.style.display = 'block';
-                return false;
+            if (field.type === 'email' && field.value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(field.value)) {
+                    errorElement.textContent = 'Format d\'email invalide';
+                    errorElement.style.display = 'block';
+                    return false;
+                }
             }
             
             errorElement.style.display = 'none';
             return true;
         }
 
-        // Charger les formateurs (vous devrez adapter cette fonction selon votre architecture)
-        function loadFormateurs() {
-            // Cette fonction devrait charger les formateurs depuis votre base de données
-            // Exemple avec une requête AJAX si nécessaire :
-            /*
-            fetch('../controle/index.php?do=get_formateurs')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('formateur');
-                    select.innerHTML = '<option value="">Sélectionner un formateur</option>';
-                    data.forEach(formateur => {
-                        const option = document.createElement('option');
-                        option.value = formateur.id;
-                        option.textContent = `${formateur.prenom} ${formateur.nom}`;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Erreur chargement formateurs:', error);
-                });
-            */
-        }
-
-        // Charger les formateurs au démarrage
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFormateurs();
+        // Vérification de l'email en temps réel
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const errorElement = document.getElementById('emailError');
+            
+            if (!email) return;
+            
+            // Vérification du format email d'abord
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return; // Ne pas vérifier si le format est invalide
+            }
+            
+            // Note: La vérification de l'unicité de l'email se fera côté serveur
+            // Vous pouvez ajouter une vérification AJAX ici si vous le souhaitez
         });
     </script>
 </body>

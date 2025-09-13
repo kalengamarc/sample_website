@@ -721,6 +721,9 @@
                         <tbody>
                             <?php
                             include_once('../controle/controleur_utilisateur.php');
+                            include_once('../controle/controleur_formation.php');
+
+                            $formation = new FormationController();
                             $utilisateurCtrl = new UtilisateurController();
                             $usersData = $utilisateurCtrl->getUtilisateursByRole('etudiant');
                             ?>
@@ -739,7 +742,11 @@
                                         <td><?= htmlspecialchars($user->getEmail()) ?></td>
                                         <td><?= htmlspecialchars($user->getTelephone()) ?></td>
                                         <td><?= htmlspecialchars($user->getSpecialite()) ?></td>
-                                        <td><?= $user->getIdFormation() ?></td>
+                                        <?php
+                                        $titre = $formation->getFormation($user->getIdFormation());
+                                        
+                                        ?>
+                                        <td><?= $titre['data']->getTitre() ?></td>
                                         <td>
                                             <div class="action-buttons">
                                                 <a href="#" class="action-btn action-view" 
@@ -757,10 +764,10 @@
                                                    title="Voir détails">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="modifier.php?id=<?= $user->getId() ?>" class="action-btn action-edit" title="Modifier">
+                                                <a href="AjoutParticipant.php?resp=<?= $user->getId() ?>" class="action-btn action-edit" title="Modifier">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="supprimer.php?id=<?= $user->getId() ?>" 
+                                                <a href="../controle/index.php?do=participant_delete&id=<?= $user->getId() ?>" 
                                                    onclick="return confirm('Voulez-vous vraiment supprimer ce participant ?')" 
                                                    class="action-btn action-delete" 
                                                    title="Supprimer">
