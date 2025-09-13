@@ -6,6 +6,14 @@
     <title>Ajouter un Formateur</title>
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
+    <?php
+    if (isset($_GET['resp'])) {
+        $isEdit = $_GET['resp'];
+    }else {
+        $isEdit = null;
+    }
+    
+    ?>
     <style>
         .header_dash {
             width: 100%;
@@ -382,10 +390,6 @@
                         
                         <!-- Affichage des messages de réponse -->
                         <?php
-session_start();
-if(!isset($_SESSION['user'])){
-    header('location:../vue/connexion.html');
-}
 
 // Vérifier si on est en mode modification
 $isEdit = isset($_GET['resp']) && !empty($_GET['resp']);
@@ -407,7 +411,7 @@ if ($isEdit) {
 ?>
                             <div class="col-md-12 mb-4">
                                 <?php  
-                                switch($_GET['resp']) {
+                                switch($isEdit) {
                                     case 10: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>Veuillez renseigner tous les champs obligatoires</span>";
                                         break;

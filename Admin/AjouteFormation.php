@@ -10,7 +10,12 @@
         include_once('../controle/controleur_utilisateur.php');
         $userController = new UtilisateurController();
         $formateurs = $userController->getUtilisateursByRole('formateur');
-        $isEdit = $_GET['resp'];
+        if (isset($_GET['resp'])) {
+            $isEdit = $_GET['resp'];
+        }else {
+            $isEdit = 0;
+        }
+        
     ?>
     <style>
         .header_dash {
@@ -375,7 +380,7 @@ if ($isEdit) {
 ?>
                             <div class="col-md-12 mb-4">
                                 <?php  
-                                switch($_GET['resp']) {
+                                switch($isEdit) {
                                     case 10: 
                                         echo "<span class='btn btn-danger-soft col-md-12'>Veuillez renseigner tous les champs obligatoires</span>";
                                         break;

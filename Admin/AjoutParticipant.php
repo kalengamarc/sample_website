@@ -411,13 +411,13 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="nom">Nom <span class="required">*</span></label>
-                                        <input type="text" id="nom" name="nom" value="<?= $participant['data']->getNom() ?? '' ?>" required>
+                                        <input type="text" id="nom" name="nom" value="<?= isset($_GET['resp']) ? $participant['data']->getNom() : '' ?>" required>
                                         <div class="error_message" id="nomError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="prenom">Prénom <span class="required">*</span></label>
-                                        <input type="text" id="prenom" name="prenom" value="<?= $participant['data']->getPrenom() ?? '' ?>" required>
+                                        <input type="text" id="prenom" name="prenom" value="<?= isset($_GET['resp']) ? $participant['data']->getPrenom() : '' ?>" required>
                                         <div class="error_message" id="prenomError"></div>
                                     </div>
                                 </div>
@@ -425,13 +425,13 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="email">Email <span class="required">*</span></label>
-                                        <input type="email" id="email" name="email" value="<?= $participant['data']->getEmail() ?? '' ?>" required>
+                                        <input type="email" id="email" name="email" value="<?= isset($_GET['resp']) ? $participant['data']->getEmail() : '' ?>" required>
                                         <div class="error_message" id="emailError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="telephone">Téléphone</label>
-                                        <input type="tel" id="telephone" name="telephone" value="<?= $participant['data']->getTelephone() ?? '' ?>">
+                                        <input type="tel" id="telephone" name="telephone" value="<?= isset($_GET['resp']) ? $participant['data']->getTelephone() : '' ?>">
                                         <div class="error_message" id="telephoneError"></div>
                                     </div>
                                 </div>
@@ -458,7 +458,7 @@
                                 
                                 <div class="form_group">
                                     <label for="specialite">Domaine <span class="required">*</span></label>
-                                    <input type="text" id="specialite" name="specialite" value="<?= $participant['data']->getSpecialite() ?? '' ?>" required>
+                                    <input type="text" id="specialite" name="specialite" value="<?= isset($_GET['resp']) ? $participant['data']->getSpecialite() : '' ?>" required>
                                     <div class="error_message" id="specialiteError"></div>
                                 </div>
                                 <div class="form_group">
@@ -473,7 +473,7 @@
                                 
                                 <div class="form_group">
                                     <label for="bio">Biographie</label>
-                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= $participant['data']->getDescription() ?? '' ?></textarea>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= isset($_GET['resp']) ? $participant['data']->getDescription() : '' ?></textarea>
                                     <div class="error_message" id="bioError"></div>
                                 </div>
                                 
@@ -498,10 +498,10 @@
                                 </div>
                                 
                                 <input type="hidden" name="role" value="etudiant">
-                                <input type="hidden" name="do" value="<?= $participant['data']->getId() ?>? participant_update : participant_create">
+                                <input type="hidden" name="do" value="<?= isset($_GET['resp']) ?>? participant_update : participant_create">
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    <?php if ($participant['data']->getId() > 0): ?>
+                                    <?php if (isset($_GET['resp']) > 0): ?>
                                     💾 Modifier le Participant
                                     <?php else: ?>
                                     💾 Enregistrer le Participant
