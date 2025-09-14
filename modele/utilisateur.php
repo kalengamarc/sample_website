@@ -27,7 +27,7 @@ class Utilisateur {
         $date_creation,
         $photo,
         $specialite = '',
-        $id_formation)
+        $id_formation = null)
         {
         $this->id = $id;
         $this->nom = $nom;
@@ -56,6 +56,7 @@ class Utilisateur {
     public function getDateCreation() { return $this->date_creation; }
     public function getPhoto() { return $this->photo; } // ✅ Getter photo
     public function getIdFormation() { return $this->id_formation; } // ✅ Getter photo
+    public function getBio() { return $this->description; } // ✅ Alias pour description
 
     // --- SETTERS ---
     public function setNom($nom) { $this->nom = $nom; }
@@ -69,6 +70,7 @@ class Utilisateur {
     public function setDateCreation($date_creation) { $this->date_creation = $date_creation; }
     public function setPhoto($photo) { $this->photo = $photo; } // ✅ Setter photo
     public function setIdFormation($id_formation) { $this->id_formation = $id_formation; } // ✅ Setter photo
+    public function setBio($bio) { $this->description = $bio; } // ✅ Alias pour description
 }
 
 
@@ -82,25 +84,53 @@ class RequeteUtilisateur {
 
     // ✅ Ajouter utilisateur avec photo
     public function ajouterUtilisateur($utilisateur) {
-        $pdo = new Database();
-        $crud = $pdo->getConnection();
-        $sql = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role,description, date_creation, photo, specialite, id_formation) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $crud->prepare($sql);
-        $params = [
-            $utilisateur->getNom(),
-            $utilisateur->getPrenom(),
-            $utilisateur->getEmail(),
-            password_hash($utilisateur->getMotDePasse(), PASSWORD_BCRYPT),
-            $utilisateur->getTelephone(),
-            $utilisateur->getRole(),
-            $utilisateur->getDescription(),
-            $utilisateur->getDateCreation(),
-            $utilisateur->getPhoto(),
-            $utilisateur->getSpecialite(),
-            $utilisateur->getIdFormation()
-        ];
-        return $stmt->execute($params);
+        try {
+            $pdo = new Database();
+            $crud = $pdo->getConnection();
+            
+            // Debug: Log the SQL and parameters
+            $sql = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role, description, date_creation, photo, specialite, id_formation) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            // Handle null values properly
+            $idFormation = $utilisateur->getIdFormation();
+            if ($idFormation === '' || $idFormation === '2') {
+                $idFormation = null; // Set to NULL for database
+            }
+            
+            $params = [
+                $utilisateur->getNom(),
+                $utilisateur->getPrenom(),
+                $utilisateur->getEmail(),
+                password_hash($utilisateur->getMotDePasse(), PASSWORD_BCRYPT),
+                $utilisateur->getTelephone(),
+                $utilisateur->getRole(),
+                $utilisateur->getDescription(),
+                $utilisateur->getDateCreation(),
+                $utilisateur->getPhoto() ?: '', // Convert NULL to empty string
+                $utilisateur->getSpecialite(),
+                $idFormation
+            ];
+            
+            error_log("DEBUG SQL: " . $sql);
+            error_log("DEBUG Params: " . print_r($params, true));
+            
+            $stmt = $crud->prepare($sql);
+            $result = $stmt->execute($params);
+            
+            if (!$result) {
+                $errorInfo = $stmt->errorInfo();
+                error_log("DEBUG SQL Error: " . print_r($errorInfo, true));
+                error_log("DEBUG Last Insert ID attempt: " . $crud->lastInsertId());
+            } else {
+                error_log("DEBUG SQL Success - Last Insert ID: " . $crud->lastInsertId());
+            }
+            
+            return $result;
+        } catch (Exception $e) {
+            error_log("DEBUG Exception in ajouterUtilisateur: " . $e->getMessage());
+            return false;
+        }
     }
 
     public static function getUtilisateurByEmail($email) {
@@ -111,7 +141,7 @@ class RequeteUtilisateur {
         $stmt->execute([$email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'],  $row['specialite'], $row['id_formation']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'], $row['id_formation']);
         }
         return null;
     }
@@ -150,7 +180,7 @@ class RequeteUtilisateur {
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'],  $row['id_formation']);
+            return new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'], $row['id_formation']);
         }
         return null;
     }
@@ -160,25 +190,25 @@ class RequeteUtilisateur {
         $stmt = $this->crud->query($sql);
         $utilisateurs = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'],$row['id_formation']);
+            $utilisateurs[] = new Utilisateur($row['id_utilisateur'], $row['nom'], $row['prenom'], $row['email'], $row['mot_de_passe'], $row['telephone'], $row['role'], $row['description'], $row['date_creation'], $row['photo'], $row['specialite'], $row['id_formation']);
         }
         return $utilisateurs;
     }
 
-    // ✅ Mise à jour avec photo
+    // ✅ Mise à jour avec photo et bio
     public function mettreAJourUtilisateur($utilisateur) {
         $sql = "UPDATE utilisateurs 
-                SET nom = ?, prenom = ?, email = ?, mot_de_passe = ?, telephone = ?, role = ?, photo = ?
+                SET nom = ?, prenom = ?, email = ?, telephone = ?, role = ?, photo = ?, description = ?
                 WHERE id_utilisateur = ?";
         $stmt = $this->crud->prepare($sql);
         $params = [
             $utilisateur->getNom(),
             $utilisateur->getPrenom(),
             $utilisateur->getEmail(),
-            password_hash($utilisateur->getMotDePasse(), PASSWORD_BCRYPT),
             $utilisateur->getTelephone(),
             $utilisateur->getRole(),
             $utilisateur->getPhoto(),
+            $utilisateur->getDescription(),
             $utilisateur->getId()
         ];
         return $stmt->execute($params);

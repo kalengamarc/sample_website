@@ -79,26 +79,26 @@ class FormationController {
      * Récupérer toutes les formations
      */
     public function getAllFormations(): array {
-        try {
-            $formations = $this->requeteFormation->getAllFormations();
-            
-            return [
-                'success' => true,
-                'data' => $formations,
-                'count' => count($formations)
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ];
-        }
+    try {
+        $formations = $this->requeteFormation->getAllFormations();
+        
+        return [
+            'success' => true,
+            'data' => $formations,
+            'count' => count($formations)
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
     }
+}
 
     /**
      * Mettre à jour une formation
      */
-    public function updateFormation($id_formation, $titre, $description, $prix, $duree, $id_formateur, $debut_formation, $photo = null): array {
+public function updateFormation($id_formation, $titre, $description, $prix, $duree, $id_formateur, $debut_formation, $photo = null): array {
         try {
             // Vérifier d'abord si la formation existe
             $existingFormation = $this->requeteFormation->getFormationById($id_formation);
@@ -285,134 +285,248 @@ class FormationController {
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
+                'message' => 'Erreur lors de la suppression de la formation'
             ];
         }
-    }
-
-    public function getTempsRestantFinFormation($timeSpeci,$duree){
-        $timePresent = time();
-        $timeSpecifique = strtotime($timeSpeci);
-        $heureRestant = ($timeSpecifique - $timePresent)/3600;
-
-        if ($heureRestant<=0 && $heureRestant<$duree) {
-            if (abs(round($heureRestant/24))>30) {
-                return round(abs(round($heureRestant/24))/30) ." mois ". abs(round($heureRestant/24))%30 ." jours de cours";
-            } else {
-                return abs(round($heureRestant/24))." jours de cours";
-            }            
-        }
-        elseif ($heureRestant >= 0) {
-            if (($heureRestant/24)>=30) {
-                return 'la formation en preparation il reste <b> '. round(($heureRestant/24)/30) .' mois et '. round($heureRestant/24)%30 .' jours';
-            }elseif (($heureRestant/24)<30 && ($heureRestant/24)>=1) {
-                return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
-            }elseif (($heureRestant/24)<1 && $heureRestant>=0) {
-                return 'la formation commence aujourd\'hui';
-            }
-            else{
-                return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
-            }        
-        }
-        elseif(abs($heureRestant)>$duree) {
-            return 'la formation a deja termine';
-        }
-    }
-
-    /**
-     * Ajouter un commentaire à une formation
-     */
-    public function ajouterCommentaire($id_service, $id_utilisateur, $note, $commentaire_text): array {
-        try {
-            // Validation des données
-            if (empty($id_service) || !is_numeric($id_service)) {
-                return [
-                    'success' => false,
-                    'message' => 'ID de service invalide'
-                ];
-            }
-
-            if (empty($id_utilisateur) || !is_numeric($id_utilisateur)) {
-                return [
-                    'success' => false,
-                    'message' => 'ID utilisateur invalide'
-                ];
-            }
-
-            if (empty($note) || !is_numeric($note) || $note < 1 || $note > 5) {
-                return [
-                    'success' => false,
-                    'message' => 'La note doit être comprise entre 1 et 5'
-                ];
-            }
-
-            if (empty(trim($commentaire_text))) {
-                return [
-                    'success' => false,
-                    'message' => 'Le commentaire ne peut pas être vide'
-                ];
-            }
-
-            // Vérifier si la formation existe
-            $formation = $this->requeteFormation->getFormationById($id_service);
-            if (!$formation) {
-                return [
-                    'success' => false,
-                    'message' => 'Formation non trouvée'
-                ];
-            }
-
-            // Créer le commentaire
-            $date_commentaire = date('Y-m-d H:i:s');
-            $commentaire = new Commentaire(
-                null, // id_commentaire (auto-increment)
-                $id_utilisateur,
-                $id_service, // id_formation
-                null, // id_produit (null pour les formations)
-                trim($commentaire_text),
-                $note,
-                $date_commentaire,
-                'actif', // statut
-                null // parent_id (null pour commentaire principal)
-            );
-
-            // Sauvegarder le commentaire
-            $commentaireCRUD = new CommentaireCRUD();
-            $savedCommentaire = $commentaireCRUD->create($commentaire);
-
-            return [
-                'success' => true,
-                'message' => 'Commentaire ajouté avec succès',
-                'data' => $savedCommentaire
-            ];
-
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Récupérer les commentaires d'une formation
-     */
-    public function getCommentairesFormation($id_formation): array {
-        try {
-            $commentaireCRUD = new CommentaireCRUD();
-            $commentaires = $commentaireCRUD->getByFormation($id_formation);
-
-            return [
-                'success' => true,
-                'data' => $commentaires,
-                'count' => count($commentaires)
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ];
-        }
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
     }
 }
-?>
+
+/**
+ * Rechercher des formations par mot-clé
+ */
+public function searchFormations($mot_cle): array {
+    try {
+        if (empty(trim($mot_cle))) {
+            return [
+                'success' => false,
+                'message' => 'Le mot-clé de recherche ne peut pas être vide'
+            ];
+        }
+
+        $formations = $this->requeteFormation->rechercherFormations($mot_cle);
+        
+        return [
+            'success' => true,
+            'data' => $formations,
+            'count' => count($formations),
+            'search_term' => $mot_cle
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
+    }
+}
+
+/**
+ * Valider les données d'une formation
+ */
+private function validateFormationData($titre, $description, $prix, $duree, $id_formateur): array {
+    $errors = [];
+
+    if (empty(trim($titre))) {
+        $errors[] = 'Le titre est requis';
+    } elseif (strlen(trim($titre)) < 3) {
+        $errors[] = 'Le titre doit contenir au moins 3 caractères';
+    }
+
+    if (empty(trim($description))) {
+        $errors[] = 'La description est requise';
+    } elseif (strlen(trim($description)) < 10) {
+        $errors[] = 'La description doit contenir au moins 10 caractères';
+    }
+
+    if (!is_numeric($prix) || $prix < 0) {
+        $errors[] = 'Le prix doit être un nombre positif';
+    }
+
+    if (!is_numeric($duree) || $duree <= 0) {
+        $errors[] = 'La durée doit être un nombre positif';
+    }
+
+    if (!is_numeric($id_formateur) || $id_formateur <= 0) {
+        $errors[] = 'ID formateur invalide';
+    }
+
+    return $errors;
+}
+
+/**
+ * Récupérer les formations d'un formateur spécifique
+ */
+public function getFormationsByFormateur($id_formateur): array {
+    try {
+        $allFormations = $this->requeteFormation->getAllFormations();
+        $formations = array_filter($allFormations, function($formation) use ($id_formateur) {
+            return $formation->getIdFormateur() == $id_formateur;
+        });
+        
+        return [
+            'success' => true,
+            'data' => array_values($formations),
+            'count' => count($formations)
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
+    }
+}
+
+/**
+ * Récupérer les formations récentes (limitées)
+ */
+public function getRecentFormations($limit = 5): array {
+    try {
+        $allFormations = $this->requeteFormation->getAllFormations();
+        // Trier par date de création décroissante et limiter
+        usort($allFormations, function($a, $b) {
+            return strtotime($b->getDateCreation()) - strtotime($a->getDateCreation());
+        });
+        
+        $recentFormations = array_slice($allFormations, 0, $limit);
+        
+        return [
+            'success' => true,
+            'data' => $recentFormations,
+            'count' => count($recentFormations)
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
+    }
+}
+
+public function getTempsRestantFinFormation($timeSpeci,$duree){
+    $timePresent = time();
+    $timeSpecifique = strtotime($timeSpeci);
+    $heureRestant = ($timeSpecifique - $timePresent)/3600;
+
+    if ($heureRestant<=0 && $heureRestant<$duree) {
+        if (abs(round($heureRestant/24))>30) {
+            return round(abs(round($heureRestant/24))/30) ." mois ". abs(round($heureRestant/24))%30 ." jours de cours";
+        } else {
+            return abs(round($heureRestant/24))." jours de cours";
+        }            
+    }
+    elseif ($heureRestant >= 0) {
+        if (($heureRestant/24)>=30) {
+            return 'la formation en preparation il reste <b> '. round(($heureRestant/24)/30) .' mois et '. round($heureRestant/24)%30 .' jours';
+        }elseif (($heureRestant/24)<30 && ($heureRestant/24)>=1) {
+            return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
+        }elseif (($heureRestant/24)<1 && $heureRestant>=0) {
+            return 'la formation commence aujourd\'hui';
+        }
+        else{
+            return 'la formation en preparation il reste <b> '. round($heureRestant/24) .'</b> jours';
+        }        
+    }
+    elseif(abs($heureRestant)>$duree) {
+        return 'la formation a deja termine';
+    }
+}
+
+/**
+ * Ajouter un commentaire à une formation
+ */
+public function ajouterCommentaire($id_service, $id_utilisateur, $note, $commentaire_text): array {
+    try {
+        // Validation des données
+        if (empty($id_service) || !is_numeric($id_service)) {
+            return [
+                'success' => false,
+                'message' => 'ID de service invalide'
+            ];
+        }
+
+        if (empty($id_utilisateur) || !is_numeric($id_utilisateur)) {
+            return [
+                'success' => false,
+                'message' => 'ID utilisateur invalide'
+            ];
+        }
+
+        if (empty($note) || !is_numeric($note) || $note < 1 || $note > 5) {
+            return [
+                'success' => false,
+                'message' => 'La note doit être comprise entre 1 et 5'
+            ];
+        }
+
+        if (empty(trim($commentaire_text))) {
+            return [
+                'success' => false,
+                'message' => 'Le commentaire ne peut pas être vide'
+            ];
+        }
+
+        // Vérifier si la formation existe
+        $formation = $this->requeteFormation->getFormationById($id_service);
+        if (!$formation) {
+            return [
+                'success' => false,
+                'message' => 'Formation non trouvée'
+            ];
+        }
+
+        // Créer le commentaire
+        $date_commentaire = date('Y-m-d H:i:s');
+        $commentaire = new Commentaire(
+            null, // id_commentaire (auto-increment)
+            $id_utilisateur,
+            $id_service, // id_formation
+            null, // id_produit (null pour les formations)
+            trim($commentaire_text),
+            $note,
+            $date_commentaire,
+            'actif', // statut
+            null // parent_id (null pour commentaire principal)
+        );
+
+        // Sauvegarder le commentaire
+        $commentaireCRUD = new CommentaireCRUD();
+        $savedCommentaire = $commentaireCRUD->create($commentaire);
+
+        return [
+            'success' => true,
+            'message' => 'Commentaire ajouté avec succès',
+            'data' => $savedCommentaire
+        ];
+
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
+    }
+}
+
+/**
+ * Récupérer les commentaires d'une formation
+ */
+public function getCommentairesFormation($id_formation): array {
+    try {
+        $commentaireCRUD = new CommentaireCRUD();
+        $commentaires = $commentaireCRUD->getByFormation($id_formation);
+
+        return [
+            'success' => true,
+            'data' => $commentaires,
+            'count' => count($commentaires)
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Erreur: ' . $e->getMessage()
+        ];
+    }
+}

@@ -368,10 +368,29 @@
                 <?php include_once('menu.php'); ?>
                 <div class="dashcontainu">
                                     <div class="form_container">
-                        <h2 class="form_title">👨‍🎓 Ajouter un Nouveau Participant</h2>
-                        
                         <!-- Affichage des messages de réponse -->
-                        <?php if(isset($_GET['resp']) && !empty($_GET['resp'])) : ?>
+                        <?php
+// Vérifier si on est en mode modification
+$isEdit = isset($_GET['resp']) && !empty($_GET['resp']) && is_numeric($_GET['resp']);
+$participant = null;
+
+if ($isEdit) {
+    include_once('../controle/controleur_utilisateur.php');
+    $utilisateurCtrl = new UtilisateurController();
+    $participantData = $utilisateurCtrl->getUtilisateur($_GET['resp']);
+    
+    if ($participantData['success']) {
+        $participant = $participantData['data'];
+    } else {
+        // Rediriger si le participant n'existe pas
+        header('location: liste_participant.php');
+        exit;
+    }
+}
+?>
+                        <h2 class="form_title"><?= $isEdit ? '✏️ Modifier le Participant' : '👨‍🎓 Ajouter un Nouveau Participant' ?></h2>
+                        
+                        <?php if(isset($_GET['resp']) && !empty($_GET['resp']) && !is_numeric($_GET['resp'])) : ?>
                             <div class="col-md-12 mb-4">
                                 <?php  
                                 switch($_GET['resp']) {
@@ -411,13 +430,13 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="nom">Nom <span class="required">*</span></label>
-                                        <input type="text" id="nom" name="nom" value="<?= isset($_GET['resp']) ? $participant['data']->getNom() : '' ?>" required>
+                                        <input type="text" id="nom" name="nom" value="<?= $participant ? $participant->getNom() : ($_POST['nom'] ?? '') ?>" required>
                                         <div class="error_message" id="nomError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="prenom">Prénom <span class="required">*</span></label>
-                                        <input type="text" id="prenom" name="prenom" value="<?= isset($_GET['resp']) ? $participant['data']->getPrenom() : '' ?>" required>
+                                        <input type="text" id="prenom" name="prenom" value="<?= $participant ? $participant->getPrenom() : ($_POST['prenom'] ?? '') ?>" required>
                                         <div class="error_message" id="prenomError"></div>
                                     </div>
                                 </div>
@@ -425,17 +444,18 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label for="email">Email <span class="required">*</span></label>
-                                        <input type="email" id="email" name="email" value="<?= isset($_GET['resp']) ? $participant['data']->getEmail() : '' ?>" required>
+                                        <input type="email" id="email" name="email" value="<?= $participant ? $participant->getEmail() : ($_POST['email'] ?? '') ?>" required>
                                         <div class="error_message" id="emailError"></div>
                                     </div>
                                     
                                     <div class="form_group">
                                         <label for="telephone">Téléphone</label>
-                                        <input type="tel" id="telephone" name="telephone" value="<?= isset($_GET['resp']) ? $participant['data']->getTelephone() : '' ?>">
+                                        <input type="tel" id="telephone" name="telephone" value="<?= $participant ? $participant->getTelephone() : ($_POST['telephone'] ?? '') ?>">
                                         <div class="error_message" id="telephoneError"></div>
                                     </div>
                                 </div>
                                 
+                                <?php if (!$isEdit): ?>
                                 <div class="form_row">
                                     <div class="form_group password_toggle">
                                         <label for="password">Mot de passe <span class="required">*</span></label>
@@ -455,10 +475,11 @@
                                         <div class="error_message" id="confirm_passwordError"></div>
                                     </div>
                                 </div>
+                                <?php endif; ?>
                                 
                                 <div class="form_group">
                                     <label for="specialite">Domaine <span class="required">*</span></label>
-                                    <input type="text" id="specialite" name="specialite" value="<?= isset($_GET['resp']) ? $participant['data']->getSpecialite() : '' ?>" required>
+                                    <input type="text" id="specialite" name="specialite" value="<?= $participant ? $participant->getSpecialite() : ($_POST['specialite'] ?? '') ?>" required>
                                     <div class="error_message" id="specialiteError"></div>
                                 </div>
                                 <div class="form_group">
@@ -473,42 +494,52 @@
                                 
                                 <div class="form_group">
                                     <label for="bio">Biographie</label>
-                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du formateur..."><?= isset($_GET['resp']) ? $participant['data']->getDescription() : '' ?></textarea>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Description du parcours et des compétences du participant..."><?= $participant ? $participant->getBio() : ($_POST['bio'] ?? '') ?></textarea>
                                     <div class="error_message" id="bioError"></div>
                                 </div>
                                 
                                 <div class="image_upload">
                                     <label>Photo de profil</label>
                                     <div class="image_preview" id="imagePreview">
-                                        <img src="" alt="Aperçu" id="previewImage">
-                                        <span class="default-text" id="defaultText">Aucune photo</span>
+                                        <?php if ($participant && $participant->getPhoto()): ?>
+                                            <img src="../controle/<?= $participant->getPhoto() ?>" alt="Photo actuelle" id="previewImage" style="display: block;">
+                                            <span class="default-text" id="defaultText" style="display: none;">Aucune photo</span>
+                                        <?php else: ?>
+                                            <img src="" alt="Aperçu" id="previewImage" style="display: none;">
+                                            <span class="default-text" id="defaultText">Aucune photo</span>
+                                        <?php endif; ?>
                                     </div>
                                     
                                     <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
                                     <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
-                                        📷 Choisir une photo
+                                        📷 <?= $participant && $participant->getPhoto() ? 'Changer la photo' : 'Choisir une photo' ?>
                                     </button>
-                                    <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
-                                        🗑️ Supprimer
-                                    </button>
+                                    <?php if ($participant && $participant->getPhoto()): ?>
+                                        <button type="button" class="remove_btn" onclick="removeImage()" style="display: inline-block;">
+                                            🗑️ Supprimer
+                                        </button>
+                                    <?php else: ?>
+                                        <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
+                                            🗑️ Supprimer
+                                        </button>
+                                    <?php endif; ?>
                                     
                                     <div class="upload_info">
                                         Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
                                     </div>
                                 </div>
                                 
-                                <input type="hidden" name="role" value="etudiant">
-                                <input type="hidden" name="do" value="<?= isset($_GET['resp']) ?>? participant_update : participant_create">
+                                <input type="hidden" name="role" value="participant">
+                                <input type="hidden" name="do" value="<?= $isEdit ? 'participant_update' : 'participant_create' ?>">
+                                <?php if ($isEdit): ?>
+                                <input type="hidden" name="id" value="<?= $participant->getId() ?>">
+                                <?php endif; ?>
                                 
                                 <button type="submit" class="submit_btn" id="submitBtn">
-                                    <?php if (isset($_GET['resp']) > 0): ?>
-                                    💾 Modifier le Participant
-                                    <?php else: ?>
-                                    💾 Enregistrer le Participant
-                                    <?php endif; ?>
+                                    <?= $isEdit ? '✏️ Modifier le Participant' : '💾 Enregistrer le Participant' ?>
                                 </button>
                             </form>
-                        </div>
+{{ ... }}
                     </div>
                 </div>
             </div>
@@ -572,11 +603,25 @@
             const preview = document.getElementById('previewImage');
             const defaultText = document.getElementById('defaultText');
             const removeBtn = document.querySelector('.remove_btn');
+            const uploadBtn = document.querySelector('.upload_btn');
             
             input.value = '';
+            preview.src = '';
             preview.style.display = 'none';
             defaultText.style.display = 'block';
             removeBtn.style.display = 'none';
+            uploadBtn.textContent = '📷 Choisir une photo';
+            
+            // Ajouter un champ caché pour indiquer la suppression de l'image
+            let deletePhotoInput = document.getElementById('delete_photo');
+            if (!deletePhotoInput) {
+                deletePhotoInput = document.createElement('input');
+                deletePhotoInput.type = 'hidden';
+                deletePhotoInput.name = 'delete_photo';
+                deletePhotoInput.id = 'delete_photo';
+                document.getElementById('formateurForm').appendChild(deletePhotoInput);
+            }
+            deletePhotoInput.value = '1';
         }
 
         // Validation des mots de passe

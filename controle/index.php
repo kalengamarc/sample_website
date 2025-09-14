@@ -64,31 +64,46 @@ function checkAdminPermission() {
 
 // Fonctions de gestion d'images
 function handleImageUpload($file, $category) {
+    error_log("DEBUG handleImageUpload: File info: " . print_r($file, true));
+    
     if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-        return ['success' => false, 'message' => 'Aucun fichier uploadé'];
+        $errorMsg = 'Aucun fichier uploadé';
+        if ($file && $file['error'] !== UPLOAD_ERR_OK) {
+            $errorMsg = 'Erreur upload: ' . $file['error'];
+        }
+        error_log("DEBUG handleImageUpload: " . $errorMsg);
+        return ['success' => false, 'message' => $errorMsg];
     }
     
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $maxSize = 5 * 1024 * 1024;
     
     if (!in_array($file['type'], $allowedTypes)) {
-        return ['success' => false, 'message' => 'Type de fichier non autorisé'];
+        error_log("DEBUG handleImageUpload: Type non autorisé: " . $file['type']);
+        return ['success' => false, 'message' => 'Type de fichier non autorisé: ' . $file['type']];
     }
     
     if ($file['size'] > $maxSize) {
+        error_log("DEBUG handleImageUpload: Fichier trop volumineux: " . $file['size']);
         return ['success' => false, 'message' => 'Fichier trop volumineux (max 5MB)'];
     }
     
     $uploadDir = __DIR__ . '/uploads/' . $category . '/';
+    error_log("DEBUG handleImageUpload: Upload directory: " . $uploadDir);
+    
     if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+        $created = mkdir($uploadDir, 0755, true);
+        error_log("DEBUG handleImageUpload: Directory created: " . ($created ? 'yes' : 'no'));
     }
     
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = uniqid() . '_' . time() . '.' . $extension;
     $filepath = $uploadDir . $filename;
     
+    error_log("DEBUG handleImageUpload: Attempting to move file to: " . $filepath);
+    
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        error_log("DEBUG handleImageUpload: File moved successfully");
         return [
             'success' => true,
             'message' => 'Fichier uploadé avec succès',
@@ -200,6 +215,9 @@ try {
             break;
 
         case 'user_participant':
+                // Debug: Log received data
+                error_log("DEBUG user_participant: " . print_r($data, true));
+                
                 //checkAdminPermission();
                 // Gestion de l'upload d'image pour les utilisateurs
                 $photoPath = null;
@@ -208,8 +226,9 @@ try {
                     if ($uploadResult['success']) {
                         $photoPath = $uploadResult['filepath'];
                     } else {
-                        sendJsonResponse($uploadResult);
-                        break;
+                        error_log("Photo upload failed: " . print_r($uploadResult, true));
+                        header("Location: ../Admin/AjoutParticipant.php?resp=403");
+                        exit;
                     }
                 }
                 
@@ -226,12 +245,15 @@ try {
                     $data['id_formation'] ?? ''
                 );
                 
-                if ($data['role'] === 'etudiant') {
-                    $redirectPath = '../Admin/liste_participant.php';
-                    header("Location: $redirectPath");
-                    exit;
+                // Debug: Log result
+                error_log("DEBUG createUtilisateur participant result: " . print_r($result, true));
+                
+                if ($result['success']) {
+                    header("Location: ../Admin/liste_participant.php?success=1");
+                } else {
+                    header("Location: ../Admin/AjoutParticipant.php?error=" . urlencode($result['message']));
                 }
-    
+                exit;
                 break;
 
         case 'user_get':
@@ -316,48 +338,93 @@ try {
 
         // Gestion des formateurs
         case 'formateur_create':
+            // Debug: Log received data
+            error_log("DEBUG formateur_create: " . print_r($data, true));
+            error_log("DEBUG FILES: " . print_r($_FILES, true));
+            
             $photoPath = null;
-            if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
-                $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+            if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                error_log("DEBUG: Photo file detected, processing upload...");
+                $uploadResult = handleImageUpload($_FILES['photo'], 'utilisateurs');
+                error_log("DEBUG: Upload result: " . print_r($uploadResult, true));
                 if ($uploadResult['success']) {
                     $photoPath = $uploadResult['filepath'];
+                    error_log("DEBUG: Photo path set to: " . $photoPath);
                 } else {
-                    header("Location: ../Admin/AjoutFormateur.php?resp=403");
+                    error_log("Photo upload failed: " . print_r($uploadResult, true));
+                    header("Location: ../Admin/AjoutFormateur.php?resp=403&error=" . urlencode($uploadResult['message']));
                     exit;
                 }
+            } else {
+                error_log("DEBUG: No photo uploaded or upload error. FILES photo: " . print_r($_FILES['photo'] ?? 'not set', true));
             }
             
             $result = $userController->createUtilisateur(
                 $data['nom'] ?? '',
                 $data['prenom'] ?? '',
                 $data['email'] ?? '',
-                $data['mot_de_passe'] ?? '',
+                $data['password'] ?? '',
                 $data['telephone'] ?? '',
                 'formateur',
                 $data['bio'] ?? '',
                 $photoPath,
                 $data['specialite'] ?? ''
             );
-            header("Location: ../Admin/liste_formateur.php");
+            
+            // Debug: Log result
+            error_log("DEBUG createUtilisateur result: " . print_r($result, true));
+            
+            if ($result['success']) {
+                header("Location: ../Admin/liste_formateur.php?success=1");
+            } else {
+                header("Location: ../Admin/AjoutFormateur.php?error=" . urlencode($result['message']));
+            }
             exit;
             break;
 
         case 'formateur_update':
-            $existingUser = $userController->getUtilisateur($data['id'] ?? 0);
-            $photoPath = $existingUser['success'] ? $existingUser['data']->getPhoto() : null;
+            error_log("DEBUG formateur_update: " . print_r($data, true));
+            error_log("DEBUG FILES: " . print_r($_FILES, true));
             
-            if (isset($data['photo']) && $data['photo']['error'] === UPLOAD_ERR_OK) {
-                if ($photoPath && file_exists(__DIR__ . '/' . $photoPath)) {
-                    unlink(__DIR__ . '/' . $photoPath);
+            $existingUser = $userController->getUtilisateur($data['id'] ?? 0);
+            if (!$existingUser['success']) {
+                error_log("DEBUG: User not found for ID: " . ($data['id'] ?? 'not set'));
+                header("Location: ../Admin/AjoutFormateur.php?error=user_not_found");
+                exit;
+            }
+            
+            $currentPhoto = $existingUser['data']->getPhoto();
+            error_log("DEBUG: Current photo path: " . ($currentPhoto ?? 'null'));
+            
+            $photoToUpdate = null; // Don't update photo by default
+            
+            // Check if user wants to delete existing photo
+            if (isset($data['delete_photo']) && $data['delete_photo'] == '1') {
+                error_log("DEBUG: User requested photo deletion");
+                if ($currentPhoto && file_exists(__DIR__ . '/' . $currentPhoto)) {
+                    unlink(__DIR__ . '/' . $currentPhoto);
+                    error_log("DEBUG: Existing photo deleted: " . $currentPhoto);
+                }
+                $photoToUpdate = ''; // Set empty string to clear photo in database
+            } elseif (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                error_log("DEBUG: New photo uploaded, processing...");
+                if ($currentPhoto && file_exists(__DIR__ . '/' . $currentPhoto)) {
+                    unlink(__DIR__ . '/' . $currentPhoto);
+                    error_log("DEBUG: Old photo deleted: " . $currentPhoto);
                 }
                 
-                $uploadResult = handleImageUpload($data['photo'], 'utilisateurs');
+                $uploadResult = handleImageUpload($_FILES['photo'], 'utilisateurs');
+                error_log("DEBUG: Upload result: " . print_r($uploadResult, true));
                 if ($uploadResult['success']) {
-                    $photoPath = $uploadResult['filepath'];
+                    $photoToUpdate = $uploadResult['filepath'];
+                    error_log("DEBUG: New photo path: " . $photoToUpdate);
                 } else {
-                    header("Location: ../Admin/AjoutFormateur.php?resp=" . $data['id'] . "&error=403");
+                    error_log("DEBUG: Photo upload failed: " . $uploadResult['message']);
+                    header("Location: ../Admin/AjoutFormateur.php?resp=" . $data['id'] . "&error=" . urlencode($uploadResult['message']));
                     exit;
                 }
+            } else {
+                error_log("DEBUG: No new photo uploaded. Keeping existing photo unchanged");
             }
             
             $result = $userController->updateUtilisateur(
@@ -367,9 +434,17 @@ try {
                 $data['email'] ?? '',
                 $data['telephone'] ?? '',
                 'formateur',
-                $photoPath
+                $photoToUpdate, // null if no new photo, filepath if new photo
+                $data['bio'] ?? ''
             );
-            header("Location: ../Admin/liste_formateur.php");
+            
+            error_log("DEBUG: Update result: " . print_r($result, true));
+            
+            if ($result['success']) {
+                header("Location: ../Admin/liste_formateur.php?success=1");
+            } else {
+                header("Location: ../Admin/AjoutFormateur.php?resp=" . $data['id'] . "&error=" . urlencode($result['message']));
+            }
             exit;
             break;
 
@@ -404,7 +479,7 @@ try {
                 $data['nom'] ?? '',
                 $data['prenom'] ?? '',
                 $data['email'] ?? '',
-                $data['mot_de_passe'] ?? '',
+                $data['password'] ?? '',
                 $data['telephone'] ?? '',
                 'etudiant',
                 $data['bio'] ?? '',
@@ -441,7 +516,8 @@ try {
                 $data['email'] ?? '',
                 $data['telephone'] ?? '',
                 'etudiant',
-                $photoPath
+                $photoPath,
+                $data['bio'] ?? ''
             );
             header("Location: ../Admin/liste_participant.php");
             exit;

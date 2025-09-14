@@ -21,36 +21,32 @@
                     <div class="mt">
                         <div id="surenamename">
                             <div class="divename">
-                                <label for="name">Name *</label><br>
+                                <label for="nom">Nom *</label><br>
                                 <input type="text">
                             </div>
                             <div class="divsurename">
-                                <label for="surename" >Surename *</label><br>
+                                <label for="prenom" >Prenom *</label><br>
                                 <input type="text" >
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="input">
-                    <label for="email" id="labell">Post name</label>
-                    <input type="text" id="input12"> 
+                    <label for="email" id="labell">E-mail *</label>
+                    <input type="email" name="email" id="input12">
                 </div>
                 <div class="input">
-                    <label for="adress" id="labell">E-mail *</label>
-                    <input type="email" id="input12">
-                </div>
-                <div class="input">
-                    <label for="date" id="labell">Telephone</label>
+                    <label for="telephone" id="labell">Telephone</label>
                    
-                    <input type="telephone" id="input12">
+                    <input type="telephone" name="telephone" id="input12">
                 </div>
                 <div class="input">
-                    <label for="adress" id="labell">Mot de pass</label>
-                    <input type="text" id="input12">
+                    <label for="motdepasse" id="labell">Mot de pass</label>
+                    <input type="text" name="motdepasse" id="input12">
                 </div>
                 <div class="input">
-                    <label for="adress" id="labell">Confirmer le mot de passe</label>
-                    <input type="text" id="input12">
+                    <label for="confirmermotdepasse" id="labell">Confirmer le mot de passe</label>
+                    <input type="text" name="confirmermotdepasse" id="input12">
                 </div>
                 </div>
                 <div class="botton_part">
@@ -68,10 +64,10 @@
                 </button>
                 <div class="fina_inf">
                     <p>Vous aves deja un compte ? <span>
-                        <a href="">se connecter</a>
+                        <a href="connexion.php">se connecter</a>
                     </span></p>
                     <p  id="retour">
-                        <a href=""> <span><-</span> Retour a l'acceuil</a>
+                        <a href="actualite.php"> <span><-</span> Retour a l'acceuil</a>
                     </p>
                 </div>
             </div>

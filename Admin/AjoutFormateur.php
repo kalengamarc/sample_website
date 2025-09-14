@@ -367,26 +367,6 @@
                 <div class="dashcontainu">
                     <div class="form_container">
                         <h2 class="form_title"><?= $isEdit ? '✏️ Modifier le Formateur' : '➕ Ajouter un Nouveau Formateur' ?></h2>
-
-                         <div class="image_upload">
-                                    <label>Photo de profil</label>
-                                    <div class="image_preview" id="imagePreview">
-                                        <img src="" alt="Aperçu" id="previewImage">
-                                        <span class="default-text" id="defaultText">Aucune photo</span>
-                                    </div>
-                                    
-                                    <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
-                                    <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
-                                        📷 Choisir une photo
-                                    </button>
-                                    <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
-                                        🗑️ Supprimer
-                                    </button>
-                                    
-                                    <div class="upload_info">
-                                        Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
-                                    </div>
-                                </div>
                         
                         <!-- Affichage des messages de réponse -->
                         <?php
@@ -506,6 +486,37 @@ if ($isEdit) {
                                     <textarea id="bio" name="bio" placeholder="Parlez-nous de votre expérience..."><?= $formateur ? $formateur->getBio() : ($_POST['bio'] ?? '') ?></textarea>
                                     <div class="error_message" id="bioError"></div>
                                 </div>
+
+                                <div class="image_upload">
+                                    <label>Photo de profil</label>
+                                    <div class="image_preview" id="imagePreview">
+                                        <?php if ($formateur && $formateur->getPhoto()): ?>
+                                            <img src="../controle/<?= $formateur->getPhoto() ?>" alt="Photo actuelle" id="previewImage" style="display: block;">
+                                            <span class="default-text" id="defaultText" style="display: none;">Aucune photo</span>
+                                        <?php else: ?>
+                                            <img src="" alt="Aperçu" id="previewImage" style="display: none;">
+                                            <span class="default-text" id="defaultText">Aucune photo</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <input type="file" id="photo" name="photo" accept="image/*" style="display: none;">
+                                    <button type="button" class="upload_btn" onclick="document.getElementById('photo').click()">
+                                        📷 <?= $formateur && $formateur->getPhoto() ? 'Changer la photo' : 'Choisir une photo' ?>
+                                    </button>
+                                    <?php if ($formateur && $formateur->getPhoto()): ?>
+                                        <button type="button" class="remove_btn" onclick="removeImage()" style="display: inline-block;">
+                                            🗑️ Supprimer
+                                        </button>
+                                    <?php else: ?>
+                                        <button type="button" class="remove_btn" onclick="removeImage()" style="display: none;">
+                                            🗑️ Supprimer
+                                        </button>
+                                    <?php endif; ?>
+                                    
+                                    <div class="upload_info">
+                                        Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)
+                                    </div>
+                                </div>
                                 
                                 <input type="hidden" name="role" value="formateur">
                                 <input type="hidden" name="do" value="<?= $isEdit ? 'formateur_update' : 'formateur_create' ?>">
@@ -581,11 +592,25 @@ if ($isEdit) {
             const preview = document.getElementById('previewImage');
             const defaultText = document.getElementById('defaultText');
             const removeBtn = document.querySelector('.remove_btn');
+            const uploadBtn = document.querySelector('.upload_btn');
             
             input.value = '';
+            preview.src = '';
             preview.style.display = 'none';
             defaultText.style.display = 'block';
             removeBtn.style.display = 'none';
+            uploadBtn.textContent = '📷 Choisir une photo';
+            
+            // Ajouter un champ caché pour indiquer la suppression de l'image
+            let deletePhotoInput = document.getElementById('delete_photo');
+            if (!deletePhotoInput) {
+                deletePhotoInput = document.createElement('input');
+                deletePhotoInput.type = 'hidden';
+                deletePhotoInput.name = 'delete_photo';
+                deletePhotoInput.id = 'delete_photo';
+                document.getElementById('formateurForm').appendChild(deletePhotoInput);
+            }
+            deletePhotoInput.value = '1';
         }
 
         // Validation des mots de passe

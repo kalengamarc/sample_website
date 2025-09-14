@@ -15,10 +15,18 @@
             switch ($_POST['action']) {
                 case 'ajouter_commentaire':
                     if (isset($_POST['id_service'], $_POST['note'], $_POST['commentaire'])) {
+                        // Vérifier si l'utilisateur est connecté
+                        if (!isset($_SESSION['user_id'])) {
+                            $_SESSION['message'] = "Vous devez être connecté pour ajouter un commentaire.";
+                            $_SESSION['message_type'] = "error";
+                            header("Location: connexion.php");
+                            exit();
+                        }
+                        
                         // Traiter l'ajout de commentaire
                         $result = $formations->ajouterCommentaire(
                             $_POST['id_service'],
-                            $_SESSION['user_id'] ?? 1, // ID utilisateur par défaut pour la démo
+                            $_SESSION['user_id'],
                             $_POST['note'],
                             $_POST['commentaire']
                         );
