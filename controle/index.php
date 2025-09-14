@@ -15,6 +15,7 @@ require_once '../controle/controleur_inscription.php';
 require_once '../controle/controleur_presence.php';
 require_once '../controle/controleur_produit.php';
 require_once '../controle/controleur.paiement.php';
+require_once '../controle/controleur_commentaire.php';
 
 // Inclure les modèles
 require_once __DIR__ . '/../modele/utilisateur.php';
@@ -120,6 +121,7 @@ try {
     $presenceController = new PresenceController();
     $produitController = new ProduitController();
     $detailCommandeController = new DetailCommandeController();
+    $CommentaireController = new CommentaireController();
 
     // Router les requêtes en fonction du paramètre "do"
     switch ($do) {
@@ -182,8 +184,19 @@ try {
                 $redirectPath = '../Admin/liste_formateur.php';
                 header("Location: $redirectPath");
                 exit;
-            }
+            } 
+            break; 
 
+        case "ajout_commentaire": 
+            $result = $CommentaireController->createCommentaire(
+                $data['id_utilisateur'] ?? "",
+                $data['id_formation'] ?? null,
+                $data['id_produit'] ? intval($data['id_produit']) : null,
+                $data['commentaire'] ?? "",
+                $data['note'] ? intval($data['note']) : null,
+                $data['parent_id'] ? intval($data['parent_id']) : null, 
+            );
+            echo json_encode($result); 
             break;
 
         case 'user_participant':

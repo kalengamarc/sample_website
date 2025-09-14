@@ -82,8 +82,7 @@ class CommentaireCRUD {
     public function create(Commentaire $commentaire) {
         if (!$commentaire->isValid()) {
             throw new InvalidArgumentException("Le commentaire n'est pas valide");
-        }
-
+        } 
         $sql = "INSERT INTO commentaires (id_utilisateur, id_formation, id_produit, commentaire, note, date_commentaire, statut, parent_id) 
                 VALUES (:id_utilisateur, :id_formation, :id_produit, :commentaire, :note, :date_commentaire, :statut, :parent_id)";
         
