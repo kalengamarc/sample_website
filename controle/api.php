@@ -436,6 +436,193 @@ try {
             sendResponse($result);
             break;
             
+        case 'get_product_comments':
+            // Récupérer les commentaires d'un produit spécifique
+            $validation = validatePostData(['id_produit' => 'int']);
+            
+            if (!empty($validation['errors'])) {
+                sendResponse([
+                    'success' => false, 
+                    'message' => 'Données invalides', 
+                    'errors' => $validation['errors']
+                ], 400);
+            }
+            
+            try {
+                require_once '../modele/commentaire.php';
+                require_once '../modele/utilisateur.php';
+                
+                $commentaireCRUD = new CommentaireCRUD();
+                $utilisateurCRUD = new RequeteUtilisateur();
+                
+                $commentaires = $commentaireCRUD->getByProduit($validation['data']['id_produit']);
+                $commentaires_avec_utilisateurs = [];
+                
+                foreach ($commentaires as $commentaire) {
+                    $utilisateur = $utilisateurCRUD->getUtilisateurById($commentaire->getIdUtilisateur());
+                    
+                    $commentaires_avec_utilisateurs[] = [
+                        'id' => $commentaire->getIdCommentaire(),
+                        'commentaire' => $commentaire->getCommentaire(),
+                        'note' => $commentaire->getNote(),
+                        'date' => $commentaire->getDateCommentaire(),
+                        'utilisateur' => [
+                            'nom' => $utilisateur ? $utilisateur->getNom() : 'Utilisateur inconnu',
+                            'prenom' => $utilisateur ? $utilisateur->getPrenom() : '',
+                            'photo' => $utilisateur ? $utilisateur->getPhoto() : null
+                        ]
+                    ];
+                }
+                
+                // Calculer la note moyenne
+                $note_moyenne = $commentaireCRUD->getAverageNoteByProduit($validation['data']['id_produit']);
+                
+                sendResponse([
+                    'success' => true,
+                    'data' => [
+                        'commentaires' => $commentaires_avec_utilisateurs,
+                        'total' => count($commentaires_avec_utilisateurs),
+                        'note_moyenne' => round($note_moyenne, 1)
+                    ]
+                ]);
+                
+            } catch (Exception $e) {
+                sendResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de la récupération des commentaires: ' . $e->getMessage()
+                ], 500);
+            }
+            break;
+            
+        case 'get_service_comments':
+            // Récupérer les commentaires d'un service/formation spécifique
+            $validation = validatePostData(['id_service' => 'int']);
+            
+            if (!empty($validation['errors'])) {
+                sendResponse([
+                    'success' => false, 
+                    'message' => 'Données invalides', 
+                    'errors' => $validation['errors']
+                ], 400);
+            }
+            
+            try {
+                require_once '../modele/commentaire.php';
+                require_once '../modele/utilisateur.php';
+                
+                $commentaireCRUD = new CommentaireCRUD();
+                $utilisateurCRUD = new RequeteUtilisateur();
+                
+                $commentaires = $commentaireCRUD->getByFormation($validation['data']['id_service']);
+                $commentaires_avec_utilisateurs = [];
+                
+                foreach ($commentaires as $commentaire) {
+                    $utilisateur = $utilisateurCRUD->getUtilisateurById($commentaire->getIdUtilisateur());
+                    
+                    $commentaires_avec_utilisateurs[] = [
+                        'id' => $commentaire->getIdCommentaire(),
+                        'commentaire' => $commentaire->getCommentaire(),
+                        'note' => $commentaire->getNote(),
+                        'date' => $commentaire->getDateCommentaire(),
+                        'utilisateur' => [
+                            'nom' => $utilisateur ? $utilisateur->getNom() : 'Utilisateur inconnu',
+                            'prenom' => $utilisateur ? $utilisateur->getPrenom() : '',
+                            'photo' => $utilisateur ? $utilisateur->getPhoto() : null
+                        ]
+                    ];
+                }
+                
+                // Calculer la note moyenne
+                $note_moyenne = $commentaireCRUD->getAverageNoteByFormation($validation['data']['id_service']);
+                
+                sendResponse([
+                    'success' => true,
+                    'data' => [
+                        'commentaires' => $commentaires_avec_utilisateurs,
+                        'total' => count($commentaires_avec_utilisateurs),
+                        'note_moyenne' => round($note_moyenne, 1)
+                    ]
+                ]);
+                
+            } catch (Exception $e) {
+                sendResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de la récupération des commentaires: ' . $e->getMessage()
+                ], 500);
+            }
+            break;
+            
+        case 'add_service_comment':
+            // Ajouter un commentaire pour un service/formation
+            $user_id = requireAuth();
+            $validation = validatePostData([
+                'id_service' => 'int',
+                'note' => 'int',
+                'commentaire' => 'string'
+            ]);
+            
+            if (!empty($validation['errors'])) {
+                sendResponse([
+                    'success' => false, 
+                    'message' => 'Données invalides', 
+                    'errors' => $validation['errors']
+                ], 400);
+            }
+            
+            // Validation des données
+            if ($validation['data']['note'] < 1 || $validation['data']['note'] > 5) {
+                sendResponse([
+                    'success' => false,
+                    'message' => 'La note doit être comprise entre 1 et 5'
+                ], 400);
+            }
+            
+            if (strlen(trim($validation['data']['commentaire'])) < 10) {
+                sendResponse([
+                    'success' => false,
+                    'message' => 'Le commentaire doit contenir au moins 10 caractères'
+                ], 400);
+            }
+            
+            try {
+                require_once '../modele/commentaire.php';
+                
+                $commentaire = new Commentaire(
+                    null, // id_commentaire (auto-increment)
+                    $user_id, // id_utilisateur
+                    $validation['data']['id_service'], // id_formation
+                    null, // id_produit
+                    $validation['data']['commentaire'], // commentaire
+                    $validation['data']['note'], // note
+                    date('Y-m-d H:i:s'), // date_commentaire
+                    'actif', // statut
+                    null // parent_id
+                );
+                
+                $commentaireCRUD = new CommentaireCRUD();
+                $result = $commentaireCRUD->create($commentaire);
+                
+                if ($result) {
+                    sendResponse([
+                        'success' => true,
+                        'message' => 'Commentaire ajouté avec succès',
+                        'data' => ['id_commentaire' => $result]
+                    ]);
+                } else {
+                    sendResponse([
+                        'success' => false,
+                        'message' => 'Erreur lors de l\'ajout du commentaire'
+                    ], 500);
+                }
+                
+            } catch (Exception $e) {
+                sendResponse([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'ajout du commentaire: ' . $e->getMessage()
+                ], 500);
+            }
+            break;
+            
         // ===== GESTION DU PARTAGE =====
         case 'share_item':
             $user_id = requireAuth();

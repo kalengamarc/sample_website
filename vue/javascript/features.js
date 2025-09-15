@@ -10,6 +10,22 @@ class JosNetFeatures {
     init() {
         this.bindEvents();
         this.loadCartCount();
+        this.initProductComments();
+    }
+
+    // Initialize product comments loading
+    initProductComments() {
+        // Check if we're on a product page
+        const productComments = document.getElementById('productComments');
+        if (productComments) {
+            // Try to get product ID from URL or data attribute
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id') || productComments.dataset.productId;
+            
+            if (productId) {
+                this.loadProductComments(productId);
+            }
+        }
     }
 
     // Utility function for AJAX requests
@@ -30,6 +46,27 @@ class JosNetFeatures {
         } catch (error) {
             console.error('Request failed:', error);
             return { success: false, message: 'Erreur de connexion' };
+        }
+    }
+
+    // API request function for direct API calls
+    async makeApiRequest(action, data = {}, method = 'POST') {
+        const formData = new FormData();
+        formData.append('action', action);
+        
+        Object.keys(data).forEach(key => {
+            formData.append(key, data[key]);
+        });
+
+        try {
+            const response = await fetch('../controle/api.php', {
+                method: method,
+                body: formData
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            return { success: false, message: 'Erreur de connexion API' };
         }
     }
 
@@ -59,6 +96,51 @@ class JosNetFeatures {
         }
         
         return result;
+    }
+
+    // Load product comments using the new API endpoint
+    async loadProductComments(productId) {
+        try {
+            const result = await this.makeApiRequest('get_product_comments', { id_produit: productId });
+            
+            if (result.success) {
+                this.displayProductComments(result.data);
+            } else {
+                console.error('Erreur lors du chargement des commentaires:', result.message);
+                const container = document.getElementById('productComments');
+                if (container) {
+                    container.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des commentaires:', error);
+            const container = document.getElementById('productComments');
+            if (container) {
+                container.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+            }
+        }
+    }
+
+    async loadServiceComments(serviceId) {
+        try {
+            const result = await this.makeApiRequest('get_service_comments', { id_service: serviceId });
+            
+            if (result.success) {
+                this.displayServiceComments(result.data);
+            } else {
+                console.error('Erreur lors du chargement des commentaires de service:', result.message);
+                const container = document.getElementById('serviceComments');
+                if (container) {
+                    container.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des commentaires de service:', error);
+            const container = document.getElementById('serviceComments');
+            if (container) {
+                container.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+            }
+        }
     }
 
     displayComments(comments, id, type) {
@@ -95,9 +177,155 @@ class JosNetFeatures {
                     <button onclick="josnetFeatures.replyToComment(${comment.id_commentaire})" class="reply-btn">
                         <i class="fas fa-reply"></i> Répondre
                     </button>
+                    <button onclick="josnetFeatures.editComment(${comment.id_commentaire})" class="edit-btn">
+                        <i class="fas fa-edit"></i> Editer
+                    </button>
+                    <button onclick="josnetFeatures.deleteComment(${comment.id_commentaire})" class="delete-btn">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
                 </div>
             </div>
         `;
+    }
+
+    displayProductComments(data) {
+        const container = document.getElementById('productComments');
+        if (!container) return;
+
+        let html = '';
+        
+        // Afficher la note moyenne si disponible
+        if (data.note_moyenne > 0) {
+            const stars = this.generateStars(Math.round(data.note_moyenne));
+            html += `
+                <div class="average-rating">
+                    <div class="rating-stars">${stars}</div>
+                    <span class="rating-text">${data.note_moyenne}/5 (${data.total} avis)</span>
+                </div>
+            `;
+        }
+        
+        if (data.commentaires && data.commentaires.length > 0) {
+            data.commentaires.forEach(comment => {
+                const stars = this.generateStars(comment.note);
+                const date = new Date(comment.date).toLocaleDateString('fr-FR');
+                const userPhoto = comment.utilisateur.photo ? 
+                    `<img src="../controle/uploads/utilisateurs/${comment.utilisateur.photo}" alt="Photo utilisateur" class="user-avatar">` :
+                    `<div class="user-avatar-placeholder"><i class="fas fa-user"></i></div>`;
+                
+                html += `
+                    <div class="comment-item" data-comment-id="${comment.id}">
+                        <div class="comment-header">
+                            <div class="user-info">
+                                ${userPhoto}
+                                <div class="user-details">
+                                    <span class="comment-author">${comment.utilisateur.prenom} ${comment.utilisateur.nom}</span>
+                                    <span class="comment-date">${date}</span>
+                                </div>
+                            </div>
+                            ${comment.note ? `<div class="comment-rating">${stars}</div>` : ''}
+                        </div>
+                        <div class="comment-content">${comment.commentaire}</div>
+                        <div class="comment-actions">
+                            <button onclick="josnetFeatures.replyToComment(${comment.id})" class="reply-btn">
+                                <i class="fas fa-reply"></i> Répondre
+                            </button>
+                            <button onclick="josnetFeatures.editComment(${comment.id})" class="edit-btn">
+                                <i class="fas fa-edit"></i> Editer
+                            </button>
+                            <button onclick="josnetFeatures.deleteComment(${comment.id})" class="delete-btn">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            html += '<p class="no-comments">Aucun avis pour ce produit.</p>';
+        }
+        
+        container.innerHTML = html;
+    }
+
+    displayServiceComments(data) {
+        const container = document.getElementById('serviceComments');
+        if (!container) return;
+
+        let html = '';
+        
+        // Afficher la note moyenne si disponible
+        if (data.note_moyenne > 0) {
+            const stars = this.generateStars(Math.round(data.note_moyenne));
+            html += `
+                <div class="average-rating">
+                    <div class="rating-stars">${stars}</div>
+                    <span class="rating-text">${data.note_moyenne}/5 (${data.total} avis)</span>
+                </div>
+            `;
+        }
+        
+        if (data.commentaires && data.commentaires.length > 0) {
+            data.commentaires.forEach(comment => {
+                const stars = this.generateStars(comment.note);
+                const date = new Date(comment.date).toLocaleDateString('fr-FR');
+                const userPhoto = comment.utilisateur.photo ? 
+                    `<img src="../controle/uploads/utilisateurs/${comment.utilisateur.photo}" alt="Photo utilisateur" class="user-avatar">` :
+                    `<div class="user-avatar-placeholder"><i class="fas fa-user"></i></div>`;
+                
+                html += `
+                    <div class="comment-item" data-comment-id="${comment.id}">
+                        <div class="comment-header">
+                            <div class="user-info">
+                                ${userPhoto}
+                                <div class="user-details">
+                                    <span class="comment-author">${comment.utilisateur.prenom} ${comment.utilisateur.nom}</span>
+                                    <span class="comment-date">${date}</span>
+                                </div>
+                            </div>
+                            ${comment.note ? `<div class="comment-rating">${stars}</div>` : ''}
+                        </div>
+                        <div class="comment-content">${comment.commentaire}</div>
+                        <div class="comment-actions">
+                            <button onclick="josnetFeatures.replyToComment(${comment.id})" class="reply-btn">
+                                <i class="fas fa-reply"></i> Répondre
+                            </button>
+                            <button onclick="josnetFeatures.editComment(${comment.id})" class="edit-btn">
+                                <i class="fas fa-edit"></i> Editer
+                            </button>
+                            <button onclick="josnetFeatures.deleteComment(${comment.id})" class="delete-btn">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            html += '<p class="no-comments">Aucun avis pour ce service.</p>';
+        }
+        
+        container.innerHTML = html;
+    }
+
+    // Méthode pour ajouter un commentaire de service
+    async addServiceComment(serviceId, rating, commentText) {
+        try {
+            const result = await this.makeApiRequest('add_service_comment', {
+                id_service: serviceId,
+                note: rating,
+                commentaire: commentText
+            });
+            
+            if (result.success) {
+                // Recharger les commentaires après ajout
+                this.loadServiceComments(serviceId);
+                return { success: true, message: result.message };
+            } else {
+                return { success: false, message: result.message };
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout du commentaire de service:', error);
+            return { success: false, message: 'Erreur lors de l\'ajout du commentaire' };
+        }
     }
 
     generateStars(rating) {

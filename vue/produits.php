@@ -750,11 +750,13 @@ unset($_SESSION['message_type']);
             backdrop-filter: blur(5px);
             opacity: 0;
             transition: opacity 0.3s ease;
+            align-items: center;
+            justify-content: center;
         }
 
         .product-details-modal.show {
             opacity: 1;
-            display: block;
+            display: flex !important;
         }
 
         .product-details-content {
@@ -1009,10 +1011,10 @@ unset($_SESSION['message_type']);
             position: fixed;
             top: 80px;
             right: 20px;
-            width: 300px;
+            width: 280px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             z-index: 1000;
             display: none;
             overflow: hidden;
@@ -1021,31 +1023,32 @@ unset($_SESSION['message_type']);
         .whatsapp-popup-header {
             background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .whatsapp-popup-header i {
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .whatsapp-popup-header h3 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
+            margin: 0;
         }
 
         .whatsapp-popup-content {
-            padding: 15px;
-            max-height: 300px;
+            padding: 12px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
         .whatsapp-popup-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
         }
 
@@ -1054,14 +1057,14 @@ unset($_SESSION['message_type']);
         }
 
         .whatsapp-popup-item-icon {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 10px;
+            font-size: 14px;
             color: #04221a;
         }
 
@@ -1072,21 +1075,22 @@ unset($_SESSION['message_type']);
         .whatsapp-popup-item-title {
             font-weight: 600;
             color: #04221a;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
+            font-size: 13px;
         }
 
         .whatsapp-popup-item-desc {
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
         }
 
         .whatsapp-popup-item-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
         }
 
         .whatsapp-popup-footer {
-            padding: 10px 15px;
+            padding: 8px 12px;
             text-align: center;
             background: #f9f9f9;
             border-top: 1px solid #eee;
@@ -1096,6 +1100,7 @@ unset($_SESSION['message_type']);
             color: #04221a;
             text-decoration: none;
             font-weight: 600;
+            font-size: 12px;
         }
 
         /* Badge for notifications */
@@ -1211,6 +1216,81 @@ unset($_SESSION['message_type']);
                 max-height: 250px;
             }
         }
+
+        /* Comments Section Styles - Original Design */
+        .comments-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .comments-section h4 {
+            color: #04221a;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comments-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #04221a;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #04221a;
+        }
+
+        .comment-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .comment-rating {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 8px;
+        }
+
+        .comment-rating .star {
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .comment-rating .star.empty {
+            color: #ddd;
+        }
+
+        .comment-text {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
     </style>
 </head>
 
@@ -1645,7 +1725,7 @@ unset($_SESSION['message_type']);
                     <div class="product-details-right">
                         <div class="comments-section">
                             <h4><i class="fas fa-comments"></i> Avis clients</h4>
-                            <div id="productComments" class="comments-list">
+                            <div id="productComments" class="comments-list" data-product-id="">
                                 <!-- Les commentaires seront chargés dynamiquement -->
                             </div>
                         </div>
@@ -1825,7 +1905,10 @@ unset($_SESSION['message_type']);
 
         // Fonction pour ouvrir le popup de détails produit
         function openProductDetails(productId) {
+            console.log('openProductDetails called with ID:', productId);
+            
             if (!productId) {
+                console.error('ID du produit manquant');
                 alert('Erreur: ID du produit manquant');
                 return;
             }
@@ -1833,7 +1916,11 @@ unset($_SESSION['message_type']);
             currentProductId = productId;
             const product = productsData[productId];
             
+            console.log('Product data:', product);
+            console.log('All products data:', productsData);
+            
             if (!product) {
+                console.error('Produit non trouvé pour ID:', productId);
                 alert('Erreur: Produit non trouvé');
                 return;
             }
@@ -1860,19 +1947,136 @@ unset($_SESSION['message_type']);
                 specsContainer.appendChild(specItem);
             }
             
+            // Mettre à jour l'ID du produit pour les commentaires
+            document.getElementById('productComments').setAttribute('data-product-id', productId);
+            
             // Charger les commentaires
-            loadProductComments(productId);
+            if (window.josnetFeatures && typeof window.josnetFeatures.loadProductComments === 'function') {
+                window.josnetFeatures.loadProductComments(productId);
+            } else {
+                console.warn('JosNetFeatures not loaded yet, will try to load comments after initialization');
+                // Attendre que JosNetFeatures soit chargé
+                setTimeout(() => {
+                    if (window.josnetFeatures && typeof window.josnetFeatures.loadProductComments === 'function') {
+                        window.josnetFeatures.loadProductComments(productId);
+                    } else {
+                        console.error('JosNetFeatures still not available, loading comments manually');
+                        // Charger les commentaires manuellement
+                        loadCommentsManually(productId);
+                    }
+                }, 500);
+            }
             
             // Afficher le modal
             const modal = document.getElementById('productDetailsModal');
-            modal.style.display = 'block';
+            console.log('Modal element:', modal);
+            
+            if (!modal) {
+                console.error('Modal element not found!');
+                alert('Erreur: Modal non trouvée');
+                return;
+            }
+            
+            modal.style.display = 'flex';
+            console.log('Modal display set to flex');
             
             // Animation d'ouverture
             setTimeout(() => {
                 modal.classList.add('show');
+                console.log('Show class added to modal');
             }, 10);
             
             modal.setAttribute('aria-hidden', 'false');
+        }
+
+        // Fonction pour charger les commentaires manuellement
+        async function loadCommentsManually(productId) {
+            const commentsContainer = document.getElementById('productComments');
+            if (!commentsContainer) return;
+            
+            commentsContainer.innerHTML = '<p class="no-comments">Chargement des commentaires...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_product_comments');
+                formData.append('id_produit', productId);
+                
+                const response = await fetch('../controle/api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayProductCommentsManually(result.data);
+                } else {
+                    commentsContainer.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des commentaires:', error);
+                commentsContainer.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+            }
+        }
+        
+        // Fonction pour afficher les commentaires manuellement
+        function displayProductCommentsManually(data) {
+            const container = document.getElementById('productComments');
+            if (!container) return;
+
+            let html = '';
+            
+            // Afficher la note moyenne si disponible
+            if (data.note_moyenne > 0) {
+                const stars = generateStarsManually(Math.round(data.note_moyenne));
+                html += `
+                    <div class="average-rating">
+                        <div class="rating-stars">${stars}</div>
+                        <span class="rating-text">${data.note_moyenne}/5 (${data.total} avis)</span>
+                    </div>
+                `;
+            }
+            
+            if (data.commentaires && data.commentaires.length > 0) {
+                data.commentaires.forEach(comment => {
+                    const stars = generateStarsManually(comment.note);
+                    const date = new Date(comment.date).toLocaleDateString('fr-FR');
+                    const userPhoto = comment.utilisateur.photo ? 
+                        `<img src="../controle/uploads/utilisateurs/${comment.utilisateur.photo}" alt="Photo utilisateur" class="user-avatar">` :
+                        `<div class="user-avatar-placeholder"><i class="fas fa-user"></i></div>`;
+                    
+                    html += `
+                        <div class="comment-item" data-comment-id="${comment.id}">
+                            <div class="comment-header">
+                                <div class="user-info">
+                                    ${userPhoto}
+                                    <div class="user-details">
+                                        <span class="comment-author">${comment.utilisateur.prenom} ${comment.utilisateur.nom}</span>
+                                        <span class="comment-date">${date}</span>
+                                    </div>
+                                </div>
+                                ${comment.note ? `<div class="comment-rating">${stars}</div>` : ''}
+                            </div>
+                            <div class="comment-content">${comment.commentaire}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p class="no-comments">Aucun avis pour ce produit.</p>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // Fonction pour générer les étoiles manuellement
+        function generateStarsManually(rating) {
+            if (!rating) return '';
+            
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += `<i class="fas fa-star ${i <= rating ? 'active' : ''}"></i>`;
+            }
+            return stars;
         }
 
         // Fonction pour fermer le popup de détails produit

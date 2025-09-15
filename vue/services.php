@@ -3,6 +3,9 @@
 <head>
     <?php
     session_start();
+    ?>
+    <?php
+    require_once 'session_client.php';
     include_once('../controle/controleur_formation.php');
     include_once('../controle/controleur_utilisateur.php');
     $utilisateur = new UtilisateurController();
@@ -855,17 +858,6 @@
 
         .no-comments {
             text-align: center;
-            color: #666;
-            font-style: italic;
-            padding: 40px 20px;
-        }
-
-        /* WhatsApp-like popup styles */
-        .whatsapp-popup {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 300px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -877,31 +869,32 @@
         .whatsapp-popup-header {
             background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .whatsapp-popup-header i {
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .whatsapp-popup-header h3 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
+            margin: 0;
         }
 
         .whatsapp-popup-content {
-            padding: 15px;
-            max-height: 300px;
+            padding: 12px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
         .whatsapp-popup-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
         }
 
@@ -910,14 +903,14 @@
         }
 
         .whatsapp-popup-item-icon {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 10px;
+            font-size: 14px;
             color: #04221a;
         }
 
@@ -928,21 +921,22 @@
         .whatsapp-popup-item-title {
             font-weight: 600;
             color: #04221a;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
+            font-size: 13px;
         }
 
         .whatsapp-popup-item-desc {
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
         }
 
         .whatsapp-popup-item-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
         }
 
         .whatsapp-popup-footer {
-            padding: 10px 15px;
+            padding: 8px 12px;
             text-align: center;
             background: #f9f9f9;
             border-top: 1px solid #eee;
@@ -952,6 +946,89 @@
             color: #04221a;
             text-decoration: none;
             font-weight: 600;
+            font-size: 12px;
+        }
+
+        /* User Profile Dropdown */
+        .user-profile-dropdown {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+
+        .profile-toggle {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            background: #04221a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            min-width: 250px;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s ease;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .profile-dropdown .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
         }
 
         /* Footer */
@@ -965,6 +1042,19 @@
         }
 
         /* Notifications */
+        .whatsapp-popup {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -1172,6 +1262,49 @@
 </head>
 
 <body>
+    <!-- User Profile Dropdown -->
+    <div class="user-profile-dropdown">
+        <?php if (isUserLoggedIn()): ?>
+            <?php $user = getCurrentClientUser(); ?>
+            <button class="profile-toggle" onclick="toggleProfileDropdown()">
+                <div class="profile-avatar">
+                    <?= strtoupper(substr($user['prenom'], 0, 1)) ?>
+                </div>
+                <span><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <strong><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></strong>
+                    <small><?= htmlspecialchars(ucfirst($user['role'])) ?></small>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    Mon Profil
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-shopping-bag"></i>
+                    Mes Commandes
+                </a>
+                <?php if ($user['role'] === 'admin'): ?>
+                    <a href="../Admin/dashboard.php" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Administration
+                    </a>
+                <?php endif; ?>
+                <a href="logout_client.php" class="dropdown-item logout" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Se déconnecter
+                </a>
+            </div>
+        <?php else: ?>
+            <a href="connexion.php" class="profile-toggle">
+                <i class="fas fa-sign-in-alt"></i>
+                Se connecter
+            </a>
+        <?php endif; ?>
+    </div>
+
     <!-- User Message Icons -->
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
@@ -1418,7 +1551,7 @@
                 </div>
                 
                 <div class="modal-body">
-                    <form method="post" id="commentForm">
+                    <form id="commentForm" onsubmit="return handleServiceCommentSubmission(event)">
                         <input type="hidden" name="action" value="ajouter_commentaire">
                         <input type="hidden" name="id_service" id="comment_service_id">
                         
@@ -1640,8 +1773,22 @@
                 specsContainer.appendChild(specItem);
             }
             
-            // Charger les commentaires
-            loadServiceComments(serviceId);
+            // Charger les commentaires avec fallback
+            if (window.josnetFeatures && typeof window.josnetFeatures.loadServiceComments === 'function') {
+                console.log('Chargement des commentaires via JosNetFeatures pour le service:', serviceId);
+                window.josnetFeatures.loadServiceComments(serviceId);
+            } else {
+                console.log('JosNetFeatures non disponible, utilisation du fallback manuel pour le service:', serviceId);
+                setTimeout(() => {
+                    if (window.josnetFeatures && typeof window.josnetFeatures.loadServiceComments === 'function') {
+                        console.log('Retry: Chargement des commentaires via JosNetFeatures pour le service:', serviceId);
+                        window.josnetFeatures.loadServiceComments(serviceId);
+                    } else {
+                        console.log('Fallback: Chargement manuel des commentaires pour le service:', serviceId);
+                        loadServiceCommentsManually(serviceId);
+                    }
+                }, 500);
+            }
             
             // Afficher le modal
             const modal = document.getElementById('serviceDetailsModal');
@@ -1668,41 +1815,96 @@
             }
         }
 
-        // Fonction pour charger les commentaires d'un service
-        function loadServiceComments(serviceId) {
+        // Fonction pour charger les commentaires d'un service manuellement
+        async function loadServiceCommentsManually(serviceId) {
             const commentsContainer = document.getElementById('serviceComments');
+            if (!commentsContainer) return;
             
-            // Pour cette version sans API, on simule des commentaires
-            commentsContainer.innerHTML = `
-                <div class="comment-item">
-                    <div class="comment-header">
-                        <span class="comment-author">Utilisateur #123</span>
-                        <span class="comment-date">15 juin 2023</span>
+            commentsContainer.innerHTML = '<p class="no-comments">Chargement des commentaires...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_service_comments');
+                formData.append('id_service', serviceId);
+                
+                const response = await fetch('../controle/api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayServiceCommentsManually(result.data);
+                } else {
+                    commentsContainer.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des commentaires:', error);
+                commentsContainer.innerHTML = '<p class="no-comments">Erreur lors du chargement des commentaires.</p>';
+            }
+        }
+        
+        // Fonction pour afficher les commentaires de service manuellement
+        function displayServiceCommentsManually(data) {
+            const container = document.getElementById('serviceComments');
+            if (!container) return;
+
+            let html = '';
+            
+            // Afficher la note moyenne si disponible
+            if (data.note_moyenne > 0) {
+                const stars = generateStarsManually(Math.round(data.note_moyenne));
+                html += `
+                    <div class="average-rating">
+                        <div class="rating-stars">${stars}</div>
+                        <span class="rating-text">${data.note_moyenne}/5 (${data.total} avis)</span>
                     </div>
-                    <div class="comment-rating">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star empty">★</span>
-                    </div>
-                    <div class="comment-text">Formation très complète et instructeur compétent. Je recommande!</div>
-                </div>
-                <div class="comment-item">
-                    <div class="comment-header">
-                        <span class="comment-author">Utilisateur #456</span>
-                        <span class="comment-date">10 juin 2023</span>
-                    </div>
-                    <div class="comment-rating">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star empty">★</span>
-                        <span class="star empty">★</span>
-                    </div>
-                    <div class="comment-text">Contenu intéressant mais le rythme était un peu trop rapide pour moi.</div>
-                </div>
-            `;
+                `;
+            }
+            
+            if (data.commentaires && data.commentaires.length > 0) {
+                data.commentaires.forEach(comment => {
+                    const stars = generateStarsManually(comment.note);
+                    const date = new Date(comment.date).toLocaleDateString('fr-FR');
+                    const userPhoto = comment.utilisateur.photo ? 
+                        `<img src="../controle/uploads/utilisateurs/${comment.utilisateur.photo}" alt="Photo utilisateur" class="user-avatar">` :
+                        `<div class="user-avatar-placeholder"><i class="fas fa-user"></i></div>`;
+                    
+                    html += `
+                        <div class="comment-item" data-comment-id="${comment.id}">
+                            <div class="comment-header">
+                                <div class="user-info">
+                                    ${userPhoto}
+                                    <div class="user-details">
+                                        <span class="comment-author">${comment.utilisateur.prenom} ${comment.utilisateur.nom}</span>
+                                        <span class="comment-date">${date}</span>
+                                    </div>
+                                </div>
+                                ${comment.note ? `<div class="comment-rating">${stars}</div>` : ''}
+                            </div>
+                            <div class="comment-content">${comment.commentaire}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p class="no-comments">Aucun avis pour ce service.</p>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // Fonction pour générer les étoiles manuellement
+        function generateStarsManually(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<span class="star filled">★</span>';
+                } else {
+                    stars += '<span class="star empty">★</span>';
+                }
+            }
+            return stars;
         }
 
         // Fonctions pour les actions depuis le popup de détails service
@@ -1940,6 +2142,24 @@
             }
         });
 
+        // Fonction pour toggle le dropdown profil
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Fermer le dropdown si on clique ailleurs
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const toggle = document.querySelector('.profile-toggle');
+            
+            if (dropdown && toggle && !toggle.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
         // Animation de hover pour les plateformes de partage
         document.addEventListener('DOMContentLoaded', function() {
             const shareButtons = document.querySelectorAll('.plateformes-partage button');
@@ -2010,6 +2230,113 @@
             document.getElementById('charCount').textContent = '0';
             document.querySelector('.char-counter').classList.remove('warning');
         }
+
+        // Fonction pour gérer la soumission du formulaire de commentaire de service
+        async function handleServiceCommentSubmission(event) {
+            event.preventDefault();
+            
+            const serviceId = document.getElementById('comment_service_id').value;
+            const rating = currentRating;
+            const commentText = document.getElementById('commentaire').value.trim();
+            
+            // Validation côté client
+            if (!rating || rating < 1 || rating > 5) {
+                alert('Veuillez sélectionner une note entre 1 et 5 étoiles.');
+                return false;
+            }
+            
+            if (!commentText || commentText.length < 10) {
+                alert('Votre commentaire doit contenir au moins 10 caractères.');
+                return false;
+            }
+            
+            if (!serviceId) {
+                alert('Erreur: ID du service manquant.');
+                return false;
+            }
+            
+            // Désactiver le bouton de soumission
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            
+            try {
+                let result;
+                
+                // Utiliser JosNetFeatures si disponible, sinon fallback manuel
+                if (window.josnetFeatures && typeof window.josnetFeatures.addServiceComment === 'function') {
+                    console.log('Ajout de commentaire via JosNetFeatures pour le service:', serviceId);
+                    result = await window.josnetFeatures.addServiceComment(serviceId, rating, commentText);
+                } else {
+                    console.log('JosNetFeatures non disponible, ajout manuel du commentaire pour le service:', serviceId);
+                    result = await addServiceCommentManually(serviceId, rating, commentText);
+                }
+                
+                if (result.success) {
+                    alert('Commentaire ajouté avec succès!');
+                    closeModal('commentModal');
+                    resetForm();
+                    
+                    // Recharger les commentaires si la modal de détails est ouverte
+                    if (currentServiceId === parseInt(serviceId)) {
+                        setTimeout(() => {
+                            if (window.josnetFeatures && typeof window.josnetFeatures.loadServiceComments === 'function') {
+                                window.josnetFeatures.loadServiceComments(serviceId);
+                            } else {
+                                loadServiceCommentsManually(serviceId);
+                            }
+                        }, 500);
+                    }
+                } else {
+                    alert('Erreur: ' + (result.message || 'Impossible d\'ajouter le commentaire'));
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout du commentaire:', error);
+                alert('Erreur lors de l\'ajout du commentaire. Veuillez réessayer.');
+            } finally {
+                // Réactiver le bouton
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+            
+            return false;
+        }
+
+        // Fonction manuelle pour ajouter un commentaire de service
+        async function addServiceCommentManually(serviceId, rating, commentText) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add_service_comment');
+                formData.append('id_service', serviceId);
+                formData.append('note', rating);
+                formData.append('commentaire', commentText);
+                
+                const response = await fetch('../controle/api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout manuel du commentaire:', error);
+                return { success: false, message: 'Erreur lors de l\'ajout du commentaire' };
+            }
+        }
+    </script>
+    <!-- Include JosNetFeatures for dynamic comment loading -->
+    <script src="javascript/features.js"></script>
+    <script>
+        // Initialize JosNetFeatures when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof JosNetFeatures !== 'undefined') {
+                window.josnetFeatures = new JosNetFeatures();
+                console.log('JosNetFeatures initialized for services page');
+            } else {
+                console.warn('JosNetFeatures class not found');
+            }
+        });
     </script>
 </body>
 </html>

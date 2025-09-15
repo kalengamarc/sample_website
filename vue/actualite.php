@@ -3,6 +3,7 @@
 <head>
     <?php
     session_start();
+    require_once 'session_client.php';
     include_once('../controle/controleur_formation.php');
     include_once('../controle/controleur_utilisateur.php');
     $utilisateur = new UtilisateurController();
@@ -10,9 +11,9 @@
     $listeFormation = $formations->getAllFormations();
     ?>
   
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Services - JosNet</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualités - JosNet</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -499,6 +500,88 @@
             border: 1px solid #f5c6cb;
         }
 
+        /* User Profile Dropdown */
+        .user-profile-dropdown {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+
+        .profile-toggle {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            background: #04221a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            min-width: 250px;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s ease;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .profile-dropdown .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -581,12 +664,12 @@
         /* WhatsApp-like popup styles */
         .whatsapp-popup {
             position: fixed;
-            bottom: 90px;
+            top: 80px;
             right: 20px;
-            width: 300px;
+            width: 280px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             z-index: 1000;
             display: none;
             overflow: hidden;
@@ -595,31 +678,32 @@
         .whatsapp-popup-header {
             background: linear-gradient(135deg, #04221a 0%, #2c5f2d 100%);
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .whatsapp-popup-header i {
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .whatsapp-popup-header h3 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
+            margin: 0;
         }
 
         .whatsapp-popup-content {
-            padding: 15px;
-            max-height: 300px;
+            padding: 12px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
         .whatsapp-popup-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
         }
 
@@ -628,14 +712,14 @@
         }
 
         .whatsapp-popup-item-icon {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 10px;
+            font-size: 14px;
             color: #04221a;
         }
 
@@ -646,21 +730,22 @@
         .whatsapp-popup-item-title {
             font-weight: 600;
             color: #04221a;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
+            font-size: 13px;
         }
 
         .whatsapp-popup-item-desc {
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
         }
 
         .whatsapp-popup-item-time {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
         }
 
         .whatsapp-popup-footer {
-            padding: 10px 15px;
+            padding: 8px 12px;
             text-align: center;
             background: #f9f9f9;
             border-top: 1px solid #eee;
@@ -670,6 +755,7 @@
             color: #04221a;
             text-decoration: none;
             font-weight: 600;
+            font-size: 12px;
         }
 
         /* Badge for notifications */
@@ -748,6 +834,49 @@
 </head>
 
 <body>
+    <!-- User Profile Dropdown -->
+    <div class="user-profile-dropdown">
+        <?php if (isUserLoggedIn()): ?>
+            <?php $user = getCurrentClientUser(); ?>
+            <button class="profile-toggle" onclick="toggleProfileDropdown()">
+                <div class="profile-avatar">
+                    <?= strtoupper(substr($user['prenom'], 0, 1)) ?>
+                </div>
+                <span><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <strong><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></strong>
+                    <small><?= htmlspecialchars(ucfirst($user['role'])) ?></small>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    Mon Profil
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-shopping-bag"></i>
+                    Mes Commandes
+                </a>
+                <?php if ($user['role'] === 'admin'): ?>
+                    <a href="../Admin/dashboard.php" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Administration
+                    </a>
+                <?php endif; ?>
+                <a href="logout_client.php" class="dropdown-item logout" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Se déconnecter
+                </a>
+            </div>
+        <?php else: ?>
+            <a href="connexion.php" class="profile-toggle">
+                <i class="fas fa-sign-in-alt"></i>
+                Se connecter
+            </a>
+        <?php endif; ?>
+    </div>
+
 <!-- User Message Icons -->
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
@@ -1413,8 +1542,7 @@
             });
         });
 
-        let activePopup = null;
-
+        // Gestion des popups
         function togglePopup(popupId) {
             const popup = document.getElementById(popupId);
             
@@ -1425,39 +1553,46 @@
                 }
             });
             
-            // Ouvrir ou fermer le popup actuel
+            // Toggle le popup demandé
             if (popup.style.display === 'block') {
                 popup.style.display = 'none';
-                activePopup = null;
             } else {
                 popup.style.display = 'block';
-                activePopup = popupId;
             }
         }
 
-        // Fermer les popups WhatsApp en cliquant à l'extérieur
-        document.addEventListener('click', function(e) {
-            if (activePopup) {
-                const popup = document.getElementById(activePopup);
-                const userMessageIcons = document.querySelector('.user_message');
-                
-                // Vérifier si le clic est en dehors du popup et des icônes
-                if (!popup.contains(e.target) && !userMessageIcons.contains(e.target)) {
+        // Fonction pour toggle le dropdown profil
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Fermer les popups en cliquant en dehors
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.user_message') && !event.target.closest('.whatsapp-popup')) {
+                document.querySelectorAll('.whatsapp-popup').forEach(popup => {
                     popup.style.display = 'none';
-                    activePopup = null;
-                }
+                });
+            }
+
+            // Fermer le dropdown profil si on clique ailleurs
+            const dropdown = document.getElementById('profileDropdown');
+            const toggle = document.querySelector('.profile-toggle');
+            
+            if (dropdown && toggle && !toggle.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
             }
         });
 
-        // Fermer avec la touche Échap
+        // Fermer les popups avec Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 // Fermer les popups WhatsApp
                 document.querySelectorAll('.whatsapp-popup').forEach(popup => {
                     popup.style.display = 'none';
                 });
-                
-                activePopup = null;
             }
         });
     </script>
