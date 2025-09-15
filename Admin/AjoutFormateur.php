@@ -1,3 +1,13 @@
+<?php
+// Vérification de session en premier
+require_once 'session_check.php';
+
+if (isset($_GET['resp'])) {
+    $isEdit = $_GET['resp'];
+}else {
+    $isEdit = null;
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,11 +17,6 @@
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
     <?php
-    if (isset($_GET['resp'])) {
-        $isEdit = $_GET['resp'];
-    }else {
-        $isEdit = null;
-    }
     
     ?>
     <style>
@@ -479,6 +484,16 @@ if ($isEdit) {
                                     <label for="specialite">Spécialité <span class="required">*</span></label>
                                     <input type="text" id="specialite" name="specialite" value="<?= $formateur ? $formateur->getSpecialite() : ($_POST['specialite'] ?? '') ?>" required>
                                     <div class="error_message" id="specialiteError"></div>
+                                </div>
+                                
+                                <div class="form_group">
+                                    <label for="id_formation">Formation <span class="required">*</span></label>
+                                    <select name="id_formation" id="id_formation">
+                                        <?php foreach($listeFormation['data'] as $list):?>
+                                        <option value="<?=$list->getIdFormation()?>" <?= ($formateur && $formateur->getIdFormation() == $list->getIdFormation()) ? 'selected' : (($list->getIdFormation() == 2) ? 'selected' : '') ?>><?=$list->getTitre()?></option>
+                                        <?php endforeach;?>
+                                    </select>
+                                    <div class="error_message" id="id_formationError"></div>
                                 </div>
                                 
                                 <div class="form_group">

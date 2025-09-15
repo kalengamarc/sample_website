@@ -1,17 +1,19 @@
+<?php
+// Vérification de session en premier
+require_once 'session_check.php';
+
+include_once '../controle/controleur_formation.php';
+include_once '../controle/controleur_utilisateur.php';
+$formation = new FormationController();
+$listeFormation = $formation->getAllFormations();
+$id = isset($_GET['resp']) ? $_GET['resp'] : null;
+$id = (int) $id;
+$participantController = new UtilisateurController();
+$participant = $participantController->getUtilisateur($id);
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <?php
-    include_once '../controle/controleur_formation.php';
-    include_once '../controle/controleur_utilisateur.php';
-    $formation = new FormationController();
-    $listeFormation = $formation->getAllFormations();
-    $id = isset($_GET['resp']) ? $_GET['resp'] : null;
-    $id = (int) $id;
-    $participantController = new UtilisateurController();
-    $participant = $participantController->getUtilisateur($id);
-    
-    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajouter un Participant</title>
@@ -486,7 +488,7 @@ if ($isEdit) {
                                     <label for="specialite">Formation <span class="required">*</span></label>
                                     <select name="id_formation" id="specialite">
                                         <?php foreach($listeFormation['data'] as $list):?>
-                                        <option value="<?=$list->getIdFormation()?>"><?=$list->getTitre()?></option>
+                                        <option value="<?=$list->getIdFormation()?>" <?= ($list->getIdFormation() == 2) ? 'selected' : '' ?>><?=$list->getTitre()?></option>
                                         <?php endforeach;?>
                                     </select>
                                     <div class="error_message" id="specialiteError"></div>

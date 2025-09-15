@@ -16,6 +16,8 @@ require_once '../controle/controleur_presence.php';
 require_once '../controle/controleur_produit.php';
 require_once '../controle/controleur.paiement.php';
 require_once '../controle/controleur_commentaire.php';
+require_once '../controle/controleur_favori.php';
+require_once '../controle/controleur_panier.php';
 
 // Inclure les modèles
 require_once __DIR__ . '/../modele/utilisateur.php';
@@ -136,7 +138,9 @@ try {
     $presenceController = new PresenceController();
     $produitController = new ProduitController();
     $detailCommandeController = new DetailCommandeController();
-    $CommentaireController = new CommentaireController();
+    $commentaireController = new CommentaireController();
+    $favoriController = new FavoriController();
+    $panierController = new PanierController();
 
     // Router les requêtes en fonction du paramètre "do"
     switch ($do) {
@@ -154,13 +158,59 @@ try {
             break;
 
         // Gestion des utilisateurs
-        case 'user_login':
+        case 'user_register':
+        // Inscription d'un nouvel utilisateur client
+        $nom = $data['nom'] ?? '';
+        $prenom = $data['prenom'] ?? '';
+        $email = $data['email'] ?? '';
+        $telephone = $data['telephone'] ?? '';
+        $password = $data['password'] ?? '';
+        $role = 'client'; // Force le rôle client
+        
+        if (!empty($nom) && !empty($prenom) && !empty($email) && !empty($password)) {
+            // Utiliser la même méthode que pour les formateurs mais avec rôle client
+            $result = $userController->createUtilisateur(
+                $nom,           // nom
+                $prenom,        // prenom  
+                $email,         // email
+                $password,      // password
+                $telephone,     // telephone
+                $role,          // role = 'client'
+                '',             // bio (vide pour les clients)
+                null,           // photo (null pour les clients)
+                '',             // specialite (vide pour les clients)
+                null            // id_formation (null pour les clients)
+            );
+            
+            if ($result['success']) {
+                // Redirection vers la page de connexion avec message de succès
+                header('Location: ../vue/connexion.php?message=Inscription réussie ! Vous pouvez maintenant vous connecter.&type=success');
+                exit();
+            } else {
+                // Redirection vers la page d'inscription avec message d'erreur
+                header('Location: ../vue/register.php?message=' . urlencode($result['message']) . '&type=error');
+                exit();
+            }
+        } else {
+            header('Location: ../vue/register.php?message=Tous les champs obligatoires doivent être remplis&type=error');
+            exit();
+        }
+        break;
+        
+    case 'user_login':
             $result = $userController->authenticate($data['email'] ?? '',$data['password'] ?? '');
             if ($result['success']) {
                 $_SESSION['user_id'] = $result['data']->getId();
                 $_SESSION['user_role'] = $result['data']->getRole();
                 $_SESSION['user_nom'] = $result['data']->getNom();
                 $_SESSION['user_prenom'] = $result['data']->getPrenom();
+                
+                // Ajouter l'URL de redirection basée sur le rôle
+                if ($result['data']->getRole() === 'admin') {
+                    $result['redirect_url'] = '../Admin/dashboard.php';
+                } else {
+                    $result['redirect_url'] = '../vue/produits.php';
+                }
             }
             sendJsonResponse($result);
             break;
@@ -368,7 +418,8 @@ try {
                 'formateur',
                 $data['bio'] ?? '',
                 $photoPath,
-                $data['specialite'] ?? ''
+                $data['specialite'] ?? '',
+                $data['id_formation'] ?? 2
             );
             
             // Debug: Log result
@@ -435,7 +486,9 @@ try {
                 $data['telephone'] ?? '',
                 'formateur',
                 $photoToUpdate, // null if no new photo, filepath if new photo
-                $data['bio'] ?? ''
+                $data['bio'] ?? '',
+                $data['specialite'] ?? '',
+                $data['id_formation'] ?? 2
             );
             
             error_log("DEBUG: Update result: " . print_r($result, true));
@@ -966,6 +1019,230 @@ try {
             checkAuthentication();
             $result = $detailCommandeController->getCommandeTotal($data['id_commande'] ?? 0);
             sendJsonResponse($result);
+            break;
+
+        // Gestion des commentaires
+        case 'comment_create':
+            checkAuthentication();
+            
+            // Check if data comes from session (form submission) or direct data
+            $commentData = $_SESSION['comment_data'] ?? [];
+            if (!empty($commentData)) {
+                unset($_SESSION['comment_data']);
+                $data = array_merge($data, $commentData);
+            }
+            
+            $result = $commentaireController->createCommentaire(
+                $_SESSION['user_id'],
+                $data['id_formation'] ?? null,
+                $data['id_produit'] ?? null,
+                $data['commentaire'] ?? '',
+                $data['note'] ?? null,
+                $data['parent_id'] ?? null
+            );
+            
+            // If it's a form submission, redirect back with message
+            if (!empty($commentData)) {
+                if ($result['success']) {
+                    $redirectUrl = '../vue/produits.php?message=' . urlencode('Commentaire ajouté avec succès!') . '&type=success';
+                } else {
+                    $redirectUrl = '../vue/produits.php?message=' . urlencode($result['message']) . '&type=error';
+                }
+                header('Location: ' . $redirectUrl);
+                exit();
+            }
+            
+            sendJsonResponse($result);
+            break;
+
+        case 'comment_get':
+            $result = $commentaireController->getCommentaire($data['id'] ?? 0);
+            sendJsonResponse($result);
+            break;
+
+        case 'comment_getByFormation':
+            $result = $commentaireController->getCommentairesByFormation($data['id_formation'] ?? 0);
+            sendJsonResponse($result);
+            break;
+
+        case 'comment_getByProduit':
+            $result = $commentaireController->getCommentairesByProduit($data['id_produit'] ?? 0);
+            sendJsonResponse($result);
+            break;
+
+        case 'comment_update':
+            checkAuthentication();
+            $result = $commentaireController->updateCommentaire(
+                $data['id'] ?? 0,
+                $data['commentaire'] ?? '',
+                $data['note'] ?? null
+            );
+            sendJsonResponse($result);
+            break;
+
+        case 'comment_delete':
+            checkAuthentication();
+            $result = $commentaireController->deleteCommentaire($data['id'] ?? 0);
+            sendJsonResponse($result);
+            break;
+
+        // Gestion des favoris
+        case 'favori_add':
+            checkAuthentication();
+            
+            // Check if data comes from session (form submission) or direct data
+            $favoriData = $_SESSION['favori_data'] ?? [];
+            if (!empty($favoriData)) {
+                unset($_SESSION['favori_data']);
+                $data = array_merge($data, $favoriData);
+            }
+            
+            $result = $favoriController->addToFavorites(
+                $_SESSION['user_id'],
+                $data['type'] ?? '',
+                $data['id_element'] ?? 0
+            );
+            
+            // If it's a form submission, redirect back with message
+            if (!empty($favoriData)) {
+                if ($result['success']) {
+                    $redirectUrl = '../vue/produits.php?message=' . urlencode('Produit ajouté aux favoris!') . '&type=success';
+                } else {
+                    $redirectUrl = '../vue/produits.php?message=' . urlencode($result['message']) . '&type=error';
+                }
+                header('Location: ' . $redirectUrl);
+                exit();
+            }
+            
+            sendJsonResponse($result);
+            break;
+
+        case 'favori_remove':
+            checkAuthentication();
+            $result = $favoriController->removeFromFavorites(
+                $_SESSION['user_id'],
+                $data['type'] ?? '',
+                $data['id_element'] ?? 0
+            );
+            sendJsonResponse($result);
+            break;
+
+        case 'favori_getByUser':
+            checkAuthentication();
+            $result = $favoriController->getUserFavorites($_SESSION['user_id']);
+            sendJsonResponse($result);
+            break;
+
+        case 'favori_check':
+            checkAuthentication();
+            $result = $favoriController->isFavorite(
+                $_SESSION['user_id'],
+                $data['type'] ?? '',
+                $data['id_element'] ?? 0
+            );
+            sendJsonResponse($result);
+            break;
+
+        // Gestion du panier
+        case 'panier_add':
+            checkAuthentication();
+            
+            // Check if data comes from session (form submission) or direct data
+            $panierData = $_SESSION['panier_data'] ?? [];
+            if (!empty($panierData)) {
+                unset($_SESSION['panier_data']);
+                $data = array_merge($data, $panierData);
+            }
+            
+            $result = $panierController->addToCart(
+                $_SESSION['user_id'],
+                $data['id_produit'] ?? 0,
+                $data['quantite'] ?? 1
+            );
+            
+            // If it's a form submission, redirect back with message
+            if (!empty($panierData)) {
+                if ($result['success']) {
+                    $redirectUrl = '../vue/produits.php?message=' . urlencode('Produit ajouté au panier!') . '&type=success';
+                } else {
+                    $redirectUrl = '../vue/produits.php?message=' . urlencode($result['message']) . '&type=error';
+                }
+                header('Location: ' . $redirectUrl);
+                exit();
+            }
+            
+            sendJsonResponse($result);
+            break;
+
+        case 'panier_update':
+            checkAuthentication();
+            $result = $panierController->updateQuantity(
+                $data['id_panier'] ?? 0,
+                $data['quantite'] ?? 1
+            );
+            sendJsonResponse($result);
+            break;
+
+        case 'panier_remove':
+            checkAuthentication();
+            $result = $panierController->removeFromCart($data['id_panier'] ?? 0);
+            sendJsonResponse($result);
+            break;
+
+        case 'panier_get':
+            checkAuthentication();
+            $result = $panierController->getCartItems($_SESSION['user_id']);
+            sendJsonResponse($result);
+            break;
+
+        case 'panier_clear':
+            checkAuthentication();
+            $result = $panierController->clearCart($_SESSION['user_id']);
+            sendJsonResponse($result);
+            break;
+
+        case 'panier_count':
+            checkAuthentication();
+            $result = $panierController->getCartCount($_SESSION['user_id']);
+            sendJsonResponse($result);
+            break;
+
+        // Gestion du partage
+        case 'share_generate':
+            $type = $data['type'] ?? ''; // 'produit' ou 'formation'
+            $id = $data['id'] ?? 0;
+            $platform = $data['platform'] ?? 'general'; // 'facebook', 'twitter', 'whatsapp', 'email', 'general'
+            
+            $shareData = [
+                'success' => true,
+                'data' => [
+                    'url' => $data['url'] ?? '',
+                    'title' => $data['title'] ?? '',
+                    'description' => $data['description'] ?? '',
+                    'image' => $data['image'] ?? '',
+                    'platform' => $platform
+                ]
+            ];
+            
+            // Générer les URLs de partage selon la plateforme
+            switch ($platform) {
+                case 'facebook':
+                    $shareData['data']['share_url'] = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($shareData['data']['url']);
+                    break;
+                case 'twitter':
+                    $shareData['data']['share_url'] = 'https://twitter.com/intent/tweet?url=' . urlencode($shareData['data']['url']) . '&text=' . urlencode($shareData['data']['title']);
+                    break;
+                case 'whatsapp':
+                    $shareData['data']['share_url'] = 'https://wa.me/?text=' . urlencode($shareData['data']['title'] . ' ' . $shareData['data']['url']);
+                    break;
+                case 'email':
+                    $shareData['data']['share_url'] = 'mailto:?subject=' . urlencode($shareData['data']['title']) . '&body=' . urlencode($shareData['data']['description'] . ' ' . $shareData['data']['url']);
+                    break;
+                default:
+                    $shareData['data']['share_url'] = $shareData['data']['url'];
+            }
+            
+            sendJsonResponse($shareData);
             break;
 
         // Page d'accueil par défaut

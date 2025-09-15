@@ -1,3 +1,7 @@
+<?php
+// Vérification de session en premier
+require_once 'session_check.php';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>

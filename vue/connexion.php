@@ -66,49 +66,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         // Si pas d'erreurs de validation, tentative de connexion
         if (empty($errors)) {
             try {
-                // Ici vous devriez inclure votre contrôleur d'authentification
+                // Utiliser le contrôleur d'authentification
                 include_once('../controle/controleur_utilisateur.php');
                 $authController = new UtilisateurController();
-                $result = $authController->getAllUtilisateurs(); // Remplacez par la méthode d'authentification appropriée
-                // je dois creer un tableau d'utilisateurs de test qui contient des emails et des mots de passe hachés
-                $valid_users = [];
-
-                if ($result['success'] && is_array($result['data'])) {
-                    foreach ($result['data'] as $user) {
-                        // Supposons que $user est un objet Utilisateur
-                        $valid_users[] = [
-                            'id' => $user->getId(),
-                            'email' => $user->getEmail(),
-                            'password_hash' => $user->getMotDePasse() // Déjà haché en base
-                        ];
-                    }
-                }
+                $authResult = $authController->authenticateUser($email, $password);
                 
-                // Vérification de l'utilisateur
-                $id = null;
-                $user_found = false;
-                foreach ($valid_users as $user) {
-                    if ($user['email'] === $email && password_verify($password, $user['password_hash'])) {
-                        $user_found = true;
-                        $id = $user['id'];
-                        break;
-                    }
-                }
-
-                
-                
-                // Simulation d'une vérification d'authentification
-                // Dans un vrai projet, vous vérifieriez en base de données
-                //$valid_users = [
-                   // 'admin@josnet.com' => password_hash('admin123', PASSWORD_DEFAULT),
-                   // 'user@josnet.com' => password_hash('user123', PASSWORD_DEFAULT),
-                  //  'test@josnet.com' => password_hash('test123', PASSWORD_DEFAULT)
-                //];
-                
-                if ($user_found) {
+                if ($authResult['success']) {
+                    $user = $authResult['data'];
                     // Connexion réussie
-                    $_SESSION['user_id'] = $id; // Dans un vrai projet, utilisez l'ID de la base de données
+                    $_SESSION['user_id'] = $user->getId(); 
                     $_SESSION['user_email'] = $email;
+                    $_SESSION['user_role'] = $user->getRole();
+                    $_SESSION['user_nom'] = $user->getNom();
+                    $_SESSION['user_prenom'] = $user->getPrenom();
                     $_SESSION['login_time'] = time();
                     
                     // Gestion du "Se souvenir de moi"
@@ -118,8 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         // Dans un vrai projet, stockez ce token en base de données
                     }
                     
-                    // Redirection après connexion réussie
-                    $redirect_url = isset($_GET['redirect']) ? $_GET['redirect'] : 'produits.php';
+                    // Redirection basée sur le rôle de l'utilisateur
+                    if (isset($_GET['redirect'])) {
+                        $redirect_url = $_GET['redirect'];
+                    } elseif ($user->getRole() === 'admin') {
+                        $redirect_url = '../Admin/dashboard.php';
+                    } else {
+                        $redirect_url = 'produits.php';
+                    }
+                    
                     header('Location: ' . $redirect_url);
                     exit();
                 } else {

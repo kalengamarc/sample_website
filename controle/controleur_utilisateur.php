@@ -108,6 +108,34 @@ class UtilisateurController {
     }
 
     /**
+     * Authentifier un utilisateur
+     */
+    public function authenticateUser(string $email, string $password): array {
+        try {
+            $utilisateur = $this->requeteUtilisateur->getUtilisateurByEmail($email);
+            
+            if (!$utilisateur) {
+                return ['success' => false, 'message' => 'Email ou mot de passe incorrect'];
+            }
+            
+            if (password_verify($password, $utilisateur->getMotDePasse())) {
+                // Connexion réussie - ne pas retourner le mot de passe
+                $utilisateur->setMotDePasse('');
+                return [
+                    'success' => true, 
+                    'message' => 'Connexion réussie',
+                    'data' => $utilisateur
+                ];
+            } else {
+                return ['success' => false, 'message' => 'Email ou mot de passe incorrect'];
+            }
+            
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Erreur: ' . $e->getMessage()];
+        }
+    }
+
+    /**
      * Gérer le téléchargement de fichier
      */
     private function handleFileUpload($file, $category): string {
@@ -184,7 +212,9 @@ class UtilisateurController {
         string $telephone,
         string $role,
         string $photo = null,
-        string $bio = null
+        string $bio = null,
+        string $specialite = null,
+        $id_formation = null
     ): array {
         try {
             $existingUtilisateur = $this->requeteUtilisateur->getUtilisateurById($id);
@@ -207,6 +237,8 @@ class UtilisateurController {
             $existingUtilisateur->setRole($role);
             if ($photo !== null) $existingUtilisateur->setPhoto($photo);
             if ($bio !== null) $existingUtilisateur->setBio($bio);
+            if ($specialite !== null) $existingUtilisateur->setSpecialite($specialite);
+            if ($id_formation !== null) $existingUtilisateur->setIdFormation($id_formation);
 
             if ($this->requeteUtilisateur->mettreAJourUtilisateur($existingUtilisateur)) {
                 $existingUtilisateur->setMotDePasse('');

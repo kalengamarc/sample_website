@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <?php
-session_start();
+require_once 'session_client.php';
 include_once('../controle/controleur_produit.php');
 $produitController = new ProduitController();
 $produitsResult = $produitController->getAllProduits();
@@ -14,64 +14,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         switch ($_POST['action']) {
             case 'ajouter_commentaire':
                 if (isset($_POST['id_produit'], $_POST['note'], $_POST['commentaire'])) {
-                    // Traiter l'ajout de commentaire
-                    $result = $produitController->ajouterCommentaire(
-                        $_POST['id_produit'],
-                        $_SESSION['user_id'] ?? 1, // ID utilisateur par défaut pour la démo
-                        $_POST['note'],
-                        $_POST['commentaire']
-                    );
-                    
-                    if ($result['success']) {
-                        $_SESSION['message'] = "Commentaire ajouté avec succès!";
-                        $_SESSION['message_type'] = "success";
-                    } else {
-                        $_SESSION['message'] = "Erreur: " . $result['message'];
-                        $_SESSION['message_type'] = "error";
-                    }
-                    
-                    // Rediriger pour éviter la resoumission du formulaire
-                    header("Location: ".$_SERVER['PHP_SELF']);
+                    // Rediriger vers le contrôleur principal pour traiter le commentaire
+                    $_SESSION['comment_data'] = [
+                        'id_produit' => $_POST['id_produit'],
+                        'commentaire' => $_POST['commentaire'],
+                        'note' => $_POST['note']
+                    ];
+                    header("Location: ../controle/index.php?do=comment_create");
                     exit();
                 }
                 break;
                 
             case 'ajouter_panier':
                 if (isset($_POST['id_produit'])) {
-                    // Ajouter au panier (stocké en session)
-                    if (!isset($_SESSION['panier'])) {
-                        $_SESSION['panier'] = [];
-                    }
-                    
-                    $_SESSION['panier'][] = $_POST['id_produit'];
-                    $_SESSION['message'] = "Produit ajouté au panier!";
-                    $_SESSION['message_type'] = "success";
-                    
-                    header("Location: ".$_SERVER['PHP_SELF']);
+                    // Rediriger vers le contrôleur principal pour traiter le panier
+                    $_SESSION['panier_data'] = [
+                        'id_produit' => $_POST['id_produit'],
+                        'quantite' => $_POST['quantite'] ?? 1
+                    ];
+                    header("Location: ../controle/index.php?do=panier_add");
                     exit();
                 }
                 break;
                 
             case 'ajouter_favoris':
                 if (isset($_POST['id_produit'])) {
-                    // Ajouter aux favoris (stocké en session)
-                    if (!isset($_SESSION['favoris'])) {
-                        $_SESSION['favoris'] = [];
-                    }
-                    
-                    $produitId = $_POST['id_produit'];
-                    if (in_array($produitId, $_SESSION['favoris'])) {
-                        // Retirer des favoris
-                        $_SESSION['favoris'] = array_diff($_SESSION['favoris'], [$produitId]);
-                        $_SESSION['message'] = "Produit retiré des favoris!";
-                    } else {
-                        // Ajouter aux favoris
-                        $_SESSION['favoris'][] = $produitId;
-                        $_SESSION['message'] = "Produit ajouté aux favoris!";
-                    }
-                    $_SESSION['message_type'] = "success";
-                    
-                    header("Location: ".$_SERVER['PHP_SELF']);
+                    // Rediriger vers le contrôleur principal pour traiter les favoris
+                    $_SESSION['favori_data'] = [
+                        'type' => 'produit',
+                        'id_element' => $_POST['id_produit']
+                    ];
+                    header("Location: ../controle/index.php?do=favori_add");
                     exit();
                 }
                 break;
@@ -79,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Récupérer les messages de session
-$message = $_SESSION['message'] ?? '';
-$message_type = $_SESSION['message_type'] ?? '';
+// Récupérer les messages depuis l'URL ou la session
+$message = $_GET['message'] ?? $_SESSION['message'] ?? '';
+$message_type = $_GET['type'] ?? $_SESSION['message_type'] ?? '';
 unset($_SESSION['message']);
 unset($_SESSION['message_type']);
 ?>
@@ -89,6 +62,7 @@ unset($_SESSION['message_type']);
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Produits - JosNet</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/features.css">
     <style>
         * {
             margin: 0;
@@ -168,14 +142,55 @@ unset($_SESSION['message_type']);
             box-shadow: 0 8px 20px rgba(4, 34, 26, 0.3);
         }
 
+        /* User Info Display */
+        .user-info-display {
+            position: fixed;
+            bottom: 180px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            z-index: 998;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .user-info-display .user-name {
+            font-weight: 600;
+            color: #04221a;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .user-info-display .logout-btn-floating {
+            background: #ffae2b;
+            color: #04221a;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .user-info-display .logout-btn-floating:hover {
+            background: #04221a;
+            color: #ffae2b;
+            transform: translateY(-2px);
+        }
+
         /* User Message Icons */
         .user_message {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 100;
             display: flex;
-            gap: 10px;
+            flex-direction: row;
+            gap: 15px;
+            z-index: 999;
         }
 
         .user_message a {
@@ -191,11 +206,110 @@ unset($_SESSION['message_type']);
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             cursor: pointer;
+            position: relative;
         }
 
         .user_message a:hover {
             transform: translateY(-2px);
             background: yellowgreen;
+        }
+
+        .user_message .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* User Profile Dropdown */
+        .user-profile-dropdown {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+
+        .profile-toggle {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            background: #04221a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            min-width: 250px;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s ease;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .profile-dropdown .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
         }
 
         /* Title Section */
@@ -893,7 +1007,7 @@ unset($_SESSION['message_type']);
         /* WhatsApp-like popup styles */
         .whatsapp-popup {
             position: fixed;
-            bottom: 90px;
+            top: 80px;
             right: 20px;
             width: 300px;
             background: white;
@@ -1101,6 +1215,50 @@ unset($_SESSION['message_type']);
 </head>
 
 <body>
+    <!-- User Profile Dropdown -->
+    <div class="user-profile-dropdown">
+        <?php if (isUserLoggedIn()): ?>
+            <?php $user = getCurrentClientUser(); ?>
+            <button class="profile-toggle" onclick="toggleProfileDropdown()">
+                <div class="profile-avatar">
+                    <?= strtoupper(substr($user['prenom'], 0, 1)) ?>
+                </div>
+                <span><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <strong><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']) ?></strong>
+                    <small><?= htmlspecialchars(ucfirst($user['role'])) ?></small>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    Mon Profil
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-shopping-bag"></i>
+                    Mes Commandes
+                </a>
+                <?php if ($user['role'] === 'admin'): ?>
+                    <a href="../Admin/dashboard.php" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Administration
+                    </a>
+                <?php endif; ?>
+                <a href="logout_client.php" class="dropdown-item logout" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Se déconnecter
+                </a>
+            </div>
+        <?php else: ?>
+            <a href="connexion.php" class="profile-toggle">
+                <i class="fas fa-sign-in-alt"></i>
+                Se connecter
+            </a>
+        <?php endif; ?>
+    </div>
+
+
     <!-- User Message Icons -->
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
@@ -1764,6 +1922,94 @@ unset($_SESSION['message_type']);
                     </div>
                     <div class="comment-text">Bon produit mais livraison un peu longue.</div>
                 </div>
+                <style>
+                    /* Profile toggle JavaScript */
+                    .profile-dropdown.show {
+                        opacity: 1 !important;
+                        visibility: visible !important;
+                        transform: translateY(0) !important;
+                    }
+                </style>
+                <head>
+                    <body>
+                        <!-- Messages d'alerte -->
+                        <?php if (!empty($message)): ?>
+                            <div class="alert alert-<?= $message_type === 'success' ? 'success' : 'danger' ?>" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 9999; padding: 15px 20px; border-radius: 8px; margin: 0;">
+                                <?= htmlspecialchars($message) ?>
+                                <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- User Profile Dropdown -->
+                        <?php if (isUserLoggedIn()): ?>
+                            <div class="user-profile-dropdown">
+                                <button class="profile-toggle" onclick="toggleProfileDropdown()">
+                                    <div class="profile-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;"><?= htmlspecialchars(getUserDisplayName()) ?></div>
+                                        <div style="font-size: 12px; color: #666;"><?= htmlspecialchars(getUserRole()) ?></div>
+                                    </div>
+                                    <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
+                                </button>
+                                <div class="profile-dropdown" id="profileDropdown">
+                                    <div class="dropdown-header">
+                                        <strong><?= htmlspecialchars(getUserDisplayName()) ?></strong>
+                                        <br><small style="color: #666;"><?= htmlspecialchars(getCurrentClientUser()['email']) ?></small>
+                                    </div>
+                                    <a href="profile.php" class="dropdown-item">
+                                        <i class="fas fa-user"></i>
+                                        Mon Profil
+                                    </a>
+                                    <a href="mes_commandes.php" class="dropdown-item">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        Mes Commandes
+                                    </a>
+                                    <?php if (getCurrentClientUser()['role'] === 'admin'): ?>
+                                    <a href="../Admin/dashboard.php" class="dropdown-item">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                        Administration
+                                    </a>
+                                    <?php endif; ?>
+                                    <a href="logout_client.php" class="dropdown-item logout" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        Se déconnecter
+                                    </a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="user-profile-dropdown">
+                                <a href="connexion.php" class="profile-toggle" style="text-decoration: none; color: inherit;">
+                                    <div class="profile-avatar">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 14px;">Se connecter</div>
+                                        <div style="font-size: 12px; color: #666;">Visiteur</div>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- User Message Icons -->
+                        <div class="user_message">
+                            <a href="#" onclick="openShareModal()" title="Partager">
+                                <i class="fas fa-share-alt"></i>
+                            </a>
+                            <a href="#" onclick="toggleFavorites()" title="Favoris">
+                                <i class="fas fa-heart"></i>
+                                <?php if (isset($_SESSION['favoris']) && count($_SESSION['favoris']) > 0): ?>
+                                    <span class="badge"><?= count($_SESSION['favoris']) ?></span>
+                                <?php endif; ?>
+                            </a>
+                            <a href="#" onclick="toggleCart()" title="Panier">
+                                <i class="fas fa-shopping-cart"></i>
+                                <?php if (isset($_SESSION['panier']) && count($_SESSION['panier']) > 0): ?>
+                                    <span class="badge"><?= count($_SESSION['panier']) ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </div>
             `;
         }
 
@@ -1951,6 +2197,29 @@ unset($_SESSION['message_type']);
             closeModal('shareModal');
         }
 
+        // Fonction pour toggle le dropdown de profil
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Fermer le dropdown si on clique ailleurs
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const toggle = document.querySelector('.profile-toggle');
+            
+            if (dropdown && !toggle.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Fonction pour confirmer la déconnexion
+        function confirmLogout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                window.location.href = 'logout_client.php';
+            }
+        }
+
         // Fermer les modales en cliquant en dehors
         window.addEventListener('click', function(event) {
             const modals = document.getElementsByClassName('modal');
@@ -2070,5 +2339,6 @@ unset($_SESSION['message_type']);
             document.querySelector('.char-counter').classList.remove('warning');
         }
     </script>
+    <script src="javascript/features.js"></script>
 </body>
 </html>

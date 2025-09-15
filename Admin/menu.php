@@ -1,11 +1,26 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Administratif</title>
-  <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
-  <style>
+<?php
+// Ne pas démarrer de session ici - elle doit être démarrée par la page principale
+
+// Fonction pour obtenir l'utilisateur actuel (si pas déjà définie)
+if (!function_exists('getCurrentUser')) {
+    function getCurrentUser() {
+        if (!isset($_SESSION['user_id'])) {
+            return null;
+        }
+        
+        return [
+            'id' => $_SESSION['user_id'],
+            'nom' => $_SESSION['user_nom'] ?? '',
+            'prenom' => $_SESSION['user_prenom'] ?? '',
+            'email' => $_SESSION['user_email'] ?? '',
+            'role' => $_SESSION['user_role'] ?? ''
+        ];
+    }
+}
+
+$currentUser = getCurrentUser();
+?>
+<style>
     /* Styles généraux */
     * {
       margin: 0;
@@ -213,11 +228,77 @@
       opacity: 1;
     }
     
+    /* Profil utilisateur */
+    .user-profile {
+      padding: 15px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: auto;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .user-avatar {
+      width: 35px;
+      height: 35px;
+      background: rgba(255, 174, 43, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-size: 16px;
+      color: #ffae2b;
+    }
+    
+    .user-details h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      color: white;
+    }
+    
+    .user-details p {
+      font-size: 12px;
+      margin: 2px 0 0;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .logout-btn {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(220, 53, 69, 0.2);
+      border: 1px solid rgba(220, 53, 69, 0.5);
+      color: #ff6b6b;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(220, 53, 69, 0.3);
+      border-color: #dc3545;
+      color: white;
+    }
+    
+    .logout-btn i {
+      margin-right: 6px;
+    }
+    
     /* Footer du menu */
     .menu-footer {
       padding: 15px 20px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 20px;
+      margin-top: 10px;
       text-align: center;
       font-size: 12px;
       color: rgba(255, 255, 255, 0.6);
@@ -455,10 +536,25 @@
             </li>
         </ul>
         
+        <!-- Profil utilisateur et déconnexion -->
+        <div class="user-profile">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h4><?= htmlspecialchars($currentUser['prenom'] . ' ' . $currentUser['nom']) ?></h4>
+                    <p><?= htmlspecialchars(ucfirst($currentUser['role'])) ?></p>
+                </div>
+            </div>
+            <a href="logout.php" class="logout-btn" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
+                <i class="fas fa-sign-out-alt"></i>
+                Se déconnecter
+            </a>
+        </div>
+        
         <div class="menu-footer">
             <p>JosNet Admin v1.0</p>
             <p>&copy; 2023 Tous droits réservés</p>
         </div>
     </div>
-</body>
-</html>

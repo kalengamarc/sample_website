@@ -1,3 +1,17 @@
+<?php
+// Vérification de session en premier
+require_once 'session_check.php';
+
+include_once('../controle/controleur_utilisateur.php');
+$userController = new UtilisateurController();
+$formateurs = $userController->getUtilisateursByRole('formateur');
+if (isset($_GET['resp'])) {
+    $isEdit = $_GET['resp'];
+}else {
+            $isEdit = 0;
+        }
+        
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,17 +20,6 @@
     <title>Ajouter une Formation</title>
     <link rel="stylesheet" href="../vue/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../vue/styles/stylemenu.css">
-    <?php
-        include_once('../controle/controleur_utilisateur.php');
-        $userController = new UtilisateurController();
-        $formateurs = $userController->getUtilisateursByRole('formateur');
-        if (isset($_GET['resp'])) {
-            $isEdit = $_GET['resp'];
-        }else {
-            $isEdit = 0;
-        }
-        
-    ?>
     <style>
         .header_dash {
             width: 100%;

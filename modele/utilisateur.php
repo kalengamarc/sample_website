@@ -195,10 +195,10 @@ class RequeteUtilisateur {
         return $utilisateurs;
     }
 
-    // ✅ Mise à jour avec photo et bio
+    // ✅ Mise à jour avec photo, bio, specialite et id_formation
     public function mettreAJourUtilisateur($utilisateur) {
         $sql = "UPDATE utilisateurs 
-                SET nom = ?, prenom = ?, email = ?, telephone = ?, role = ?, photo = ?, description = ?
+                SET nom = ?, prenom = ?, email = ?, telephone = ?, role = ?, photo = ?, description = ?, specialite = ?, id_formation = ?
                 WHERE id_utilisateur = ?";
         $stmt = $this->crud->prepare($sql);
         $params = [
@@ -209,6 +209,8 @@ class RequeteUtilisateur {
             $utilisateur->getRole(),
             $utilisateur->getPhoto(),
             $utilisateur->getDescription(),
+            $utilisateur->getSpecialite(),
+            $utilisateur->getIdFormation(),
             $utilisateur->getId()
         ];
         return $stmt->execute($params);
