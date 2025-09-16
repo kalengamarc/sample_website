@@ -1216,11 +1216,11 @@ try {
                 // Sinon, rediriger avec un message
                 if ($result['success']) {
                     $message = $type === 'formation' ? 'Formation ajoutée au panier !' : 'Produit ajouté au panier !';
-                    $redirectUrl = $type === 'formation' ? '../vue/formationpratique.php' : '../vue/produits.php';
+                    $redirectUrl = $type === 'formation' ? '../vue/services.php' : '../vue/produits.php';
                     $redirectUrl .= '?message=' . urlencode($message) . '&type=success';
                 } else {
-                    $redirectUrl = $type === 'formation' ? '../vue/formationpratique.php' : '../vue/produits.php';
-                    $redirectUrl .= '?message=' . urlencode($result['message']) . '&type=error';
+                    $redirectUrl = $type === 'formation' ? '../vue/services.php' : '../vue/produits.php';
+                    $redirectUrl .= '?message=' . urlencode($result['message'] ?? 'Une erreur est survenue') . '&type=error';
                 }
                 header('Location: ' . $redirectUrl);
                 exit();

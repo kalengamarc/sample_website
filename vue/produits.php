@@ -2,8 +2,11 @@
 <html lang="fr">
 <head>
 <?php
+
 require_once 'session_client.php';
 include_once('../controle/controleur_produit.php');
+include_once('../controle/controleur_utilisateur.php');
+$utilisateurController = new UtilisateurController();
 $produitController = new ProduitController();
 $produitsResult = $produitController->getAllProduits();
 $produits = $produitsResult['success'] ? $produitsResult['data'] : [];
@@ -57,6 +60,11 @@ $message = $_GET['message'] ?? $_SESSION['message'] ?? '';
 $message_type = $_GET['type'] ?? $_SESSION['message_type'] ?? '';
 unset($_SESSION['message']);
 unset($_SESSION['message_type']);
+
+include_once("../controle/controleur_panier.php");
+
+$panierController = new PanierController();
+$panier = $panierController->getCart($_SESSION['user_id']);
 ?>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -1343,7 +1351,7 @@ unset($_SESSION['message_type']);
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
-            <span class="badge"><?= count($_SESSION['panier'] ?? []) ?></span>
+            <span class="badge"><?=$panier['count']?></span>
         </a>
         <a href="#" title="Notifications" onclick="togglePopup('notificationPopup'); return false;">
             <i class="icon fas fa-bell"></i>
@@ -1361,39 +1369,67 @@ unset($_SESSION['message_type']);
             <h3>Votre Panier</h3>
         </div>
         <div class="whatsapp-popup-content">
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
+
+        <?php if (!empty($panier['data'])): ?>
+            <?php 
+            $totalPanier = 0;
+            foreach($panier['data'] as $paniers): 
+                // Calcul du sous-total pour chaque article
+                $sousTotal = ($paniers['prix'] ?? 0) * ($paniers['quantite'] ?? 1);
+                $totalPanier += $sousTotal;
+                
+                if($paniers['type'] == 'produit'): ?>
+                    <div class="whatsapp-popup-item">
+                        <div class="whatsapp-popup-item-icon">
+                            <i class="fas fa-headphones"></i>
+                        </div>
+                        <div class="whatsapp-popup-item-content">
+                            <div class="whatsapp-popup-item-title"><?= htmlspecialchars($paniers['nom'] ?? '') ?></div>
+                            <div class="whatsapp-popup-item-desc">
+                                <?= number_format($paniers['prix'] ?? 0, 0, ',', ' ') ?> fbu x <?= (int)($paniers['quantite'] ?? 1) ?>
+                            </div>
+                        </div>
+                        <div class="whatsapp-popup-item-time">
+                            <?= number_format($sousTotal, 0, ',', ' ') ?> fbu
+                        </div>
+                    </div>
+                <?php else: // Type formation ?>
+                    <div class="whatsapp-popup-item">
+                        <div class="whatsapp-popup-item-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="whatsapp-popup-item-content">
+                            <div class="whatsapp-popup-item-title"><?= htmlspecialchars($paniers['titre'] ?? '') ?></div>
+                            <div class="whatsapp-popup-item-desc">
+                                <?= htmlspecialchars(mb_substr($paniers['description'] ?? '', 0, 30)) ?>...
+                            </div>
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= number_format($sousTotal, 0, ',', ' ') ?> fbu
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            
+            <!-- Ligne du total -->
+            <div class="whatsapp-popup-item" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 5px;">
                 <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">iPhone 13 Pro</div>
-                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
+                    <div class="whatsapp-popup-item-title" style="font-weight: bold;">Total</div>
                 </div>
-                <div class="whatsapp-popup-item-time">999€</div>
+                <div class="whatsapp-popup-item-time" style="font-weight: bold;">
+                    <?= number_format($totalPanier, 0, ',', ' ') ?> fbu
+                </div>
             </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
-                    <i class="fas fa-headphones"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Écouteurs Bluetooth</div>
-                    <div class="whatsapp-popup-item-desc">Quantité: 2</div>
-                </div>
-                <div class="whatsapp-popup-item-time">79€</div>
+            
+        <?php else: ?>
+            <div style="padding: 20px; text-align: center; color: #666;">
+                <i class="fas fa-shopping-cart" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                Votre panier est vide
             </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Protection Écran</div>
-                    <div class="whatsapp-popup-item-desc">Quantité: 1</div>
-                </div>
-                <div class="whatsapp-popup-item-time">19€</div>
-            </div>
+        <?php endif; ?>
         </div>
         <div class="whatsapp-popup-footer">
-            <a href="#">Total: 1176€ | Voir le panier complet</a>
+            <a href="#">Total: <?= number_format($totalPanier, 0, ',', ' ') ?> fbu | Voir le panier complet</a>
         </div>
     </div>
 
@@ -1455,42 +1491,67 @@ unset($_SESSION['message_type']);
             <h3>Mon Profil</h3>
         </div>
         <div class="whatsapp-popup-content">
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
-                    <i class="fas fa-user-circle" style="color: #04221a;"></i>
+            <?php 
+            // Débogage
+            $user = $utilisateurController->getUtilisateur($_SESSION['user_id']);
+            ?>  
+            <?php if (isset($user['data']) && is_object($user['data'])): ?>
+                <!-- Informations personnelles -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                        <i class="fas fa-user" style="color: #1890ff;"></i>
+                    </div>
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-title">
+                            <?= htmlspecialchars($user['data']->getPrenom() ?? '') ?> 
+                            <?= htmlspecialchars($user['data']->getNom() ?? '') ?>
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= htmlspecialchars($user['data']->getRole() ?? 'Utilisateur') ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Jean Dupont</div>
-                    <div class="whatsapp-popup-item-desc">Membre depuis: Jan 2023</div>
+
+                <!-- Email -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                        <i class="fas fa-envelope" style="color: #52c41a;"></i>
+                    </div>
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-title">
+                            <?= htmlspecialchars($user['data']->getEmail() ?? '') ?>
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= method_exists($user['data'], 'isVerified') && $user['data']->isVerified() ? 'Email vérifié' : 'Email non vérifié' ?>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
-                    <i class="fas fa-envelope" style="color: #1890ff;"></i>
+
+                <!-- Date d'inscription -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
+                        <i class="fas fa-calendar-alt" style="color: #fa8c16;"></i>
+                    </div>
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-title">
+                            Membre depuis
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= date('d/m/Y', strtotime($user['data']->getDateCreation() ?? 'now')) ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">jean.dupont@email.com</div>
-                    <div class="whatsapp-popup-item-desc">Adresse email vérifiée</div>
+            <?php else: ?>
+                <!-- Message d'erreur si les données ne sont pas chargées -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-desc" style="text-align: center; padding: 20px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #ff4d4f; font-size: 24px; display: block; margin-bottom: 10px;"></i>
+                            Impossible de charger les informations du profil
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
-                    <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Paris, France</div>
-                    <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
-                </div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
-                    <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">12 Commandes</div>
-                    <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
         <div class="whatsapp-popup-footer">
             <a href="#">Modifier le profil</a>

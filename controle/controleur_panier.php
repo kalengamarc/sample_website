@@ -143,7 +143,7 @@ class PanierController {
             // Récupérer les détails de chaque produit si demandé
             if ($details) {
                 foreach ($panierProduits as $item) {
-                    $produit = $this->crudProduit->getById($item->getIdProduit());
+                    $produit = $this->crudProduit->getProduitById($item->getIdProduit());
                     if ($produit) {
                         $sousTotal = $produit->getPrix() * $item->getQuantite();
                         $produitsDetails[] = [
