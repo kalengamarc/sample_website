@@ -406,9 +406,9 @@ class FavoriController {
     private function checkElementExists(string $type, int $id_element): array {
         try {
             if ($type === 'formation') {
-                $element = $this->crudFormation->getById($id_element);
+                $element = $this->crudFormation->getFormationById($id_element);
             } else {
-                $element = $this->crudProduit->getById($id_element);
+                $element = $this->crudProduit->getProduitById($id_element);
             }
 
             if (!$element) {
@@ -443,7 +443,7 @@ class FavoriController {
                 $id_element = $favori->getAssociatedId();
 
                 if ($type === 'formation') {
-                    $formation = $this->crudFormation->getById($id_element);
+                    $formation = $this->crudFormation->getFormation($id_element);
                     if ($formation) {
                         $details = [
                             'id' => $formation->getIdFormation(),
@@ -455,7 +455,7 @@ class FavoriController {
                         ];
                     }
                 } else {
-                    $produit = $this->crudProduit->getById($id_element);
+                    $produit = $this->crudProduit->getProduitById($id_element);
                     if ($produit) {
                         $details = [
                             'id' => $produit->getIdProduit(),
@@ -492,7 +492,7 @@ class FavoriController {
 
         foreach ($favoris as $favori) {
             try {
-                $formation = $this->crudFormation->getById($favori->getIdFormation());
+                $formation = $this->crudFormation->getFormation($favori->getIdFormation());
                 if ($formation) {
                     $result[] = [
                         'favori' => $favori,

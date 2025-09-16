@@ -72,7 +72,12 @@ class RequeteFormation {
         return $stmt->execute($params);
     }
 
-    // ✅ Récupérer une formation par ID
+    // Récupérer une formation par ID (alias de getFormationById pour la compatibilité)
+    public function getById($id) {
+        return $this->getFormationById($id);
+    }
+
+    // Récupérer une formation par ID
     public function getFormationById($id) {
         $sql = "SELECT * FROM formations WHERE id_formation = ?";
         $stmt = $this->crud->prepare($sql);
@@ -84,7 +89,7 @@ class RequeteFormation {
         return null;
     }
 
-    // ✅ Récupérer toutes les formations
+    // Récupérer toutes les formations
     public function getAllFormations() {
         $sql = "SELECT * FROM formations ORDER BY date_creation DESC";
         $stmt = $this->crud->query($sql);

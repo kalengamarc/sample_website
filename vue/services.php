@@ -8,8 +8,10 @@
     require_once 'session_client.php';
     include_once('../controle/controleur_formation.php');
     include_once('../controle/controleur_utilisateur.php');
+    include_once('../controle/controleur_favori.php');
     $utilisateur = new UtilisateurController();
     $formations = new FormationController();
+    $favoriController = new FavoriController();
     $listeFormation = $formations->getAllFormations();
     
     // Traitement des actions sans API
@@ -66,22 +68,32 @@
                     
                 case 'ajouter_favoris':
                     if (isset($_POST['id_service'])) {
-                        // Ajouter aux favoris (stocké en session)
-                        if (!isset($_SESSION['favoris'])) {
-                            $_SESSION['favoris'] = [];
+                        // Vérifier si l'utilisateur est connecté
+                        if (!isset($_SESSION['user_id'])) {
+                            $_SESSION['message'] = "Vous devez être connecté pour ajouter aux favoris.";
+                            $_SESSION['message_type'] = "error";
+                            header("Location: connexion.php");
+                            exit();
                         }
                         
                         $serviceId = $_POST['id_service'];
-                        if (in_array($serviceId, $_SESSION['favoris'])) {
+                        $type = 'formation'; // Le type est toujours 'formation' pour les services
+                        
+                        // Vérifier si l'élément est déjà dans les favoris
+                        $isFavorite = $favoriController->isFavorite($_SESSION['user_id'], $type, $serviceId);
+                        
+                        if ($isFavorite['success'] && $isFavorite['is_favorite']) {
                             // Retirer des favoris
-                            $_SESSION['favoris'] = array_diff($_SESSION['favoris'], [$serviceId]);
-                            $_SESSION['message'] = "Service retiré des favoris!";
+                            $result = $favoriController->removeFromFavorites($_SESSION['user_id'], $type, $serviceId);
+                            $message = $result['success'] ? "Service retiré des favoris!" : $result['message'];
                         } else {
                             // Ajouter aux favoris
-                            $_SESSION['favoris'][] = $serviceId;
-                            $_SESSION['message'] = "Service ajouté aux favoris!";
+                            $result = $favoriController->addToFavorites($_SESSION['user_id'], $type, $serviceId);
+                            $message = $result['success'] ? "Service ajouté aux favoris!" : $result['message'];
                         }
-                        $_SESSION['message_type'] = "success";
+                        
+                        $_SESSION['message'] = $message;
+                        $_SESSION['message_type'] = $result['success'] ? "success" : "error";
                         
                         header("Location: ".$_SERVER['PHP_SELF']);
                         exit();
@@ -1517,11 +1529,20 @@
                                         <button type="submit" class="icon fas fa-shopping-cart" title="Ajouter au panier">
                                         </button>
                                     </form>
-                                    <form method="post" style="display: inline;">
-                                        <input type="hidden" name="action" value="ajouter_favoris">
-                                        <input type="hidden" name="id_service" value="<?=$formation->getIdFormation()?>">
-                                        <button type="submit" class="icon fas fa-star <?= in_array($formation->getIdFormation(), $_SESSION['favoris'] ?? []) ? 'favori-actif' : '' ?>" 
-                                                title="<?= in_array($formation->getIdFormation(), $_SESSION['favoris'] ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                                    <?php
+                                    // Vérifier si l'utilisateur est connecté et si l'élément est dans les favoris
+                                    $isFavorite = false;
+                                    if (isset($_SESSION['user_id'])) {
+                                        $checkFavorite = $favoriController->isFavorite($_SESSION['user_id'], 'formation', $formation->getIdFormation());
+                                        $isFavorite = $checkFavorite['success'] && $checkFavorite['is_favorite'];
+                                    }
+                                    ?>
+                                    <form method="post" action="../controle/index.php" style="display: inline;">
+                                        <input type="hidden" name="do" value="toggle_favorite">
+                                        <input type="hidden" name="type" value="formation">
+                                        <input type="hidden" name="id_element" value="<?=$formation->getIdFormation()?>">
+                                        <button type="submit" class="icon fas fa-star <?= $isFavorite ? 'favori-actif' : '' ?>" 
+                                                title="<?= $isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
                                         </button>
                                     </form>
                                     <button class="icon fas fa-share" 
@@ -1657,11 +1678,21 @@
                                         <i class="fas fa-shopping-cart"></i> Ajouter au panier
                                     </button>
                                 </form>
-                                <form method="post" style="display: inline;">
-                                    <input type="hidden" name="action" value="ajouter_favoris">
-                                    <input type="hidden" name="id_service" id="details_favoris_id">
+                                <?php
+                                // Vérifier si l'utilisateur est connecté et si l'élément est dans les favoris
+                                $isFavoriteDetails = false;
+                                if (isset($_SESSION['user_id'])) {
+                                    $checkFavoriteDetails = $favoriController->isFavorite($_SESSION['user_id'], 'formation', $formation->getIdFormation());
+                                    $isFavoriteDetails = $checkFavoriteDetails['success'] && $checkFavoriteDetails['is_favorite'];
+                                }
+                                ?>
+                                <form method="post" action="../controle/index.php" style="display: inline;">
+                                    <input type="hidden" name="do" value="toggle_favorite">
+                                    <input type="hidden" name="type" value="formation">
+                                    <input type="hidden" name="id_element" id="details_favoris_id" value="<?=$formation->getIdFormation()?>">
                                     <button type="submit" class="btn-details">
-                                        <i class="fas fa-star"></i> Ajouter aux favoris
+                                        <i class="fas fa-star <?= $isFavoriteDetails ? 'favori-actif' : '' ?>"></i> 
+                                        <?= $isFavoriteDetails ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>
                                     </button>
                                 </form>
                                 <button class="btn-details" onclick="openShareModalFromServiceDetails()">
