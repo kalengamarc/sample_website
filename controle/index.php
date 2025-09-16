@@ -1087,34 +1087,35 @@ try {
             break;
 
         // Gestion des favoris
-        case 'favori_add':
+        case 'add_to_favorites':
             checkAuthentication();
             
-            // Check if data comes from session (form submission) or direct data
-            $favoriData = $_SESSION['favori_data'] ?? [];
-            if (!empty($favoriData)) {
-                unset($_SESSION['favori_data']);
-                $data = array_merge($data, $favoriData);
-            }
+            $type = $data['type'] ?? '';
+            $id_element = $data['id_element'] ?? 0;
             
             $result = $favoriController->addToFavorites(
                 $_SESSION['user_id'],
-                $data['type'] ?? '',
-                $data['id_element'] ?? 0
+                $type,
+                $id_element
             );
             
-            // If it's a form submission, redirect back with message
-            if (!empty($favoriData)) {
+            // Si la requête vient d'un appel AJAX, renvoyer la réponse JSON
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                sendJsonResponse($result);
+            } else {
+                // Sinon, rediriger avec un message
                 if ($result['success']) {
-                    $redirectUrl = '../vue/produits.php?message=' . urlencode('Produit ajouté aux favoris!') . '&type=success';
+                    $message = $type === 'formation' ? 'Formation ajoutée aux favoris !' : 'Produit ajouté aux favoris !';
+                    $redirectUrl = $type === 'formation' ? '../vue/formationpratique.php' : '../vue/produits.php';
+                    $redirectUrl .= '?message=' . urlencode($message) . '&type=success';
                 } else {
-                    $redirectUrl = '../vue/produits.php?message=' . urlencode($result['message']) . '&type=error';
+                    $redirectUrl = $type === 'formation' ? '../vue/formationpratique.php' : '../vue/produits.php';
+                    $redirectUrl .= '?message=' . urlencode($result['message']) . '&type=error';
                 }
                 header('Location: ' . $redirectUrl);
                 exit();
             }
             
-            sendJsonResponse($result);
             break;
 
         case 'favori_remove':
@@ -1143,8 +1144,90 @@ try {
             sendJsonResponse($result);
             break;
 
+        case 'toggle_favorite':
+            checkAuthentication();
+            
+            $type = $data['type'] ?? '';
+            $id_element = $data['id_element'] ?? 0;
+            
+            // Vérifier d'abord si l'élément est déjà dans les favoris
+            $checkFavorite = $favoriController->isFavorite(
+                $_SESSION['user_id'],
+                $type,
+                $id_element
+            );
+            
+            if ($checkFavorite['success'] && $checkFavorite['is_favorite']) {
+                // Si l'élément est déjà dans les favoris, le retirer
+                $result = $favoriController->removeFromFavorites(
+                    $_SESSION['user_id'],
+                    $type,
+                    $id_element
+                );
+                if ($result['success']) {
+                    $result['action'] = 'removed';
+                    $result['message'] = $type === 'formation' ? 'Formation retirée des favoris.' : 'Produit retiré des favoris.';
+                }
+            } else {
+                // Sinon, l'ajouter aux favoris
+                $result = $favoriController->addToFavorites(
+                    $_SESSION['user_id'],
+                    $type,
+                    $id_element
+                );
+                if ($result['success']) {
+                    $result['action'] = 'added';
+                    $result['message'] = $type === 'formation' ? 'Formation ajoutée aux favoris !' : 'Produit ajouté aux favoris !';
+                }
+            }
+            
+            // Si la requête vient d'un appel AJAX, renvoyer la réponse JSON
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                sendJsonResponse($result);
+            } else {
+                // Sinon, rediriger avec un message
+                $redirectUrl = $type === 'formation' ? '../vue/services.php' : '../vue/produits.php';
+                $messageType = $result['success'] ? 'success' : 'error';
+                $redirectUrl .= '?message=' . urlencode($result['message'] ?? 'Une erreur est survenue.') . '&type=' . $messageType;
+                header('Location: ' . $redirectUrl);
+                exit();
+            }
+            break;
+
         // Gestion du panier
-        case 'panier_add':
+        case 'add_to_cart':
+            checkAuthentication();
+            
+            $type = $data['type'] ?? 'produit'; // Par défaut à 'produit' pour la rétrocompatibilité
+            $id_element = $data['id_element'] ?? 0;
+            $quantite = $data['quantite'] ?? 1;
+            
+            $result = $panierController->addToCart(
+                $_SESSION['user_id'],
+                $type,
+                $id_element,
+                $quantite
+            );
+            
+            // Si la requête vient d'un appel AJAX, renvoyer la réponse JSON
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                sendJsonResponse($result);
+            } else {
+                // Sinon, rediriger avec un message
+                if ($result['success']) {
+                    $message = $type === 'formation' ? 'Formation ajoutée au panier !' : 'Produit ajouté au panier !';
+                    $redirectUrl = $type === 'formation' ? '../vue/services.php' : '../vue/produits.php';
+                    $redirectUrl .= '?message=' . urlencode($message) . '&type=success';
+                } else {
+                    $redirectUrl = $type === 'formation' ? '../vue/services.php' : '../vue/produits.php';
+                    $redirectUrl .= '?message=' . urlencode($result['message'] ?? 'Une erreur est survenue') . '&type=error';
+                }
+                header('Location: ' . $redirectUrl);
+                exit();
+            }
+            break;
+            
+        case 'panier_add': // Ancien cas conservé pour la rétrocompatibilité
             checkAuthentication();
             
             // Check if data comes from session (form submission) or direct data
@@ -1156,6 +1239,7 @@ try {
             
             $result = $panierController->addToCart(
                 $_SESSION['user_id'],
+                'produit', // Type par défaut pour l'ancienne méthode
                 $data['id_produit'] ?? 0,
                 $data['quantite'] ?? 1
             );
@@ -1185,7 +1269,17 @@ try {
 
         case 'panier_remove':
             checkAuthentication();
-            $result = $panierController->removeFromCart($data['id_panier'] ?? 0);
+            $type = $data['type'] ?? 'produit';
+            $id_element = $data['id_element'] ?? 0;
+            
+            if (empty($id_element)) {
+                // Ancienne méthode avec ID panier direct (pour la rétrocompatibilité)
+                $result = $panierController->removeFromCart($_SESSION['user_id'], 'produit', $data['id_panier'] ?? 0);
+            } else {
+                // Nouvelle méthode avec type et ID élément
+                $result = $panierController->removeFromCart($_SESSION['user_id'], $type, $id_element);
+            }
+            
             sendJsonResponse($result);
             break;
 

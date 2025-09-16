@@ -7,10 +7,37 @@
     <?php
     require_once 'session_client.php';
     include_once('../controle/controleur_formation.php');
-    include_once('../controle/controleur_utilisateur.php');
-    $utilisateur = new UtilisateurController();
+    // Inclure les contrôleurs nécessaires
+    require_once('../controle/controleur_utilisateur.php');
+    require_once('../controle/controleur_formation.php');
+    require_once('../controle/controleur_favori.php');
+    
+    // Initialiser les contrôleurs
+    $utilisateurController = new UtilisateurController();
     $formations = new FormationController();
+    $favoriController = new FavoriController();
     $listeFormation = $formations->getAllFormations();
+
+    // Récupérer les informations de l'utilisateur connecté
+    $user = [];
+    if (isset($_SESSION['user_id'])) {
+        try {
+            error_log("Tentative de récupération des infos utilisateur pour l'ID: " . $_SESSION['user_id']);
+            $user = $utilisateurController->getUtilisateur((int)$_SESSION['user_id']);
+            
+            if (!$user || !$user['success']) {
+                error_log("Erreur lors de la récupération de l'utilisateur: " . ($user['message'] ?? 'Erreur inconnue'));
+                $user = [];
+            } else {
+                error_log("Utilisateur récupéré avec succès: " . print_r($user, true));
+            }
+        } catch (Exception $e) {
+            error_log("Exception lors de la récupération de l'utilisateur: " . $e->getMessage());
+            $user = [];
+        }
+    } else {
+        error_log("Aucun user_id trouvé dans la session");
+    }
     
     // Traitement des actions sans API
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -66,22 +93,32 @@
                     
                 case 'ajouter_favoris':
                     if (isset($_POST['id_service'])) {
-                        // Ajouter aux favoris (stocké en session)
-                        if (!isset($_SESSION['favoris'])) {
-                            $_SESSION['favoris'] = [];
+                        // Vérifier si l'utilisateur est connecté
+                        if (!isset($_SESSION['user_id'])) {
+                            $_SESSION['message'] = "Vous devez être connecté pour ajouter aux favoris.";
+                            $_SESSION['message_type'] = "error";
+                            header("Location: connexion.php");
+                            exit();
                         }
                         
                         $serviceId = $_POST['id_service'];
-                        if (in_array($serviceId, $_SESSION['favoris'])) {
+                        $type = 'formation'; // Le type est toujours 'formation' pour les services
+                        
+                        // Vérifier si l'élément est déjà dans les favoris
+                        $isFavorite = $favoriController->isFavorite($_SESSION['user_id'], $type, $serviceId);
+                        
+                        if ($isFavorite['success'] && $isFavorite['is_favorite']) {
                             // Retirer des favoris
-                            $_SESSION['favoris'] = array_diff($_SESSION['favoris'], [$serviceId]);
-                            $_SESSION['message'] = "Service retiré des favoris!";
+                            $result = $favoriController->removeFromFavorites($_SESSION['user_id'], $type, $serviceId);
+                            $message = $result['success'] ? "Service retiré des favoris!" : $result['message'];
                         } else {
                             // Ajouter aux favoris
-                            $_SESSION['favoris'][] = $serviceId;
-                            $_SESSION['message'] = "Service ajouté aux favoris!";
+                            $result = $favoriController->addToFavorites($_SESSION['user_id'], $type, $serviceId);
+                            $message = $result['success'] ? "Service ajouté aux favoris!" : $result['message'];
                         }
-                        $_SESSION['message_type'] = "success";
+                        
+                        $_SESSION['message'] = $message;
+                        $_SESSION['message_type'] = $result['success'] ? "success" : "error";
                         
                         header("Location: ".$_SERVER['PHP_SELF']);
                         exit();
@@ -96,6 +133,13 @@
     $message_type = $_SESSION['message_type'] ?? '';
     unset($_SESSION['message']);
     unset($_SESSION['message_type']);
+
+    include_once("../controle/controleur_panier.php");
+
+    // Récupérer le panier et les infos utilisateur
+    $panierController = new PanierController();
+    $panier = $panierController->getCart($_SESSION['user_id']);
+    
     ?>
   
     <meta charset="utf-8" />
@@ -1309,7 +1353,7 @@
     <div class="user_message">
         <a href="#" title="Panier" onclick="togglePopup('cartPopup'); return false;">
             <i class="icon fas fa-shopping-cart"></i>
-            <span class="badge"><?= count($_SESSION['panier'] ?? []) ?></span>
+            <span class="badge"><?=$panier['count']?></span>
         </a>
         <a href="#" title="Notifications" onclick="togglePopup('notificationPopup'); return false;">
             <i class="icon fas fa-bell"></i>
@@ -1327,14 +1371,67 @@
             <h3>Votre Panier</h3>
         </div>
         <div class="whatsapp-popup-content">
-            <div id="cartContent">
-                <div style="text-align: center; padding: 20px; color: #666;">
-                    <i class="fas fa-spinner fa-spin"></i> Chargement...
+
+        <?php if (!empty($panier['data'])): ?>
+            <?php 
+            $totalPanier = 0;
+            foreach($panier['data'] as $paniers): 
+                // Calcul du sous-total pour chaque article
+                $sousTotal = ($paniers['prix'] ?? 0) * ($paniers['quantite'] ?? 1);
+                $totalPanier += $sousTotal;
+                
+                if($paniers['type'] == 'produit'): ?>
+                    <div class="whatsapp-popup-item">
+                        <div class="whatsapp-popup-item-icon">
+                            <i class="fas fa-headphones"></i>
+                        </div>
+                        <div class="whatsapp-popup-item-content">
+                            <div class="whatsapp-popup-item-title"><?= htmlspecialchars($paniers['nom'] ?? '') ?></div>
+                            <div class="whatsapp-popup-item-desc">
+                                <?= number_format($paniers['prix'] ?? 0, 0, ',', ' ') ?> fbu x <?= (int)($paniers['quantite'] ?? 1) ?>
+                            </div>
+                        </div>
+                        <div class="whatsapp-popup-item-time">
+                            <?= number_format($sousTotal, 0, ',', ' ') ?> fbu
+                        </div>
+                    </div>
+                <?php else: // Type formation ?>
+                    <div class="whatsapp-popup-item">
+                        <div class="whatsapp-popup-item-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="whatsapp-popup-item-content">
+                            <div class="whatsapp-popup-item-title"><?= htmlspecialchars($paniers['titre'] ?? '') ?></div>
+                            <div class="whatsapp-popup-item-desc">
+                                <?= htmlspecialchars(mb_substr($paniers['description'] ?? '', 0, 30)) ?>...
+                            </div>
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= number_format($sousTotal, 0, ',', ' ') ?> fbu
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            
+            <!-- Ligne du total -->
+            <div class="whatsapp-popup-item" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 5px;">
+                <div class="whatsapp-popup-item-content">
+                    <div class="whatsapp-popup-item-title" style="font-weight: bold;">Total</div>
+                </div>
+                <div class="whatsapp-popup-item-time" style="font-weight: bold;">
+                    <?= number_format($totalPanier, 0, ',', ' ') ?> fbu
                 </div>
             </div>
+            
+        <?php else: ?>
+            <div style="padding: 20px; text-align: center; color: #666;">
+                <i class="fas fa-shopping-cart" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                Votre panier est vide
+            </div>
+        <?php endif; ?>
         </div>
         <div class="whatsapp-popup-footer">
-            <a href="#" onclick="viewFullCart()">Voir le panier complet</a>
+            <a href="#">Total: <?= number_format($totalPanier, 0, ',', ' ') ?> fbu | Voir le panier complet</a>
         </div>
     </div>
 
@@ -1396,42 +1493,67 @@
             <h3>Mon Profil</h3>
         </div>
         <div class="whatsapp-popup-content">
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #f0f0f0;">
-                    <i class="fas fa-user-circle" style="color: #04221a;"></i>
+            <?php 
+            // Débogage
+            $user = $utilisateurController->getUtilisateur($_SESSION['user_id']);
+            ?>  
+            <?php if (isset($user['data']) && is_object($user['data'])): ?>
+                <!-- Informations personnelles -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
+                        <i class="fas fa-user" style="color: #1890ff;"></i>
+                    </div>
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-title">
+                            <?= htmlspecialchars($user['data']->getPrenom() ?? '') ?> 
+                            <?= htmlspecialchars($user['data']->getNom() ?? '') ?>
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= htmlspecialchars($user['data']->getRole() ?? 'Utilisateur') ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Jean Dupont</div>
-                    <div class="whatsapp-popup-item-desc">Membre depuis: Jan 2023</div>
+
+                <!-- Email -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
+                        <i class="fas fa-envelope" style="color: #52c41a;"></i>
+                    </div>
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-title">
+                            <?= htmlspecialchars($user['data']->getEmail() ?? '') ?>
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= method_exists($user['data'], 'isVerified') && $user['data']->isVerified() ? 'Email vérifié' : 'Email non vérifié' ?>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #e6f7ff;">
-                    <i class="fas fa-envelope" style="color: #1890ff;"></i>
+
+                <!-- Date d'inscription -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
+                        <i class="fas fa-calendar-alt" style="color: #fa8c16;"></i>
+                    </div>
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-title">
+                            Membre depuis
+                        </div>
+                        <div class="whatsapp-popup-item-desc">
+                            <?= date('d/m/Y', strtotime($user['data']->getDateCreation() ?? 'now')) ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">jean.dupont@email.com</div>
-                    <div class="whatsapp-popup-item-desc">Adresse email vérifiée</div>
+            <?php else: ?>
+                <!-- Message d'erreur si les données ne sont pas chargées -->
+                <div class="whatsapp-popup-item">
+                    <div class="whatsapp-popup-item-content">
+                        <div class="whatsapp-popup-item-desc" style="text-align: center; padding: 20px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #ff4d4f; font-size: 24px; display: block; margin-bottom: 10px;"></i>
+                            Impossible de charger les informations du profil
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #f6ffed;">
-                    <i class="fas fa-map-marker-alt" style="color: #52c41a;"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">Paris, France</div>
-                    <div class="whatsapp-popup-item-desc">Adresse de livraison principale</div>
-                </div>
-            </div>
-            <div class="whatsapp-popup-item">
-                <div class="whatsapp-popup-item-icon" style="background-color: #fff7e6;">
-                    <i class="fas fa-shopping-bag" style="color: #fa8c16;"></i>
-                </div>
-                <div class="whatsapp-popup-item-content">
-                    <div class="whatsapp-popup-item-title">12 Commandes</div>
-                    <div class="whatsapp-popup-item-desc">Dernière: 12 juin 2023</div>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
         <div class="whatsapp-popup-footer">
             <a href="#">Modifier le profil</a>
@@ -1511,17 +1633,27 @@
                                             onclick="openCommentModal(<?=$formation->getIdFormation()?>)" 
                                             title="Commenter">
                                     </button>
-                                    <form method="post" style="display: inline;">
-                                        <input type="hidden" name="action" value="ajouter_panier">
-                                        <input type="hidden" name="id_service" value="<?=$formation->getIdFormation()?>">
+                                    <form method="post" action="../controle/index.php" style="display: inline;">
+                                        <input type="hidden" name="do" value="add_to_cart">
+                                        <input type="hidden" name="type" value="formation">
+                                        <input type="hidden" name="id_element" value="<?=$formation->getIdFormation()?>">
                                         <button type="submit" class="icon fas fa-shopping-cart" title="Ajouter au panier">
                                         </button>
                                     </form>
-                                    <form method="post" style="display: inline;">
-                                        <input type="hidden" name="action" value="ajouter_favoris">
-                                        <input type="hidden" name="id_service" value="<?=$formation->getIdFormation()?>">
-                                        <button type="submit" class="icon fas fa-star <?= in_array($formation->getIdFormation(), $_SESSION['favoris'] ?? []) ? 'favori-actif' : '' ?>" 
-                                                title="<?= in_array($formation->getIdFormation(), $_SESSION['favoris'] ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
+                                    <?php
+                                    // Vérifier si l'utilisateur est connecté et si l'élément est dans les favoris
+                                    $isFavorite = false;
+                                    if (isset($_SESSION['user_id'])) {
+                                        $checkFavorite = $favoriController->isFavorite($_SESSION['user_id'], 'formation', $formation->getIdFormation());
+                                        $isFavorite = $checkFavorite['success'] && $checkFavorite['is_favorite'];
+                                    }
+                                    ?>
+                                    <form method="post" action="../controle/index.php" style="display: inline;">
+                                        <input type="hidden" name="do" value="toggle_favorite">
+                                        <input type="hidden" name="type" value="formation">
+                                        <input type="hidden" name="id_element" value="<?=$formation->getIdFormation()?>">
+                                        <button type="submit" class="icon fas fa-star <?= $isFavorite ? 'favori-actif' : '' ?>" 
+                                                title="<?= $isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>">
                                         </button>
                                     </form>
                                     <button class="icon fas fa-share" 
@@ -1650,18 +1782,29 @@
                             </div>
                             
                             <div class="service-actions">
-                                <form method="post" style="display: inline;">
-                                    <input type="hidden" name="action" value="ajouter_panier">
-                                    <input type="hidden" name="id_service" id="details_service_id">
+                                <form method="post" action="../controle/index.php" style="display: inline;">
+                                    <input type="hidden" name="do" value="add_to_cart">
+                                    <input type="hidden" name="type" value="formation">
+                                    <input type="hidden" name="id_element" id="details_service_id">
                                     <button type="submit" class="btn-details">
                                         <i class="fas fa-shopping-cart"></i> Ajouter au panier
                                     </button>
                                 </form>
-                                <form method="post" style="display: inline;">
-                                    <input type="hidden" name="action" value="ajouter_favoris">
-                                    <input type="hidden" name="id_service" id="details_favoris_id">
+                                <?php
+                                // Vérifier si l'utilisateur est connecté et si l'élément est dans les favoris
+                                $isFavoriteDetails = false;
+                                if (isset($_SESSION['user_id'])) {
+                                    $checkFavoriteDetails = $favoriController->isFavorite($_SESSION['user_id'], 'formation', $formation->getIdFormation());
+                                    $isFavoriteDetails = $checkFavoriteDetails['success'] && $checkFavoriteDetails['is_favorite'];
+                                }
+                                ?>
+                                <form method="post" action="../controle/index.php" style="display: inline;">
+                                    <input type="hidden" name="do" value="toggle_favorite">
+                                    <input type="hidden" name="type" value="formation">
+                                    <input type="hidden" name="id_element" id="details_favoris_id" value="<?=$formation->getIdFormation()?>">
                                     <button type="submit" class="btn-details">
-                                        <i class="fas fa-star"></i> Ajouter aux favoris
+                                        <i class="fas fa-star <?= $isFavoriteDetails ? 'favori-actif' : '' ?>"></i> 
+                                        <?= $isFavoriteDetails ? 'Retirer des favoris' : 'Ajouter aux favoris' ?>
                                     </button>
                                 </form>
                                 <button class="btn-details" onclick="openShareModalFromServiceDetails()">
@@ -2040,11 +2183,21 @@
 
         // Fonction pour ouvrir la modale de partage
         function openShareModal(id, type) {
+            // Stocker l'ID et le type pour le partage
+            const modal = document.getElementById('shareModal');
+            modal.dataset.itemId = id;
+            modal.dataset.itemType = type;
+            
+            // Mettre à jour le titre de la modale
+            const title = type === 'service' ? 'service' : 'produit';
+            document.getElementById('shareModalTitle').innerHTML = `<i class="fas fa-share"></i> Partager ce ${title}`;
+            
+            // Stocker l'ID pour la rétrocompatibilité
             if (type === 'service') {
                 document.getElementById('share_service_id').value = id;
             }
             
-            const modal = document.getElementById('shareModal');
+            // Afficher la modale
             modal.style.display = 'block';
             setTimeout(() => {
                 modal.classList.add('show');
@@ -2059,40 +2212,82 @@
                 return;
             }
             
-            // Simulation de partage
-            let message = '';
+            const modal = document.getElementById('shareModal');
+            const itemId = modal.dataset.itemId;
+            const itemType = modal.dataset.itemType || 'service'; // Par défaut à 'service' pour la rétrocompatibilité
+            
+            // Construire l'URL de base pour le partage
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}?${itemType}=${itemId}`;
+            
+            // Trouver le nom du service dans la carte correspondante
+            let itemName = 'ce service';
+            const card = document.querySelector(`.card [onclick*="openServiceDetails(${itemId})"]`)?.closest('.card');
+            if (card) {
+                const titleElement = card.querySelector('h3');
+                if (titleElement) {
+                    itemName = titleElement.textContent.trim();
+                }
+            }
+            const shareText = `Découvrez ${itemName} sur JosNet : ${shareUrl}`;
+            
+            let shareWindow;
+            
             switch(platform) {
                 case 'facebook':
-                    message = 'Partagé sur Facebook !';
+                    shareWindow = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
                     break;
+                    
                 case 'twitter':
-                    message = 'Partagé sur Twitter !';
+                    shareWindow = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
                     break;
+                    
                 case 'linkedin':
-                    message = 'Partagé sur LinkedIn !';
+                    shareWindow = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
                     break;
+                    
                 case 'whatsapp':
-                    message = 'Partagé sur WhatsApp !';
+                    shareWindow = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
                     break;
+                    
                 case 'email':
-                    message = 'Envoyé par email !';
-                    break;
+                    shareWindow = `mailto:?subject=Je veux partager ${itemName} avec vous&body=${encodeURIComponent(shareText)}`;
+                    window.location.href = shareWindow;
+                    return;
+                    
                 case 'lien':
-                    // Copier le lien dans le presse-papiers
-                    navigator.clipboard.writeText(window.location.href)
+                    navigator.clipboard.writeText(shareUrl)
                         .then(() => {
-                            alert('Lien copié dans le presse-papiers !');
+                            showNotification('Lien copié dans le presse-papiers !', 'success');
                         })
                         .catch(err => {
-                            alert('Erreur lors de la copie du lien');
+                            showNotification('Erreur lors de la copie du lien', 'error');
                         });
                     return;
+                    
                 default:
-                    message = 'Partagé avec succès !';
+                    showNotification('Plateforme non prise en charge', 'error');
+                    return;
             }
             
-            alert(message);
+            // Ouvrir la fenêtre de partage
+            window.open(shareWindow, '_blank', 'width=600,height=400');
+            showNotification(`Partage sur ${platform} lancé !`, 'success');
             closeModal('shareModal');
+        }
+        
+        // Fonction pour afficher des notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Supprimer la notification après 3 secondes
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // Fermer les modales en cliquant en dehors

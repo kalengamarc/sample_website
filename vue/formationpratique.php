@@ -59,9 +59,9 @@
           <h3><?=$form->getTitre()?></h3>
           <p><?= $form->getDescription()?></h3>
           <div class="alignements_icones" data-idformation="<?= $form->getIdFormation()?>">
-            <span onclick="showCommentList(<?= $form->getIdFormation()?>)"><i class=" icon fa fa-comment"></i></span>
-            <span><i class=" icon fas fa-shopping-cart" ></i></span>
-            <span><i class=" icon fas fa-star"></i></span>
+            <span onclick="showCommentList(<?= $form->getIdFormation()?>)"><i class="icon fa fa-comment"></i></span>
+            <span onclick="addToCart(<?= $form->getIdFormation()?>, 'formation')"><i class="icon fas fa-shopping-cart"></i></span>
+            <span onclick="addToFavorites(<?= $form->getIdFormation()?>, 'formation')"><i class="icon fas fa-star"></i></span>
             <span><i class="icon fas fa-share"></i></span>
           </div>
         </article> 
@@ -83,12 +83,114 @@
 <?php include_once("composants/conteneur-d-commentaire.php") ?>
 
 <script>
-	function hideModal() {
-		let modal = document.querySelector(".modal-container");
-		modal.classList.add("d-none")
-	}
+  // Fonction pour ajouter un élément au panier (produit ou formation)
+  function addToCart(id, type) {
+    // Préparer les données à envoyer
+    const data = {
+      action: 'add_to_cart',
+      id_element: id,
+      type: type
+    };
+    
+    // Si c'est un produit, on ajoute la quantité (1 par défaut)
+    if (type === 'produit') {
+      data.quantite = 1; // Vous pouvez permettre à l'utilisateur de modifier cette valeur
+    }
+    
+    // Afficher un indicateur de chargement
+    const loadingMessage = type === 'formation' 
+      ? 'Ajout de la formation au panier...' 
+      : 'Ajout du produit au panier...';
+    
+    // Envoyer la requête AJAX
+    $.ajax({
+      type: 'POST',
+      url: '../controle/index.php',
+      data: data,
+      dataType: 'json',
+      beforeSend: function() {
+        // Afficher un indicateur de chargement
+        alert(loadingMessage);
+      },
+      success: function(response) {
+        if (response.success) {
+          const successMessage = type === 'formation' 
+            ? 'Formation ajoutée au panier avec succès !' 
+            : 'Produit ajouté au panier avec succès !';
+          
+          // Mettre à jour le compteur du panier
+          updateCartCount();
+          
+          // Afficher un message de succès
+          alert(successMessage);
+          
+          // Rafraîchir la page pour mettre à jour l'affichage si nécessaire
+          // window.location.reload();
+        } else {
+          // Afficher le message d'erreur du serveur
+          alert('Erreur: ' + (response.message || 'Action impossible'));
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Erreur AJAX:', error);
+        alert('Une erreur est survenue lors de la communication avec le serveur');
+      }
+    });
+  }
 
-	function showCommentList(id_produit) {  
+  // Fonction pour ajouter une formation aux favoris
+  function addToFavorites(id, type) {
+    $.ajax({
+      type: 'POST',
+      url: '../controle/index.php',
+      data: {
+        action: 'add_to_favorites',
+        id_element: id,
+        type: type
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          alert('Formation ajoutée aux favoris avec succès!');
+        } else {
+          alert('Erreur: ' + response.message);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Erreur AJAX:', error);
+        alert('Une erreur est survenue lors de l\'ajout aux favoris');
+      }
+    });
+  }
+
+  // Fonction pour mettre à jour le compteur du panier
+  function updateCartCount() {
+    $.ajax({
+      type: 'POST',
+      url: '../controle/index.php',
+      data: { action: 'get_cart_count' },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          // Mettre à jour l'affichage du compteur du panier
+          // Vous devrez peut-être ajuster ce sélecteur selon votre structure HTML
+          $('.cart-count').text(response.count);
+        }
+      }
+    });
+  }
+
+  function hideModal() {
+    let modal = document.querySelector(".modal-container");
+    modal.classList.add("d-none")
+  }
+
+  function showCommentList(id_produit) {  
+    $.ajax({
+      type:'GET',
+      data:{id_cible:id_produit,type:"formation"},
+      url:"./composants/back-modal-commentaire.php",
+      success:function(response) {  
       $.ajax({
 			type:'GET',
 			data:{id_cible:id_produit,type:"formation"},

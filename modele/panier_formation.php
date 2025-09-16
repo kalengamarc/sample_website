@@ -37,7 +37,8 @@ class PanierFormationCRUD {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getPDOConnection();
+        $db = new DataBase();
+        $this->pdo = $db->getConnection();
     }
 
     // CREATE
@@ -51,7 +52,7 @@ class PanierFormationCRUD {
             throw new InvalidArgumentException("Cette formation est déjà dans le panier");
         }
 
-        $sql = "INSERT INTO panier_formation (id_utilisateur, id_formation, date_ajout) 
+        $sql = "INSERT INTO panier_formations (id_utilisateur, id_formation, date_ajout) 
                 VALUES (:id_utilisateur, :id_formation, :date_ajout)";
         
         $stmt = $this->pdo->prepare($sql);
@@ -67,7 +68,7 @@ class PanierFormationCRUD {
 
     // READ
     public function getById($id) {
-        $sql = "SELECT * FROM panier_formation WHERE id_panier_formation = :id";
+        $sql = "SELECT * FROM panier_formations WHERE id_panier_formation = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
         
@@ -80,7 +81,7 @@ class PanierFormationCRUD {
     }
 
     public function getByUtilisateur($id_utilisateur) {
-        $sql = "SELECT * FROM panier_formation WHERE id_utilisateur = :id_utilisateur ORDER BY date_ajout DESC";
+        $sql = "SELECT * FROM panier_formations WHERE id_utilisateur = :id_utilisateur ORDER BY date_ajout DESC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id_utilisateur' => $id_utilisateur]);
         
@@ -93,7 +94,7 @@ class PanierFormationCRUD {
     }
 
     public function exists($id_utilisateur, $id_formation) {
-        $sql = "SELECT COUNT(*) FROM panier_formation WHERE id_utilisateur = :id_utilisateur AND id_formation = :id_formation";
+        $sql = "SELECT COUNT(*) FROM panier_formations WHERE id_utilisateur = :id_utilisateur AND id_formation = :id_formation";
         
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
@@ -105,7 +106,7 @@ class PanierFormationCRUD {
     }
 
     public function countByUtilisateur($id_utilisateur) {
-        $sql = "SELECT COUNT(*) FROM panier_formation WHERE id_utilisateur = :id_utilisateur";
+        $sql = "SELECT COUNT(*) FROM panier_formations WHERE id_utilisateur = :id_utilisateur";
         
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id_utilisateur' => $id_utilisateur]);
@@ -115,7 +116,7 @@ class PanierFormationCRUD {
 
     // UPDATE
     public function update(PanierFormation $panierFormation) {
-        $sql = "UPDATE panier_formation SET 
+        $sql = "UPDATE panier_formations SET 
                 id_utilisateur = :id_utilisateur,
                 id_formation = :id_formation,
                 date_ajout = :date_ajout
@@ -132,19 +133,19 @@ class PanierFormationCRUD {
 
     // DELETE
     public function delete($id) {
-        $sql = "DELETE FROM panier_formation WHERE id_panier_formation = :id";
+        $sql = "DELETE FROM panier_formations WHERE id_panier_formation = :id";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
 
     public function deleteByUtilisateur($id_utilisateur) {
-        $sql = "DELETE FROM panier_formation WHERE id_utilisateur = :id_utilisateur";
+        $sql = "DELETE FROM panier_formations WHERE id_utilisateur = :id_utilisateur";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([':id_utilisateur' => $id_utilisateur]);
     }
 
     public function deleteByUtilisateurAndFormation($id_utilisateur, $id_formation) {
-        $sql = "DELETE FROM panier_formation WHERE id_utilisateur = :id_utilisateur AND id_formation = :id_formation";
+        $sql = "DELETE FROM panier_formations WHERE id_utilisateur = :id_utilisateur AND id_formation = :id_formation";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
             ':id_utilisateur' => $id_utilisateur,
