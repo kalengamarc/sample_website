@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Sep 04, 2025 at 09:45 AM
+-- Generation Time: Sep 15, 2025 at 07:20 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -69,7 +69,7 @@ DROP TABLE IF EXISTS `commentaires`;
 CREATE TABLE IF NOT EXISTS `commentaires` (
   `id_commentaire` int NOT NULL AUTO_INCREMENT,
   `id_utilisateur` int NOT NULL,
-  `id_formation` int NOT NULL,
+  `id_formation` int DEFAULT NULL,
   `id_produit` int DEFAULT NULL,
   `commentaire` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `note` int DEFAULT NULL,
@@ -84,6 +84,18 @@ CREATE TABLE IF NOT EXISTS `commentaires` (
   KEY `idx_date` (`date_commentaire`),
   KEY `idx_statut` (`statut`)
 ) ;
+
+--
+-- Dumping data for table `commentaires`
+--
+
+INSERT INTO `commentaires` (`id_commentaire`, `id_utilisateur`, `id_formation`, `id_produit`, `commentaire`, `note`, `date_commentaire`, `statut`, `parent_id`) VALUES
+(10, 34, NULL, 2, 'gkgkhkjk', 4, '2025-09-14 13:59:57', 'actif', NULL),
+(12, 34, NULL, 2, 'est-ce que on peut augmenter trois piece car c\'est maginifique', 4, '2025-09-15 07:28:33', 'actif', NULL),
+(15, 34, 3, NULL, 'magnifique nous allons profiter de la formation', 3, '2025-09-15 10:49:42', 'actif', NULL),
+(16, 34, 4, NULL, 'il ne nous encourage pas a lire le document', 2, '2025-09-15 11:28:16', 'actif', NULL),
+(17, 35, NULL, 2, 'vous le vendez trop cher cette imprimante', 1, '2025-09-15 12:37:08', 'actif', NULL),
+(18, 35, NULL, 2, 'tous pour moi', 3, '2025-09-15 17:16:57', 'actif', NULL);
 
 --
 -- Triggers `commentaires`
@@ -143,6 +155,13 @@ CREATE TABLE IF NOT EXISTS `favoris` (
   KEY `idx_date` (`date_ajout`)
 ) ;
 
+--
+-- Dumping data for table `favoris`
+--
+
+INSERT INTO `favoris` (`id_favori`, `id_utilisateur`, `id_formation`, `id_produit`, `date_ajout`) VALUES
+(1, 35, NULL, 2, '2025-09-15 14:35:47');
+
 -- --------------------------------------------------------
 
 --
@@ -160,6 +179,7 @@ CREATE TABLE IF NOT EXISTS `formations` (
   `debut_formation` date NOT NULL,
   `date_creation` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `photo` text NOT NULL,
+  `note_moyenne` decimal(3,2) DEFAULT '0.00',
   PRIMARY KEY (`id_formation`),
   KEY `fk_formateur` (`id_formateur`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -168,11 +188,11 @@ CREATE TABLE IF NOT EXISTS `formations` (
 -- Dumping data for table `formations`
 --
 
-INSERT INTO `formations` (`id_formation`, `titre`, `description`, `prix`, `duree`, `id_formateur`, `debut_formation`, `date_creation`, `photo`) VALUES
-(1, 'Programmation Web 2', 'venez nombre pour suivre le cours', 400.00, '120', 8, '2025-07-30', '2025-08-31 02:09:05', 'uploads/formations/68b3cae1cd074_1756613345.jpg'),
-(2, 'Mathematique Pure', 'les mathetique demeurent toujours l\\\'outil du monde', 400000.00, '145', 4, '2025-08-07', '2025-08-31 03:13:40', 'uploads/formations/68b3da04ec246_1756617220.jpg'),
-(3, 'Mathematique Modele', 'les mathetique demeurent toujours l\\\'outil du monde', 400000.00, '145', 4, '2025-09-07', '2025-08-31 03:15:36', 'uploads/formations/68b3da7867511_1756617336.jpeg'),
-(4, 'Antenne et Reseau de Satellite', 'venez nombreux pour suivre le cours', 300000.00, '210', 12, '2025-09-07', '2025-08-31 05:13:10', 'uploads/formations/68b3f6062187c_1756624390.jpg');
+INSERT INTO `formations` (`id_formation`, `titre`, `description`, `prix`, `duree`, `id_formateur`, `debut_formation`, `date_creation`, `photo`, `note_moyenne`) VALUES
+(1, 'Programmation Web 2', 'venez nombre pour suivre le cours', 40000.00, '120', 14, '2025-07-30', '2025-08-31 02:09:05', 'uploads/formations/68c50d5b050ef_1757744475.jpg', 0.00),
+(2, 'Mathematique Pure', 'les mathetique demeurent toujours l\\\'outil du monde', 400000.00, '145', 8, '2025-08-07', '2025-08-31 03:13:40', 'uploads/formations/68c50cfb8eac4_1757744379.jpg', 0.00),
+(3, 'Mathematique Modele', 'les mathematique demeurent toujours l\'outil du monde', 440000.00, '100', 14, '2025-09-07', '2025-08-31 03:15:36', 'uploads/formations/68c432f51b7dd_1757688565.jpg', 3.00),
+(4, 'Antenne et Reseau de Satellite', 'venez nombreux pour suivre le cours', 300000.00, '210', 12, '2025-09-07', '2025-08-31 05:13:10', 'uploads/formations/68b3f6062187c_1756624390.jpg', 2.00);
 
 -- --------------------------------------------------------
 
@@ -234,6 +254,13 @@ CREATE TABLE IF NOT EXISTS `panier` (
 ) ;
 
 --
+-- Dumping data for table `panier`
+--
+
+INSERT INTO `panier` (`id_panier`, `id_utilisateur`, `id_produit`, `quantite`, `date_ajout`, `date_modification`) VALUES
+(1, 35, 2, 5, '2025-09-15 14:31:10', '2025-09-15 16:43:30');
+
+--
 -- Triggers `panier`
 --
 DROP TRIGGER IF EXISTS `before_panier_insert`;
@@ -241,10 +268,12 @@ DELIMITER $$
 CREATE TRIGGER `before_panier_insert` BEFORE INSERT ON `panier` FOR EACH ROW BEGIN
     DECLARE stock_actuel INT;
     
+    -- Vérifier le stock dans la table 'produits' (au pluriel)
     SELECT stock INTO stock_actuel 
-    FROM produit 
+    FROM produits 
     WHERE id_produit = NEW.id_produit;
     
+    -- Vérifier si le stock est suffisant
     IF stock_actuel < NEW.quantite THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Stock insuffisant pour ce produit';
@@ -335,8 +364,7 @@ CREATE TABLE IF NOT EXISTS `produits` (
 --
 
 INSERT INTO `produits` (`id_produit`, `nom`, `description`, `prix`, `stock`, `categorie`, `date_ajout`, `photo`) VALUES
-(1, 'Ordinateur', 'Ram 3G Disk 256G, 3.5Ghz', 900000.00, 30, 'intel 4', '2025-09-03 13:45:17', 'uploads/produits/68b8466d17efe_1756907117.jpg'),
-(2, 'Imprimente 3D', 'MVIDIA carte magnifique', 5000000.00, 40, 'cannoon', '2025-09-03 13:56:05', 'uploads/produits/68b848f580a3c_1756907765.jpg');
+(2, 'Imprimente 3D', 'MVIDIA carte magnifique', 4000000.00, 40, 'cannoon', '2025-09-03 13:56:05', 'uploads/produits/68c42439ee7f6_1757684793.png');
 
 -- --------------------------------------------------------
 
@@ -357,20 +385,33 @@ CREATE TABLE IF NOT EXISTS `utilisateurs` (
   `description` text NOT NULL,
   `photo` text NOT NULL,
   `specialite` varchar(50) NOT NULL,
+  `id_formation` int DEFAULT NULL,
   PRIMARY KEY (`id_utilisateur`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `email` (`email`),
+  KEY `id_formation` (`id_formation`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `utilisateurs`
 --
 
-INSERT INTO `utilisateurs` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `role`, `date_creation`, `description`, `photo`, `specialite`) VALUES
-(2, 'kalenga', 'kisoho', 'kayembemarc96@gmail.com', '$2y$10$AXrFYjdnH2n/vAOJgdkTIO..6GxHdjVGdSkAYzYdagjM4Kg0LSWBC', '+257 71459495', 'formateur', '2025-08-30 10:04:37', '', 'uploads/utilisateurs/68b2e8d5d1531_1756555477.png', ''),
-(4, 'Claude', 'Nyange', 'kalenga@gmail.com', '$2y$10$y1DmeunwG1vnW/jzqcBdme511vH4UtzsOThwu1b08fwlV5.Rq.87K', '+257 45655456', 'formateur', '2025-08-30 10:41:20', 'fortement', 'uploads/utilisateurs/68b2f1709cc9a_1756557680.png', 'mathematique'),
-(5, 'Kaleb', 'jena', 'bertin@biu.bi', '$2y$10$I4lpslVE28FsQDaELBIAy.PF3d5V4u8eI4LgEQCxVr2PvkcdZZ4Ua', '+257 71459495', 'formateur', '2025-08-30 11:35:33', 'comprendre', 'uploads/utilisateurs/68b2fe25ac28c_1756560933.png', 'Geologie et mine'),
-(8, 'jeanne', 'kisoho', 'benKimba@biu.bi', '$2y$10$nzvQKg50JEDlP3k.5LQvEer/c5FwzmBtXytJZ1SEOy2nZ.tDX6.zi', '+345 41459495', 'formateur', '2025-08-30 11:41:44', 'tout pour nous', 'uploads/utilisateurs/68b2ff98ad575_1756561304.png', 'mathematique'),
-(12, 'balema', 'Kamba', 'kamba@biu.bi', '$2y$10$P3WS3rjIs2ERBnJGHa3PHuvYzOvExujVu45Ndz1O4x0/m0TAAw9Ia', '+243 87989784', 'formateur', '2025-08-30 11:50:03', 'Tout pour moi', 'uploads/utilisateurs/68b3018b09d3a_1756561803.jpg', 'Histoire');
+INSERT INTO `utilisateurs` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `role`, `date_creation`, `description`, `photo`, `specialite`, `id_formation`) VALUES
+(2, 'kalenga', 'kisoho', 'kayembemarc96@gmail.com', '$2y$10$AXrFYjdnH2n/vAOJgdkTIO..6GxHdjVGdSkAYzYdagjM4Kg0LSWBC', '+257 71459495', 'formateur', '2025-08-30 10:04:37', '', 'uploads/utilisateurs/68b2e8d5d1531_1756555477.png', '', 1),
+(4, 'Claude', 'Nyange', 'kalenga@gmail.com', '$2y$10$y1DmeunwG1vnW/jzqcBdme511vH4UtzsOThwu1b08fwlV5.Rq.87K', '+257 45655456', 'formateur', '2025-08-30 10:41:20', 'fortement', 'uploads/utilisateurs/68b2f1709cc9a_1756557680.png', 'mathematique', 2),
+(5, 'Kaleb', 'jena', 'bertin@biu.bi', '$2y$10$I4lpslVE28FsQDaELBIAy.PF3d5V4u8eI4LgEQCxVr2PvkcdZZ4Ua', '+257 71459495', 'formateur', '2025-08-30 11:35:33', 'comprendre', 'uploads/utilisateurs/68b2fe25ac28c_1756560933.png', 'Geologie et mine', 2),
+(8, 'jeanne', 'kisoho', 'benKimba@biu.bi', '$2y$10$nzvQKg50JEDlP3k.5LQvEer/c5FwzmBtXytJZ1SEOy2nZ.tDX6.zi', '+345 41459495', 'formateur', '2025-08-30 11:41:44', 'tout pour nous', 'uploads/utilisateurs/68b2ff98ad575_1756561304.png', 'mathematique', 2),
+(12, 'balema', 'Kamba', 'kamba@biu.bi', '$2y$10$P3WS3rjIs2ERBnJGHa3PHuvYzOvExujVu45Ndz1O4x0/m0TAAw9Ia', '+243 87989784', 'formateur', '2025-08-30 11:50:03', 'Tout pour moi', 'uploads/utilisateurs/68b3018b09d3a_1756561803.jpg', 'Histoire', 3),
+(14, 'Kayembe', 'Mbatchika', 'kamar@biu.bi', '$2y$10$0cqUr/YPqjXjTC271wF1nu5GXVRjuBSAsCqh6HRjTwYvis6OgbaC6', '67676769', 'formateur', '2025-09-05 18:17:31', 'maitre en tout', 'uploads/utilisateurs/68bb455b2358b_1757103451.jpg', 'science de la terre', 1),
+(16, 'Rehema', 'Christine', 'rehema@biu.bi', '$2y$10$F0fAbsMEWpRlhpsVxMv8J..GTQx/DOZcF9Vbcjq35BIVQiRqwztBu', '67485756', 'etudiant', '2025-09-10 05:32:00', 'Apprendre a relever et a ameliorer la production', 'uploads/utilisateurs/68c129706db24_1757489520.jpg', 'Agriculture', 2),
+(23, 'Esther', 'Christine', 'esther@biu.bi', '$2y$10$oHHjXLC/QXTnPNefpFP2jeuzM1D4GXToRTrgFEUN9iloxKUGhtjPm', '67485756', 'etudiant', '2025-09-10 07:47:32', 'avoir un role dans la societe', 'uploads/utilisateurs/68c1493480c06_1757497652.png', 'Agriculture', 3),
+(25, 'kiloko', 'benjamin', 'benjamin@gmail.com', '$2y$10$7xIbTt/AtUd39rF3aUxd..qCguFJeiTPeiHDr8U735rm7pdBY.SRe', '67676769', 'formateur', '2025-09-10 07:54:44', 'maitre en tout', 'uploads/utilisateurs/68c14ae4797cd_1757498084.jpg', 'science de la terre', 3),
+(28, 'Mado ', 'Lziette', 'mado@biu.bi', '$2y$10$Y7OYowLzaEKIaK6mlRyIROHDvsKLQFaDLDX6XYuloEZrRP4uNoH02', '69485756', 'etudiant', '2025-09-14 08:06:05', 'Apprendre a relever et a ameliorer la production', 'uploads/utilisateurs/68c6938d7b056_1757844365.jpg', 'modernite', 4),
+(30, 'Bishop', 'Nkulu', 'bishop@biu.bi', '$2y$10$015D1gJXRhSOxv0D1Oj/TuxZGMYfH2q.eOroW6rrDeSuxzXizCpXi', '67224455', 'formateur', '2025-09-14 08:24:37', 'alors c\'est ca', 'uploads/utilisateurs/68c6938d7b056_1757844365.jpg', 'science de la terre', 2),
+(31, 'kapule', 'Latiette', 'matile@biu.bi', '$2y$10$o/P0LfdDeugYLv.bP30GtO3IMkiRz5zkVeLTRsFPNwHtGbymnE7hO', '69485756', 'etudiant', '2025-09-14 08:29:34', 'Apprendre a relever et a ameliorer la production', 'uploads/utilisateurs/68c6990e8805d_1757845774.png', 'modernite', 4),
+(32, 'kisoho', 'Marc', 'kalenga123@gmail.com', '$2y$10$OENYRegYFNGiSA0DSn8FAOzhJzxkxU98pVZW5lk3fkSVWAZBx59Cu', '0972801915', 'formateur', '2025-09-14 09:02:08', 'comprendre la vie , c;est simple', 'uploads/utilisateurs/68c6a98dd5dea_1757849997.jpg', 'modernite', 4),
+(33, 'leon', 'Mbatchika', 'kalengaMb@biu.bi', '$2y$10$CrXVayuuYMqfmJDH7meZa.e/lY1iCjPXyvl0QGBdJ4uukhlWZT6lG', '67485756', 'admin', '2025-09-14 09:04:20', 'Apprendre a relever et a ameliorer la production', 'uploads/utilisateurs/68c6ac7f3b517_1757850751.jpg', 'Agriculture', 4),
+(34, 'jose', 'saligo', 'jose@gmail.com', '$2y$10$KsUdrLjHgJxImz/PiwvUkOEmH35thIqycw7QHqb0jIUQxneRraBWq', '67670908', 'client', '2025-09-14 11:41:54', '', '', '', NULL),
+(35, 'kisoho', 'Sethi', 'kisoho@biu.bi', '$2y$10$/uQg8Vy8EbgfIawuDCsBlOCMXS1D9qkACbDSIcWCCf8pOn0KL6vYO', '61224867', 'client', '2025-09-15 10:35:11', '', '', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -525,6 +566,12 @@ ALTER TABLE `partages`
 --
 ALTER TABLE `presences`
   ADD CONSTRAINT `fk_pres_ins` FOREIGN KEY (`id_inscription`) REFERENCES `inscriptions` (`id_inscription`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
+-- Constraints for table `utilisateurs`
+--
+ALTER TABLE `utilisateurs`
+  ADD CONSTRAINT `utilisateurs_ibfk_1` FOREIGN KEY (`id_formation`) REFERENCES `formations` (`id_formation`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
