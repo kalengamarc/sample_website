@@ -1611,7 +1611,7 @@ $panier = $panierController->getCart($_SESSION['user_id']);
                             <div class="card-content">
                                 <h3><?=htmlspecialchars($produit->getNom())?></h3>
                                 <?php if (method_exists($produit, 'getPrix')): ?>
-                                    <div class="price"><?=number_format($produit->getPrix(), 2, ',', ' ')?> €</div>
+                                    <div class="price"><?=number_format($produit->getPrix(), 2, ',', ' ')?> Fbu</div>
                                 <?php endif; ?>
                                 <p><?=htmlspecialchars($produit->getDescription())?></p>
                                 
@@ -1990,7 +1990,7 @@ $panier = $panierController->getCart($_SESSION['user_id']);
             document.getElementById('productDetailsTitle').innerHTML = `<i class="fas fa-box"></i> ${product.nom}`;
             document.getElementById('productDetailsImage').src = `../controle/${product.photo}`;
             document.getElementById('productDetailsImage').alt = `Image de ${product.nom}`;
-            document.getElementById('productDetailsPrice').textContent = `${product.prix.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('productDetailsPrice').textContent = `${product.prix.toFixed(2).replace('.', ',')} Fbu`;
             document.getElementById('productDetailsDescription').textContent = product.description;
             document.getElementById('details_produit_id').value = productId;
             document.getElementById('details_favoris_id').value = productId;
@@ -2411,7 +2411,16 @@ $panier = $panierController->getCart($_SESSION['user_id']);
 
         // Fonction pour ouvrir la modale de partage
         function openShareModal(id, type) {
+            // Stocker l'ID et le type pour le partage
             const modal = document.getElementById('shareModal');
+            modal.dataset.itemId = id;
+            modal.dataset.itemType = type;
+            
+            // Mettre à jour le titre de la modale
+            const title = type === 'produit' ? 'produit' : 'service';
+            document.getElementById('shareModalTitle').innerHTML = `<i class="fas fa-share"></i> Partager ce ${title}`;
+            
+            // Afficher la modale
             modal.style.display = 'block';
             setTimeout(() => {
                 modal.classList.add('show');
@@ -2426,40 +2435,73 @@ $panier = $panierController->getCart($_SESSION['user_id']);
                 return;
             }
             
-            // Simulation de partage
-            let message = '';
+            const modal = document.getElementById('shareModal');
+            const itemId = modal.dataset.itemId;
+            const itemType = modal.dataset.itemType || 'produit'; // Par défaut à 'produit' pour la rétrocompatibilité
+            
+            // Construire l'URL de base pour le partage
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}?${itemType}=${itemId}`;
+            const itemName = document.querySelector(`[data-${itemType}-id="${itemId}"]`)?.dataset.name || 'ce ' + itemType;
+            const shareText = `Découvrez ${itemName} sur JosNet : ${shareUrl}`;
+            
+            let shareWindow;
+            
             switch(platform) {
                 case 'facebook':
-                    message = 'Partagé sur Facebook !';
+                    shareWindow = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
                     break;
+                    
                 case 'twitter':
-                    message = 'Partagé sur Twitter !';
+                    shareWindow = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
                     break;
+                    
                 case 'linkedin':
-                    message = 'Partagé sur LinkedIn !';
+                    shareWindow = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
                     break;
+                    
                 case 'whatsapp':
-                    message = 'Partagé sur WhatsApp !';
+                    shareWindow = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
                     break;
+                    
                 case 'email':
-                    message = 'Envoyé par email !';
-                    break;
+                    shareWindow = `mailto:?subject=Je veux partager ${itemName} avec vous&body=${encodeURIComponent(shareText)}`;
+                    window.location.href = shareWindow;
+                    return;
+                    
                 case 'lien':
-                    // Copier le lien dans le presse-papiers
-                    navigator.clipboard.writeText(window.location.href)
+                    navigator.clipboard.writeText(shareUrl)
                         .then(() => {
-                            alert('Lien copié dans le presse-papiers !');
+                            showNotification('Lien copié dans le presse-papiers !', 'success');
                         })
                         .catch(err => {
-                            alert('Erreur lors de la copie du lien');
+                            showNotification('Erreur lors de la copie du lien', 'error');
                         });
                     return;
+                    
                 default:
-                    message = 'Partagé avec succès !';
+                    showNotification('Plateforme non prise en charge', 'error');
+                    return;
             }
             
-            alert(message);
+            // Ouvrir la fenêtre de partage
+            window.open(shareWindow, '_blank', 'width=600,height=400');
+            showNotification(`Partage sur ${platform} lancé !`, 'success');
             closeModal('shareModal');
+        }
+        
+        // Fonction pour afficher des notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Supprimer la notification après 3 secondes
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // Fonction pour toggle le dropdown de profil

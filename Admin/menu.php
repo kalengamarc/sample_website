@@ -5,15 +5,21 @@
 if (!function_exists('getCurrentUser')) {
     function getCurrentUser() {
         if (!isset($_SESSION['user_id'])) {
-            return null;
+            return [
+                'id' => 0,
+                'nom' => 'Admin',
+                'prenom' => '',
+                'email' => '',
+                'role' => 'admin'
+            ];
         }
         
         return [
-            'id' => $_SESSION['user_id'],
+            'id' => $_SESSION['user_id'] ?? 0,
             'nom' => $_SESSION['user_nom'] ?? '',
             'prenom' => $_SESSION['user_prenom'] ?? '',
             'email' => $_SESSION['user_email'] ?? '',
-            'role' => $_SESSION['user_role'] ?? ''
+            'role' => $_SESSION['user_role'] ?? 'utilisateur'
         ];
     }
 }
@@ -543,8 +549,8 @@ $currentUser = getCurrentUser();
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="user-details">
-                    <h4><?= htmlspecialchars($currentUser['prenom'] . ' ' . $currentUser['nom']) ?></h4>
-                    <p><?= htmlspecialchars(ucfirst($currentUser['role'])) ?></p>
+                    <h4><?= htmlspecialchars(($currentUser['prenom'] ?? '') . ' ' . ($currentUser['nom'] ?? 'Invité')) ?></h4>
+                    <p><?= htmlspecialchars(isset($currentUser['role']) ? ucfirst($currentUser['role']) : 'Utilisateur') ?></p>
                 </div>
             </div>
             <a href="logout.php" class="logout-btn" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">

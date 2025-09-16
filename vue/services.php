@@ -2183,11 +2183,21 @@
 
         // Fonction pour ouvrir la modale de partage
         function openShareModal(id, type) {
+            // Stocker l'ID et le type pour le partage
+            const modal = document.getElementById('shareModal');
+            modal.dataset.itemId = id;
+            modal.dataset.itemType = type;
+            
+            // Mettre à jour le titre de la modale
+            const title = type === 'service' ? 'service' : 'produit';
+            document.getElementById('shareModalTitle').innerHTML = `<i class="fas fa-share"></i> Partager ce ${title}`;
+            
+            // Stocker l'ID pour la rétrocompatibilité
             if (type === 'service') {
                 document.getElementById('share_service_id').value = id;
             }
             
-            const modal = document.getElementById('shareModal');
+            // Afficher la modale
             modal.style.display = 'block';
             setTimeout(() => {
                 modal.classList.add('show');
@@ -2202,40 +2212,82 @@
                 return;
             }
             
-            // Simulation de partage
-            let message = '';
+            const modal = document.getElementById('shareModal');
+            const itemId = modal.dataset.itemId;
+            const itemType = modal.dataset.itemType || 'service'; // Par défaut à 'service' pour la rétrocompatibilité
+            
+            // Construire l'URL de base pour le partage
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}?${itemType}=${itemId}`;
+            
+            // Trouver le nom du service dans la carte correspondante
+            let itemName = 'ce service';
+            const card = document.querySelector(`.card [onclick*="openServiceDetails(${itemId})"]`)?.closest('.card');
+            if (card) {
+                const titleElement = card.querySelector('h3');
+                if (titleElement) {
+                    itemName = titleElement.textContent.trim();
+                }
+            }
+            const shareText = `Découvrez ${itemName} sur JosNet : ${shareUrl}`;
+            
+            let shareWindow;
+            
             switch(platform) {
                 case 'facebook':
-                    message = 'Partagé sur Facebook !';
+                    shareWindow = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
                     break;
+                    
                 case 'twitter':
-                    message = 'Partagé sur Twitter !';
+                    shareWindow = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
                     break;
+                    
                 case 'linkedin':
-                    message = 'Partagé sur LinkedIn !';
+                    shareWindow = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
                     break;
+                    
                 case 'whatsapp':
-                    message = 'Partagé sur WhatsApp !';
+                    shareWindow = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
                     break;
+                    
                 case 'email':
-                    message = 'Envoyé par email !';
-                    break;
+                    shareWindow = `mailto:?subject=Je veux partager ${itemName} avec vous&body=${encodeURIComponent(shareText)}`;
+                    window.location.href = shareWindow;
+                    return;
+                    
                 case 'lien':
-                    // Copier le lien dans le presse-papiers
-                    navigator.clipboard.writeText(window.location.href)
+                    navigator.clipboard.writeText(shareUrl)
                         .then(() => {
-                            alert('Lien copié dans le presse-papiers !');
+                            showNotification('Lien copié dans le presse-papiers !', 'success');
                         })
                         .catch(err => {
-                            alert('Erreur lors de la copie du lien');
+                            showNotification('Erreur lors de la copie du lien', 'error');
                         });
                     return;
+                    
                 default:
-                    message = 'Partagé avec succès !';
+                    showNotification('Plateforme non prise en charge', 'error');
+                    return;
             }
             
-            alert(message);
+            // Ouvrir la fenêtre de partage
+            window.open(shareWindow, '_blank', 'width=600,height=400');
+            showNotification(`Partage sur ${platform} lancé !`, 'success');
             closeModal('shareModal');
+        }
+        
+        // Fonction pour afficher des notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Supprimer la notification après 3 secondes
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // Fermer les modales en cliquant en dehors
